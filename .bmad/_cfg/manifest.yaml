@@ -1,7 +1,7 @@
 installation:
   version: 6.0.0-alpha.12
-  installDate: '2025-11-24T11:41:56.838Z'
-  lastUpdated: '2025-11-24T11:41:56.838Z'
+  installDate: '2025-11-24T13:23:10.778Z'
+  lastUpdated: '2025-11-24T13:23:10.778Z'
 modules:
   - core
   - bmm
@@ -9,6 +9,5 @@ ides:
   - claude-code
   - github-copilot
   - cline
-  - crush
   - roo
   - trae
