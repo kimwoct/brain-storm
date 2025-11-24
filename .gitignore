@@ -1,0 +1,7 @@
+.obsidian/**
+.obsidian/workspace.json
+.obsidian/plugins/**
+!.obsidian/plugins/approved-plugin/**
+!.obsidian/plugins/another-approved-plugin/**
+.DS_Store
+Thumbs.db
