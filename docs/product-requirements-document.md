@@ -136,21 +136,40 @@ See Executive Summary (Section 6)
 
 ---
 
-#### FR-3: Firebase Web Push Integration
-**Description:** Notifications and confirmations via Firebase Cloud Messaging (web push)
+#### FR-3: WhatsApp + Firebase Hybrid Notifications
+**Description:** WhatsApp for primary notifications (manual template-based) + Firebase web push for portal alerts and reminders
 
 **Requirements:**
-- Send Firebase web push notifications for assignments
-- Capture confirm/cancel responses in platform
-- Send penalty warnings via push notifications
-- Track confirmation status in platform
-- Store and manage FCM tokens for each staff
-- Handle token refresh
+
+**WhatsApp Notifications (Primary):**
+- System generates WhatsApp message templates
+- Coordinator copies template and sends via WhatsApp
+- Templates include: shift details, confirmation link, deadline
+- Support for urgent shift notifications
+- Bilingual templates (English + Traditional Chinese)
+
+**Firebase Web Push (Secondary):**
+- Send web push notifications to PHC portal
+- Trigger: new assignment, pending reminder (2h), day-before reminder (24h)
+- Alert coordinators when staff confirms
+- Store and manage FCM tokens
+- Handle token refresh gracefully
+
+**Requirements:**
+- Template generation for WhatsApp messages
+- One-click copy button for coordinators
+- Firebase push notification system
+- Confirmation link with deep linking
+- Reminder scheduling (2h, 24h)
+- Delivery tracking for both channels
 
 **Acceptance Criteria:**
-✅ Delivered in <5 minutes
-✅ Response captured correctly
-✅ Reminders sent for pending confirmations
+✅ WhatsApp template generated < 5 seconds
+✅ Firebase notification delivered < 30 seconds
+✅ Coordinator can send WhatsApp in < 1 min
+✅ Confirmation captured in web portal
+✅ Reminders sent automatically at 2h and 24h
+✅ Works on mobile and desktop browsers
 
 ---
 
@@ -375,13 +394,13 @@ See Executive Summary (Section 6)
 
 ### Technology Stack
 - **Frontend:** React.js 18+, TailwindCSS, Redux
-- **Backend:** Node.js 20+, Express.js, TypeScript
-- **Database:** PostgreSQL 15, Redis 7+, Prisma ORM
+- **Backend:** Java Spring Boot 2.7+, Spring Security
+- **Database:** MySQL 8+ (primary), Redis 6+ (caching, sessions)
 - **Storage:** S3 or Azure Blob (for files)
-- **Queue:** BullMQ (job processing)
-- **Auth:** JWT + bcrypt
+- **Queue:** Spring Batch or Quartz (job processing)
+- **Auth:** JWT + Spring Security
 - **APIs:** 13 ERP integrations (REST)
-- **Notifications:** WhatsApp Business API
+- **Notifications:** WhatsApp (manual template-based) + Firebase Cloud Messaging (web push)
 - **Hosting:** AWS or Azure (cloud)
 
 ### Architecture Principles
@@ -389,7 +408,7 @@ See Executive Summary (Section 6)
 - **Scalable:** Handles 1000+ staff, 500+ daily assignments
 - **Resilient:** Retry logic, error handling, monitoring
 - **Secure:** Encryption, RBAC, audit logging
-- **Maintainable:** TypeScript, documentation, testing
+- **Maintainable:** Java best practices, documentation, testing
 
 ---
 
@@ -512,11 +531,13 @@ See Executive Summary (Section 6)
 
 | Role | Name | Date | Status |
 |------|------|------|--------|
-| Product Owner | [TBD] |  | ⏳ Pending |
-| Engineering Lead | [TBD] |  | ⏳ Pending |
-| Operations Manager | [TBD] |  | ⏳ Pending |
-| CFO | [TBD] |  | ⏳ Pending |
-| CEO | [TBD] |  | ⏳ Pending |
+| Product Owner | [To be assigned] |  | ⏳ Pending |
+| Engineering Lead | [To be assigned] |  | ⏳ Pending |
+| Operations Manager | [To be assigned] |  | ⏳ Pending |
+| CFO | [To be assigned] |  | ⏳ Pending |
+| CEO | [To be assigned] |  | ⏳ Pending |
+
+**Target Approval Date:** December 15, 2025
 
 ---
 
@@ -543,8 +564,8 @@ See Executive Summary (Section 6)
 
 ## 📞 CONTACTS
 
-**Document Owner:** Product Manager (to be assigned)
-**Technical Contact:** Engineering Lead (to be assigned)
+**Document Owner:** [Product Manager to be assigned]
+**Technical Contact:** [Engineering Lead to be assigned]
 **Timeline:** 60 days from approval
 **Budget:** HKD 800,000
 

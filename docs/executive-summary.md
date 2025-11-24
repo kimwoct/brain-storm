@@ -341,15 +341,13 @@ System to verify staff actually showed up for shifts.
 - Recharts for metrics
 
 **Backend:**
-- Node.js 20+ (LTS)
-- Express.js 4.18+
-- TypeScript
+- Java Spring Boot 2.7+
+- Spring Security
 - JWT Authentication
 
 **Database:**
-- PostgreSQL 15+ (primary)
-- Redis 7+ (cache, sessions, queues)
-- Prisma ORM
+- MySQL 8+ (primary)
+- Redis 6+ (cache, sessions)
 
 **Infrastructure:**
 - Cloud-hosted (AWS or Azure)
@@ -357,9 +355,9 @@ System to verify staff actually showed up for shifts.
 - Docker containerization
 
 **Integrations:**
-- WhatsApp Business API
+- Firebase Cloud Messaging (web push)
 - RESTful ERP APIs
-- BullMQ for job queues
+- Spring Batch or Quartz (job scheduling)
 
 ### 5.2 Development Timeline
 
@@ -372,7 +370,10 @@ Detailed breakdown in TDD and Integration To-Do List documents.
 - **Backend Developers:** 2
 - **Frontend Developer:** 1
 - **QA/Testing:** 1
+- **DevOps/Infrastructure:** 0.5
 - **Project Manager:** 0.5 (shared)
+
+**Note:** Backend requires Java Spring Boot expertise
 
 ---
 

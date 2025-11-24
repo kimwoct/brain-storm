@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/executive-summary.md",
+                "file": "docs/erp-api-integration-specification.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "executive-summary"
+              "title": "erp-api-integration-specification"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "docs/executive-summary.md",
+                "file": "docs/erp-api-integration-specification.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for executive-summary"
+              "title": "Backlinks for erp-api-integration-specification"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "docs/executive-summary.md",
+                "file": "docs/erp-api-integration-specification.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from executive-summary"
+              "title": "Outgoing links from erp-api-integration-specification"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/executive-summary.md",
+                "file": "docs/erp-api-integration-specification.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of executive-summary"
+              "title": "Outline of erp-api-integration-specification"
             }
           }
         ]
@@ -185,6 +185,17 @@
   },
   "active": "26d069686780fd33",
   "lastOpenFiles": [
+    "docs/product-requirements-document.md.tmp.45119.1763988936372",
+    "docs/notification-method-decision.md",
+    "docs/validation-report-2025-11-24.md",
+    "workflow-init/docs/Meeting Minutes.md",
+    "workflow-init/docs/Specification Document.md",
+    "docs/executive-summary.md",
+    "docs/validation-fixes-summary.md",
+    "docs/executive-summary.md.tmp.45119.1763985404387",
+    "docs/user-stories.md.tmp.45119.1763985384079",
+    "docs/product-requirements-document.md.tmp.45119.1763985363254",
+    "docs/product-requirements-document.md.tmp.45119.1763985290682",
     "docs/sprint-artifacts",
     "docs/erp-api-integration-specification.md",
     "docs/user-stories.md",
@@ -193,7 +204,6 @@
     "docs/technical-design-document.md",
     "docs/integration-todo-list.md",
     "docs/product-requirements-document.md",
-    "docs/executive-summary.md",
     "docs/software-requirements-specification.md",
     "docs/scoring-algorithm-specification.md",
     "README.md",
@@ -208,11 +218,6 @@
     "workflow-init/docs/03 - Appendix - System Integration.md",
     "workflow-init/docs/02 - Matching System Software Requirement Specification SRS.md",
     "workflow-init/docs/01 - Prestige Health Dispatch System Meeting Minutes.md",
-    "workflow-init/docs/sprint-artifacts/07 - Appendix Dv2 - Cancellation flow.md",
-    "workflow-init/docs/sprint-artifacts/07 - Appendix Dv1 - Cancellation flow.md",
-    "workflow-init/docs/sprint-artifacts/06 - Appendix Cv2 - Matching & Confirmation Flow.md",
-    "workflow-init/docs/sprint-artifacts/06 - Appendix Cv1 - Matching & Confirmation Flow.md",
-    "workflow-init/docs/sprint-artifacts/05 - Appendix B - Job Posting flow.md",
-    "workflow-init/docs/sprint-artifacts/04 - Appendix A - Registration flow.md"
+    "workflow-init/docs/sprint-artifacts/07 - Appendix Dv2 - Cancellation flow.md"
   ]
 }

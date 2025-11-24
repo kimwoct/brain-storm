@@ -8,6 +8,33 @@
 
 ## USER STORIES
 
+### REQUIREMENTS TRACEABILITY MATRIX
+
+| User Story | Related FRs | Description |
+|------------|-------------|-------------|
+| US-NA-01 | FR-2, FR-3 | Receive assignment notification |
+| US-NA-02 | FR-1, FR-2, FR-3 | Confirm shift assignment |
+| US-NA-03 | FR-1, FR-3, FR-7 | Cancel shift with warning |
+| US-NA-04 | FR-1 | View score and tier |
+| US-NA-05 | FR-1, FR-3, FR-6, FR-7 | No-show penalty notification |
+| US-CS-01 | FR-2 | View today's assigned staff |
+| US-CS-02 | FR-6 | Verify staff clock-in |
+| US-CS-03 | FR-6, FR-7 | Mark staff as no-show |
+| US-ADM-01 | FR-4, FR-5 | View real-time dashboard |
+| US-ADM-02 | FR-2, FR-11 | Manual assignment override |
+| US-ADM-03 | FR-8 | Upload emergency protocol |
+| US-ADM-04 | FR-3, FR-8 | Distribute emergency files |
+| US-ADM-05 | FR-9 | Post emergency job |
+| US-ADM-06 | FR-5, FR-12, FR-13 | View system logs and reports |
+| US-ERP-01 | FR-5 | Staff master data sync |
+| US-ERP-02 | FR-5 | Location master data sync |
+| US-ERP-03 | FR-5 | Job demand sync |
+| US-ERP-04 | FR-2, FR-5 | Receive assignment submission |
+| US-ERP-05 | FR-5, FR-6 | Receive attendance records |
+| US-ERP-06 | FR-1, FR-5, FR-7 | Receive penalty records |
+
+---
+
 ### 1. Nursing Assistant (護理員) User Stories
 
 #### US-NA-01: Receive Shift Assignment Notification
@@ -467,6 +494,33 @@ And: Tracks who confirmed in platform
 ---
 
 ## TEST CASES
+
+### TEST TRACEABILITY
+
+| Test Case | Related FRs | Objective |
+|-----------|-------------|-----------|
+| TC-001 | FR-5 | Verify staff sync from ERP |
+| TC-002 | FR-1, FR-2 | Test matching algorithm |
+| TC-003 | FR-1, FR-5, FR-6 | Score update on attendance |
+| TC-004 | FR-1, FR-3, FR-7 | Penalty on cancellation |
+| TC-005 | FR-1, FR-3, FR-7 | Penalty on no-show |
+| TC-006 | FR-6 | QR code clock-in |
+| TC-007 | FR-3, FR-8 | Emergency file upload |
+| TC-008 | FR-3, FR-9 | Emergency job posting |
+| TC-ERP-01 | FR-5 | ERP staff API response |
+| TC-ERP-02 | FR-2, FR-5 | Assignment submission to ERP |
+| TC-ERP-03 | FR-2 | Assignment conflict handling |
+| TC-ERP-04 | FR-5, FR-6 | Attendance submission |
+| TC-ERP-05 | FR-5, FR-7 | Penalty submission |
+| TC-ERP-06 | FR-1, FR-5 | Score update to ERP |
+| TC-ERP-07 | FR-5 | Error handling - API timeout |
+| TC-ERP-08 | FR-5 | Webhook integration |
+| TC-PERF-01 | FR-2 | Matching performance |
+| TC-PERF-02 | FR-2, FR-5 | API response times |
+| TC-SEC-01 | NFR | Authentication required |
+| TC-SEC-02 | NFR | Data encryption |
+
+---
 
 ### 1. Functional Test Cases
 
