@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "workflow-init/docs/Specification Document ALIGNED.md",
+                "file": "docs/sprint-artifacts/1-1-scoring-algorithm.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Specification Document ALIGNED"
+              "title": "1-1-scoring-algorithm"
             }
           }
         ]
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 381.5
+    "width": 451.5
   },
   "right": {
     "id": "43dac6a0e55e1118",
@@ -183,23 +183,20 @@
       "bases:Create new base": false
     }
   },
-  "active": "f26d81237156efee",
+  "active": "26d069686780fd33",
   "lastOpenFiles": [
-    "docs/diagrams/wireframe-create-wireframe-workflow.excalidraw",
-    "docs/diagrams",
-    "docs/create-wireframe-workflow-analysis.md",
-    "docs/sprint-status.yaml.tmp.45119.1763994055024",
-    "docs/sprint-artifacts/1-1-scoring-algorithm.md",
-    "docs/sprint-status.yaml",
     "docs/sprint-artifacts/ux-specification-phc.md",
+    "docs/sprint-artifacts/1-1-scoring-algorithm.md",
+    "docs/architecture.md",
+    "docs/sprint-status.yaml",
+    "docs/create-wireframe-workflow-analysis.md",
+    "docs/validation-report-2025-11-24.md",
+    "workflow-init/docs/Specification Document ALIGNED.md",
     "docs/COMPLETION_SUMMARY.md",
     "docs/user-stories.md.tmp.45119.1763990093978",
     "workflow-init/docs/ARCHITECTURE_ALIGNMENT_FIXES.md",
     "docs/product-requirements-document.md",
-    "docs/architecture.md",
-    "workflow-init/docs/Specification Document ALIGNED.md",
     "docs/validation-fixes-summary.md",
-    "docs/validation-report-2025-11-24.md",
     "docs/erp-api-integration-specification.md",
     "docs/product-requirements-document.md.tmp.45119.1763988936372",
     "docs/notification-method-decision.md",
@@ -212,6 +209,8 @@
     "docs/product-requirements-document.md.tmp.45119.1763985290682",
     "docs/sprint-artifacts",
     "docs/user-stories.md",
+    "docs/executive-summary.md.tmp.43142.1763978802791",
+    "docs/user-stories.md.tmp.43142.1763978577757",
     "docs/technical-design-document.md",
     "docs/integration-todo-list.md",
     "docs/software-requirements-specification.md",
