@@ -11,6 +11,8 @@ The create-wireframe workflow is a **complete and well-structured** workflow for
 
 **Status:** ✅ **READY FOR USE**
 
+**Output Location:** Files are saved to `{project-root}/docs/diagrams/wireframe-{timestamp}.excalidraw`
+
 ---
 
 ## Workflow Components

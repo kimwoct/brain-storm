@@ -183,8 +183,10 @@
       "bases:Create new base": false
     }
   },
-  "active": "26d069686780fd33",
+  "active": "f26d81237156efee",
   "lastOpenFiles": [
+    "docs/diagrams/wireframe-create-wireframe-workflow.excalidraw",
+    "docs/diagrams",
     "docs/create-wireframe-workflow-analysis.md",
     "docs/sprint-status.yaml.tmp.45119.1763994055024",
     "docs/sprint-artifacts/1-1-scoring-algorithm.md",
@@ -210,7 +212,6 @@
     "docs/product-requirements-document.md.tmp.45119.1763985290682",
     "docs/sprint-artifacts",
     "docs/user-stories.md",
-    "docs/executive-summary.md.tmp.43142.1763978802791",
     "docs/technical-design-document.md",
     "docs/integration-todo-list.md",
     "docs/software-requirements-specification.md",
@@ -219,7 +220,6 @@
     "workflow-init/docs/08 - Appendix E - Push Notification Flow.md",
     "workflow-init/docs/07 - Appendix Dv2 - Cancellation flow.md",
     "workflow-init/docs/07 - Appendix Dv1 - Cancellation flow.md",
-    "workflow-init/docs/06 - Appendix Cv2 - Matching & Confirmation Flow.md",
-    "workflow-init/docs/06 - Appendix Cv1 - Matching & Confirmation Flow.md"
+    "workflow-init/docs/06 - Appendix Cv2 - Matching & Confirmation Flow.md"
   ]
 }
