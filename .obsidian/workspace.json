@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "README.md",
+                "file": "docs/executive-summary.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "README"
+              "title": "executive-summary"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "README.md",
+                "file": "docs/executive-summary.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for README"
+              "title": "Backlinks for executive-summary"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "README.md",
+                "file": "docs/executive-summary.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from README"
+              "title": "Outgoing links from executive-summary"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "README.md",
+                "file": "docs/executive-summary.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of README"
+              "title": "Outline of executive-summary"
             }
           }
         ]
@@ -185,9 +185,18 @@
   },
   "active": "26d069686780fd33",
   "lastOpenFiles": [
-    "docs/integration-todo-list.md",
+    "docs/sprint-artifacts",
     "docs/erp-api-integration-specification.md",
+    "docs/user-stories.md",
+    "docs/executive-summary.md.tmp.43142.1763978802791",
+    "docs/user-stories.md.tmp.43142.1763978577757",
+    "docs/technical-design-document.md",
+    "docs/integration-todo-list.md",
+    "docs/product-requirements-document.md",
+    "docs/executive-summary.md",
+    "docs/software-requirements-specification.md",
     "docs/scoring-algorithm-specification.md",
+    "README.md",
     "docs",
     "workflow-init/docs/08 - Appendix E - Push Notification Flow.md",
     "workflow-init/docs/07 - Appendix Dv2 - Cancellation flow.md",
@@ -204,10 +213,6 @@
     "workflow-init/docs/sprint-artifacts/06 - Appendix Cv2 - Matching & Confirmation Flow.md",
     "workflow-init/docs/sprint-artifacts/06 - Appendix Cv1 - Matching & Confirmation Flow.md",
     "workflow-init/docs/sprint-artifacts/05 - Appendix B - Job Posting flow.md",
-    "workflow-init/docs/sprint-artifacts/04 - Appendix A - Registration flow.md",
-    "workflow-init/docs/sprint-artifacts/03 - Appendix - System Integration.md",
-    "workflow-init/docs/sprint-artifacts/02 - Matching System Software Requirement Specification SRS.md",
-    "workflow-init/docs/sprint-artifacts/01 - Prestige Health Dispatch System Meeting Minutes.md",
-    "workflow-init/docs/sprint-artifacts/08 - Appendix E - Push Notification Flow.md"
+    "workflow-init/docs/sprint-artifacts/04 - Appendix A - Registration flow.md"
   ]
 }
