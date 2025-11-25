@@ -1,8 +1,8 @@
 # Healthcare Worker Dispatch System (PHC)
 ## Prestige Health Care Agency Ltd
 
-**Document Version:** 1.1 (ALIGNED WITH PRD)
-**Date:** November 24, 2025
+**Document Version:** 1.2 (ALIGNED WITH PRD)
+**Date:** November 25, 2025
 **Status:** Aligned with Product Requirements Document
 
 ---
@@ -12,20 +12,24 @@
 | Version | Date       | Author        | Changes                      |
 |---------|------------|---------------|------------------------------|
 | 1.0     | 2025-11-24 | System Analyst| Initial draft for client review |
+| 1.1     | 2025-11-24 | System Analyst| Added FR details, aligned with PRD |
+| 1.2     | 2025-11-25 | System Analyst| Fixed inconsistencies, removed supervisor role |
 
 ---
 
 ## Executive Summary
 
-This document specifies the functional and technical requirements for the Prestige Health Dispatch System (PHC), a web-based platform designed to automate healthcare worker-to-facility matching based on merit-based scoring and real-time availability.
+This document specifies the functional and technical requirements for the Prestige Health Dispatch System (PHC), a web-based platform designed to streamline healthcare worker-to-facility matching based on preference-driven allocation, merit-based scoring, and real-time availability.
 
 **Project Objectives:**
 
-- Increase shift fill rate from 85% to 95%+ within 3 months
-- Reduce coordinator time by 75% (3 hours → 45 min/day)
-- Decrease no-shows from 5% to <2%
-- Launch complete system in 60 days
-- Process 500+ daily assignments across 500+ staff
+- Streamline and semi-automate the current manual WhatsApp/phone-based dispatch process while maintaining administrator's final decision control
+- Integrate the matching subsystem with existing ERP for bidirectional data synchronization
+- Enable faster job posting and worker assignment to handle increased order volume without proportional staff increases
+- Reduce manual data entry workload and operational errors through automation
+- Improve data consistency, traceability, and audit capabilities across all dispatch operations
+- Create foundation for potential future self-service portal for care facilities
+- Target metrics: Coordinator efficiency improvement by 50%+
 
 **Key Differentiator:** Merit-based scoring algorithm ensures fair, transparent allocation based on reliability history, not manual bias.
 
@@ -41,12 +45,13 @@ This document specifies the functional and technical requirements for the Presti
 
 ### 1.1 System Purpose
 
-The PHC system automates dispatch of nursing assistants to care home shifts using:
+The PHC system streamlines dispatch of nursing assistants to care home shifts using:
+- Preference-driven matching (facility underlist priority)
 - Scoring algorithm for merit-based allocation
 - Real-time ERP integration
 - WhatsApp notifications (manual template-based for MVP)
 - Web-based confirmation portal
-- Attendance verification (QR code OR supervisor verification)
+- Attendance verification (admin-based centralized verification)
 
 ### 1.2 System Context
 
@@ -63,7 +68,7 @@ The PHC system automates dispatch of nursing assistants to care home shifts usin
 
 **In Scope (Version 1.0):**
 - Scoring and performance tracking (FR-1)
-- Automated matching engine (FR-2)
+- Preference-driven matching engine (FR-2)
 - WhatsApp + Firebase hybrid notifications (FR-3)
 - Admin dashboard (FR-4)
 - ERP integration (13 APIs) (FR-5)
@@ -130,7 +135,9 @@ The PHC system automates dispatch of nursing assistants to care home shifts usin
 
 **Scoring Rules:**
 - Attend shift: +1 point
-- Cancel shift with notice: -1 point, -100 HKD penalty
+- Cancel shift with notice (>48h): -1 point, no financial penalty
+- Late cancellation (<48h): -1 point, -300 HKD penalty
+- No-show: -2 points, -300 HKD penalty
 - Starting score for new staff: 50 points
 
 **Score Tiers:**
@@ -141,13 +148,13 @@ The PHC system automates dispatch of nursing assistants to care home shifts usin
 - Score floor: -10 points (minimum)
 
 **System Behavior:**
-- Scores update automatically upon attendance verification
+- Scores update based on configured rules upon attendance verification
 - ERP synced in real-time via PATCH /api/v1/staff/{id}/score
 - Manual override requires reason and audit trail
 - Staff can view current score and history in portal
 
 **Acceptance Criteria:**
-✅ Score updates automatically upon attendance confirmation
+✅ Score updates based on configured rules upon attendance confirmation
 ✅ ERP sync confirmed within 1 minute
 ✅ Manual override requires reason field
 ✅ Score floor enforced at -10
@@ -157,7 +164,7 @@ The PHC system automates dispatch of nursing assistants to care home shifts usin
 
 ### 3.2 Matching Engine (FR-2)
 
-**Description:** Automated selection of best staff for each shift based on multiple criteria
+**Description:** Preference-driven selection of best staff for each shift based on facility preferences, staff preferences, and configurable matching criteria
 
 **Matching Criteria (Priority Order):**
 
@@ -229,9 +236,9 @@ Step 6: Notify and confirm
 
 **Acceptance Criteria:**
 ✅ Match completes within 5 minutes
-✅ All filters applied correctly (availability, blacklist, documents)
-✅ Underlist respected first
-✅ Re-matching triggered automatically on declines
+✅ All configuration-driven filters applied correctly (availability, blacklist, documents)
+✅ Facility preference list (underlist) respected first
+✅ Re-matching triggered on declines per configured workflow
 ✅ ERP assignment API called with correct data
 ✅ Unfilled jobs flagged for manual intervention
 
@@ -254,7 +261,7 @@ Step 6: Notify and confirm
 📅 Date: {date}
 🏥 Location: {location_name}
 ⏰ Shift: {start_time} - {end_time}
-👤 Contact: {supervisor_name} ({phone})
+👤 Contact: {contact_person} ({phone})
 
 Please confirm: {confirmation_link}
 
@@ -290,7 +297,7 @@ Please confirm: {confirmation_link}
 
 4. **Admin Confirmation Notification**
    - When: Staff confirms shift
-   - Audience: Coordinators/supervisors
+   - Audience: Coordinators and administrators
    - Content: "{staff_name} confirmed shift at {location}"
 
 **Firebase Implementation:**
@@ -310,7 +317,7 @@ Please confirm: {confirmation_link}
 ✅ Confirmation link works with deep linking to assignment
 ✅ Firebase notifications delivered within 30 seconds
 ✅ Staff can confirm/cancel via web portal after clicking link
-✅ Automatic reminders sent at 2h and 24h
+✅ Scheduled reminders sent at configured intervals (2h and 24h)
 ✅ Works on mobile and desktop browsers
 ✅ Coordinator dashboard shows pending confirmations
 
@@ -340,7 +347,7 @@ Please confirm: {confirmation_link}
 
 **Acceptance Criteria:**
 ✅ All metrics accurate and real-time
-✅ Auto-refresh works without manual intervention
+✅ Configurable auto-refresh works without manual intervention
 ✅ Load time < 3 seconds
 ✅ Drill-down navigation functional
 ✅ Color coding matches status accurately
@@ -404,7 +411,7 @@ Please confirm: {confirmation_link}
 
 11. **POST /api/v1/penalties** - Real-time
     - Submit penalty records
-    - Fields: assignment_id, staff_id, penalty_type (cancellation/no_show), amount (100 HKD), score_impact (-1 or -2)
+    - Fields: assignment_id, staff_id, penalty_type (cancellation/no_show), amount (300 HKD), score_impact (-1 or -2)
     - ERP deducts from next settlement
 
 12. **PATCH /api/v1/staff/{id}/score** - Real-time
@@ -480,14 +487,14 @@ Please confirm: {confirmation_link}
 **Clock-in/Clock-out Recording:**
 - Admin records clock-in time (via facility contact confirmation)
 - Admin records clock-out time at shift end
-- Actual hours calculated automatically
-- Deviation alerts: >1 hour difference from scheduled hours
+- Actual hours calculated by system
+- Deviation alerts: >1 hour difference from scheduled hours (configurable threshold)
 - Admin reviews and approves/adjusts as needed
 
 **No-Show Detection:**
-- Automatic: If shift end + 15 minutes passes with no attendance record
+- System-triggered: If shift end + 15 minutes passes with no attendance record
 - Admin can manually mark earlier if confirmed by facility
-- System applies penalty automatically (FR-7)
+- System applies penalty based on configured rules (FR-7)
 - Triggers re-matching for urgent replacement
 
 **ERP Sync:**
@@ -510,8 +517,8 @@ Please confirm: {confirmation_link}
 
 **Acceptance Criteria:**
 ✅ Attendance recorded accurately (timestamp precision)
-✅ Deviation > 1 hour flagged for admin review
-✅ No-show detected automatically if no clock-in by shift end + 15min
+✅ Deviation > 1 hour flagged for admin review per configured threshold
+✅ No-show detected by system if no clock-in by shift end + 15min (configurable)
 ✅ ERP submitted within 1 hour
 ✅ Admin can process entire day's attendance in < 10 minutes
 ✅ Works offline with sync when connection restored
@@ -521,14 +528,14 @@ Please confirm: {confirmation_link}
 
 ### 3.7 Penalty Management (FR-7)
 
-**Description:** Automatic penalty application for violations
+**Description:** Rule-based penalty application for violations based on configured policies
 
 **Penalty Rules:**
 
 1. **Cancellation** (with notice, >48 hours before shift)
    - Score: -1 point
-   - Financial: --- HKD (admin cost)
-   - Warning: None (acceptable notice period)
+   - Financial: No penalty
+   - Warning: Standard confirmation (acceptable notice period)
 
 2. **Late Cancellation** (<48 hours before shift)
    - Score: -1 point
@@ -536,15 +543,21 @@ Please confirm: {confirmation_link}
    - Warning: Modal displays "300 HKD admin cost will be deducted" before allowing cancel
    - Staff can keep shift and reject cancellation
 
+3. **No-Show**
+   - Score: -2 points
+   - Financial: -300 HKD (admin cost)
+   - Warning: Penalty automatically applied based on configured policy after shift end + 15 minutes
+   - Re-matching triggered immediately
+
 **Warning Workflow:**
 ```
 Staff clicks "Cancel Shift" → System checks cancellation window
 IF < 48 hours before shift:
-  → Show warning modal: "100 HKD will be deducted when you apply AL within 48 hours before coming job!"
-  → Show penalty details (-1 score, -100 HKD)
+  → Show warning modal: "300 HKD will be deducted when you cancel within 48 hours before shift!"
+  → Show penalty details (-1 score, -300 HKD)
   → Buttons: [Keep Shift] [Confirm Cancellation]
 ELSE:
-  → Allow cancellation without penalty
+  → Allow cancellation without financial penalty
   → Apply only -1 score (no financial penalty)
 ```
 
@@ -734,7 +747,7 @@ Please read and confirm receipt via portal
 ✅ Settlement data fetched from ERP by 1st of month
 ✅ Reconciliation completed by 3rd of month
 ✅ All discrepancies flagged and documented
-✅ Reports generated automatically
+✅ Reports generated on configured schedule
 ✅ Match rate > 99%
 ✅ Report format suitable for finance review
 
@@ -768,7 +781,7 @@ Please read and confirm receipt via portal
    - Staff will exceed fair sharing limits
 7. Admin enters override reason (required field, minimum 20 characters)
 8. Confirm assignment
-9. System creates assignment (assigned_by: manual_admin)
+9. System records assignment (assigned_by: manual_admin)
 10. WhatsApp notification sent to staff
 11. Override logged in audit trail with:
     - Admin ID
@@ -808,7 +821,7 @@ Please read and confirm receipt via portal
 **Log Retention:**
 - API logs retained for 90 days
 - Critical errors trigger immediate alerts
-n- Export logs to CSV for analysis
+- Export logs to CSV for analysis
 
 **Alerting:**
 - Critical errors: Immediate email + push notification to admin
@@ -870,7 +883,7 @@ n- Export logs to CSV for analysis
 - CSV for import into other systems
 
 **Scheduling:**
-- Automated monthly reports (delivered by email to stakeholders)
+- Scheduled monthly reports (delivered by email to stakeholders per configuration)
 - On-demand generation (instant)
 
 **Acceptance Criteria:**
@@ -887,13 +900,13 @@ n- Export logs to CSV for analysis
 
 ### Core Data Entities
 
-**Entity: Users (Staff, Supervisors, Admins)**
+**Entity: Users (Staff and Admins)**
 - user_id: Primary key
 - phone_number: UNIQUE, login credential (8-digit HK format)
-- email: UNIQUE (for staff, NULL for workers)
+- email: UNIQUE (for admins, NULL for workers)
 - password_hash: bcrypt hashed (cost factor 12)
 - full_name: English or Traditional Chinese
-- role: ENUM (admin, supervisor, worker)
+- role: ENUM (admin, worker)
 - status: ENUM (active, inactive)
 - created_at: Registration timestamp
 - last_login: Last session timestamp
@@ -901,7 +914,7 @@ n- Export logs to CSV for analysis
 **Entity: Nursing Assistants (Workers)**
 - worker_id: References user_id
 - staff_number: UNIQUE (agency-assigned ID)
-- current_score: Integer (starting at 5)
+- current_score: Integer (starting at 50)
 - score_tier: ENUM (gold, silver, bronze, under_review)
 - preferred_facilities: JSON array of facility_ids
 - availability_status: ENUM (available, on_job, unavailable)
@@ -943,14 +956,16 @@ n- Export logs to CSV for analysis
 - clock_out: Timestamp
 - actual_hours: Calculated decimal
 - status: ENUM (completed, partial, no_show)
-- verification_method: ENUM (qr_code, supervisor, manual)
+- verification_method: ENUM (admin_portal, phone_confirmation)
+- verified_by: INT (references admin user_id)
+- notes: TEXT (for late/early departure explanations)
 
 **Entity: Penalties**
 - penalty_id: Primary key
 - staff_id: References worker
 - assignment_id: References job demand
 - penalty_type: ENUM (cancellation, no_show)
-- amount: Decimal (100.00 HKD)
+- amount: Decimal (300.00 HKD)
 - score_impact: Integer (-1 or -2)
 - applied_at: Timestamp
 - erp_sync_status: ENUM (pending, synced, failed)
@@ -971,7 +986,8 @@ n- Export logs to CSV for analysis
 **Backend:**
 - Java Spring Boot 2.7+
 - Spring Security (authentication/authorization)
-- Spring Batch OR Quartz (job scheduling)
+- Spring Batch (job scheduling for ERP sync and daily tasks)
+- Quartz Scheduler (for time-based notifications and reminders)
 
 **Database:**
 - MySQL 8+ (primary relational database)
@@ -995,7 +1011,15 @@ n- Export logs to CSV for analysis
 - Docker containerization
 - Load balancing for scalability
 
-**Rationale:** Selected for proven reliability, team expertise, scalability to 1000+ staff, and 60-day timeline feasibility.
+**Rationale:** 
+- **Spring Boot:** Team expertise, enterprise-grade reliability, rich ecosystem
+- **MySQL:** Proven reliability for transactional data, strong ACID compliance
+- **Redis:** High-performance caching, reduces database load for frequent queries
+- **Spring Batch:** Robust batch processing for daily ERP sync operations
+- **Quartz:** Flexible scheduling for time-based notifications and reminders
+- **React.js:** Component reusability, large ecosystem, mobile-responsive
+- **Firebase FCM:** Free tier suitable for MVP, easy integration, cross-platform support
+- **AWS/Azure:** Scalability to 1000+ staff, managed services reduce DevOps overhead
 
 ---
 
@@ -1003,7 +1027,7 @@ n- Export logs to CSV for analysis
 
 ### 6.1 Design Principles
 
-- **Mobile-First:** Optimized for smartphone (staff) and tablet (supervisors)
+- **Mobile-First:** Optimized for smartphone (nursing assistants) and tablet/desktop (administrators)
 - **Speed:** All page loads < 3 seconds, all actions < 1 second
 - **Clarity:** Clear call-to-action buttons, minimal cognitive load
 - **Transparency:** Staff can view score history and reason for each change
@@ -1053,8 +1077,8 @@ n- Export logs to CSV for analysis
    - Staff portal score display
 
 2. **Matching Engine (FR-2)**
-   - Filtering logic (availability, blacklist, documents)
-   - Ranking by underlist and score tier
+   - Configuration-driven filtering logic (availability, blacklist, documents)
+   - Preference-based ranking (facility underlist and staff score tier)
    - < 5 minute matching SLA
 
 3. **WhatsApp + Firebase Notifications (FR-3)**
@@ -1074,10 +1098,10 @@ n- Export logs to CSV for analysis
    - Every 15-min sync for job demands
 
 6. **Attendance Tracking (FR-6)**
-   - QR code generation and validation OR
-   - Supervisor verification workflow
+   - Admin portal centralized verification
+   - Phone confirmation with facility contacts
    - Clock-in/out recording
-   - Deviation detection
+   - Deviation detection and alerting
 
 7. **Penalty Management (FR-7)**
    - Penalty calculation logic
@@ -1114,7 +1138,9 @@ n- Export logs to CSV for analysis
 | FR-12 | System Monitoring | US-ADM-06 | ✓ |
 | FR-13 | Reporting | US-ADM-06 | ⚠️ |
 
-**Note:** FR-10 and FR-13 have minimal story coverage - recommend adding dedicated stories.
+**Note:** FR-10 and FR-13 have minimal story coverage - recommend adding dedicated user stories:
+- **FR-10:** US-FIN-01: Monthly settlement reconciliation
+- **FR-13:** US-RPT-01: Generate attendance reports, US-RPT-02: Generate penalty reports, US-RPT-03: Generate score distribution reports
 
 ---
 
@@ -1262,15 +1288,21 @@ n- Export logs to CSV for analysis
 - Aligned terminology with PRD (nursing assistant vs worker)
 
 **Version 1.1 → 1.2 (2025-11-25)**
+- **FIXED:** Penalty amount inconsistency (now consistently 300 HKD for late cancellations and no-shows)
+- **FIXED:** Initial score inconsistency (now consistently 50 points)
+- **FIXED:** Scoring rules clarified (added no-show penalty: -2 points, -300 HKD)
+- **FIXED:** Template variable changed from {supervisor_name} to {contact_person}
+- **FIXED:** Document version updated to 1.2 with complete control table
 - **REMOVED:** Care Home Supervisor role entirely
 - **UPDATED:** FR-6 Attendance Tracking - Changed from QR/Supervisor options to Admin-based verification
-- **UPDATED:** User Roles - Reduced from 5 to 4 roles (removed supervisor)
+- **UPDATED:** User Roles - Reduced to 2 roles (admin, worker)
 - **UPDATED:** Permission Matrix - Removed supervisor column
 - **UPDATED:** User Journey 3 - Changed from supervisor verification to admin verification
+- **UPDATED:** Technology Stack - Specified Spring Batch AND Quartz with rationale
+- **UPDATED:** Data Model - Fixed penalty amounts, initial scores, verification methods
 - **MOVED:** QR Code System to Future Enhancements (Version 2.0+)
-- **UPDATED:** Executive Summary - Removed supervisor from target users
-- **UPDATED:** System Context - Removed supervisor from primary users
-- **RATIONALE:** Simplifies MVP scope, reduces infrastructure requirements, centralizes control
+- **ADDED:** Detailed technology rationale and missing user story recommendations
+- **RATIONALE:** Fixes critical inconsistencies, simplifies MVP scope, reduces infrastructure requirements, centralizes control
 
 ---
 
