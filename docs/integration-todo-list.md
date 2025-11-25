@@ -1,8 +1,9 @@
 # ERP Integration Implementation Checklist
 
 **Project:** Prestige Health Dispatch System (PHC)
-**Document Version:** 1.0
-**Last Updated:** 2025-11-24
+**Document Version:** 1.5 (Human Screening Workflow)
+**Last Updated:** 2025-11-25
+**Status:** Updated for v1.5 PRD - Application/Approval Workflow
 
 ---
 
@@ -10,7 +11,72 @@
 
 This checklist outlines the step-by-step implementation plan for integrating PHC with the existing ERP system across the 4 main business flows.
 
-**Critical Path:** Master Data Sync → Job Posting → Assignment → Settlement
+**Critical Path:** Master Data Sync → Job Posting → **Staff Application & Admin Screening (v1.5)** → Assignment → Settlement
+
+**⚠️ v1.5 MAJOR WORKFLOW CHANGE:**
+- **From:** Automated matching with staff confirmation
+- **To:** Staff application with admin screening/approval
+- **Impact:** FR-2 becomes recommendation engine (not auto-assignment), new application workflow UIs required, assignment API triggered by admin approval (not system matching)
+
+---
+
+## 🔄 v1.5 Workflow Changes - Implementation Impact
+
+### Critical Changes from v1.0 to v1.5
+
+#### 1. Assignment Workflow Paradigm Shift
+- **OLD (v1.0):** System matches staff → Staff confirms/rejects → ERP updated
+- **NEW (v1.5):** Staff applies → Admin screens → Admin approves → ERP updated
+
+#### 2. FR-2 Matching Engine Redefined
+- **OLD:** Auto-assignment based on rules
+- **NEW:** Ranking/recommendation engine to assist admin screening
+- **Implementation:** Keep scoring/filtering logic, remove auto-assignment trigger
+
+#### 3. New UI Components Required
+- [ ] Staff application interface (browse and apply for shifts)
+- [ ] Admin screening dashboard (pending applications queue)
+- [ ] Admin approval workflow (approve/reject with reasons)
+- [ ] Application status tracking (applied → approved/rejected → confirmed)
+
+#### 4. ERP API Timing Changes
+- **OLD:** API 3.1 (POST assignments) triggered by system matching
+- **NEW:** API 3.1 triggered by **admin approval action**
+- **NEW Status:** "applied" state added (before "approved")
+
+#### 5. Notification Flow Updates
+- **Added:** "Shift available - apply now" notification
+- **Added:** "Application received" confirmation
+- **Added:** "Application approved" notification
+- **Added:** "Application rejected" notification
+- **Changed:** Confirmation notification now sent **after** admin approval
+
+### Implementation Priority Updates
+
+#### High Priority (Blocking MVP):
+- [ ] **Update workflow appendices** - Cv1, Cv2, B documents need v1.5 rewrite
+- [ ] **Build application UIs** - Staff application + admin screening interfaces
+- [ ] **Refactor matching engine** - From auto-assignment to recommendation
+- [ ] **Update API triggers** - Assignment creation now admin-driven
+
+#### Medium Priority:
+- [ ] **Update terminology** - "match" → "recommend", "confirm" → "apply/approve"
+- [ ] **Notification templates** - Add application-related notifications
+- [ ] **Status tracking** - Expand to include application states
+
+### Workflow Documentation Alignment
+
+#### Documents Requiring Updates:
+- [ ] `06 - Appendix Cv1 - Matching & Confirmation Flow.md` - Rewrite for human screening
+- [ ] `06 - Appendix Cv2 - Matching & Confirmation Flow.md` - Fair sharing now manual admin control
+- [ ] `05 - Appendix B - Job Posting flow.md` - Change "grab shift" to "apply for shift"
+- [ ] `07 - Appendix Dv1 - Cancellation flow.md` - Minor terminology updates
+- [ ] `08 - Appendix E - Push Notification Flow.md` - Add application notifications
+
+#### Documents Already Aligned:
+- [x] `Product Specification Document ALIGNED Revised.md` (v1.5) - Updated
+- [x] `dataflow-phc-erp-integration.excalidraw` - Shows human screening workflow
+- [x] `04 - Appendix A - Registration flow.md` - No workflow dependency
 
 ---
 
@@ -136,30 +202,53 @@ This checklist outlines the step-by-step implementation plan for integrating PHC
 
 ### Week 4: Assignment Management
 
-#### Assignment Submission
+#### Staff Application & Admin Screening (v1.5 Workflow)
+- [x] **WORKFLOW CHANGE:** Staff now **apply** for shifts (not auto-assigned)
+- [x] **WORKFLOW CHANGE:** Admin performs manual **screening/approval** (not automated matching)
+- [ ] Build staff application interface (browse available shifts)
+- [ ] Create application submission workflow
+- [ ] Build admin screening dashboard (view all applications)
+- [ ] Implement admin approval/rejection interface
+- [ ] Create application queue management
+- [ ] Build ranking/recommendation engine (FR-2) to assist admin screening
+- [ ] Display underlist priority flag to admin during screening
+- [ ] Show staff scores and history during screening
+- [ ] Implement conflict checking during approval
+- [ ] Create fair sharing alerts for admin (max 5 jobs per staff)
+
+**Owner:** Backend + Frontend Developer
+**Test:** Application workflow end-to-end
+**Deliverable:** Human screening workflow operational
+
+#### Assignment Submission to ERP
 - [ ] Implement API 3.1 (POST /api/v1/jobs/assignments)
-- [ ] Trigger API call when matching algorithm selects staff
+- [ ] Trigger API call when **admin approves** staff application (v1.5 change)
 - [ ] Map PHC assignment to ERP format
 - [ ] Handle successful submission (store ERP assignment_id)
 - [ ] Handle conflict errors (staff unavailable)
-- [ ] Implement re-matching logic on conflict
+- [ ] Implement re-notification to admin on conflict
 - [ ] Create assignment submission logs
 
 **Owner:** Backend Developer
 **Test:** Assignment submission success rate > 99%
-**Deliverable:** Assignments syncing to ERP in real-time
+**Deliverable:** Approved assignments syncing to ERP in real-time
 
 #### Assignment Status Updates
 - [ ] Implement API 3.2 (PATCH /api/v1/jobs/assignments/{id})
-- [ ] Update status: confirmed (staff accepts)
-- [ ] Update status: cancelled (staff cancels)
+- [ ] Update status: applied (staff submits application)
+- [ ] Update status: approved (admin approves application)
+- [ ] Update status: rejected (admin rejects application)
+- [ ] Update status: confirmed (staff accepts approval)
+- [ ] Update status: cancelled (staff cancels after approval)
+- [ ] Include application timestamp
+- [ ] Include approval/rejection timestamp
 - [ ] Include confirmation timestamp
 - [ ] Include cancellation reason
-- [ ] Track update history
+- [ ] Track complete application-to-assignment history
 
 **Owner:** Backend Developer
 **Test:** Status update accuracy
-**Deliverable:** Assignment status sync operational
+**Deliverable:** Assignment lifecycle tracking operational
 
 #### Reconciliation
 - [ ] Implement API 3.3 (GET assignment status verification)
@@ -462,6 +551,8 @@ This checklist outlines the step-by-step implementation plan for integrating PHC
 - [ ] Demand sync latency: < 15 minutes
 - [ ] Assignment submission success: > 99%
 - [ ] API uptime: > 99%
+- [ ] **v1.5:** Application submission success: > 99%
+- [ ] **v1.5:** Admin screening interface response time: < 3 seconds
 
 ### Phase 2 Success Criteria
 - [ ] Attendance submission success: > 99%
@@ -472,8 +563,11 @@ This checklist outlines the step-by-step implementation plan for integrating PHC
 ### Overall Project Success
 - [ ] All 4 main flows operational
 - [ ] Zero critical data loss
-- [ ] API response time: < 3 seconds average
+- [ ] API response time: < 3 seconds average (< 30 seconds MVP target per v1.5 PRD)
 - [ ] Monthly settlement processing: automated
+- [ ] **v1.5:** Staff can browse and apply for shifts successfully
+- [ ] **v1.5:** Admin can screen and approve applications efficiently
+- [ ] **v1.5:** Application-to-assignment workflow < 2 hours (manual screening time included)
 
 ---
 
@@ -481,6 +575,7 @@ This checklist outlines the step-by-step implementation plan for integrating PHC
 
 Before production launch:
 
+### Technical Readiness
 - [ ] All Phase 1 tasks complete
 - [ ] All Phase 2 tasks complete
 - [ ] All APIs tested and stable
@@ -491,28 +586,55 @@ Before production launch:
 - [ ] Load testing passed
 - [ ] Security audit passed
 - [ ] User acceptance testing passed
+
+### v1.5 Workflow Readiness
+- [ ] Staff application interface tested and approved
+- [ ] Admin screening dashboard tested and approved
+- [ ] Application workflow end-to-end testing completed
+- [ ] Admin team trained on screening process
+- [ ] Workflow documentation updated (Appendices Cv1, Cv2, B)
+- [ ] FR-2 recommendation engine validated by admins
+- [ ] Application status tracking verified
+- [ ] Notification templates approved (application/approval messages)
+
+### Business Readiness
 - [ ] Business stakeholders approval obtained
+- [ ] Staff onboarding plan for application workflow
+- [ ] Admin screening procedures documented
+- [ ] Escalation procedures for edge cases defined
+- [ ] Performance metrics baseline established
 
 ---
 
 ## 🔴 Risk Mitigation
 
 ### High Risk Items
-1. **ERP API not ready**
+
+1. **v1.5 Workflow Change Adoption**
+   - Risk: Staff and admins may resist application/screening workflow
+   - Mitigation: Clear communication, training, phased rollout
+   - Contingency: Temporary admin auto-approval mode for familiar users
+
+2. **ERP API not ready**
    - Mitigation: Parallel development with mock APIs
    - Contingency: Manual data entry bridge
 
-2. **Webhook unreliable**
+3. **Webhook unreliable**
    - Mitigation: Robust polling fallback
    - Contingency: Increase polling frequency
 
-3. **Data quality issues**
+4. **Data quality issues**
    - Mitigation: Strong validation rules
    - Contingency: Manual data correction workflows
 
-4. **Performance issues**
+5. **Performance issues**
    - Mitigation: Caching and optimization
    - Contingency: Scale infrastructure
+
+6. **Admin screening bottleneck (v1.5)**
+   - Risk: Manual screening may slow assignment process
+   - Mitigation: Recommendation engine to assist, batch approval features
+   - Contingency: Increase admin staffing during peak hours
 
 ---
 
