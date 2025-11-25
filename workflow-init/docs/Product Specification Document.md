@@ -83,7 +83,6 @@ The Healthcare Worker Matching System is a web-based platform that automates the
 
 **Out of Scope (Phase 1):**
 
-- QR code generation for facility identification
 - Facility self-service portal
 - Payment processing and commission calculation
 - Worker rating and performance management
@@ -341,20 +340,7 @@ The Healthcare Worker Matching System is a web-based platform that automates the
 - **Restriction:** Cannot withdraw after staff assigns job
 - **Priority:** MUST HAVE
 
-### 3.7 QR Code System (FR-QR)
-
-**FR-QR-001: Facility QR Code Generation**
-
-- **Description:** Generate unique QR codes for each facility
-- **QR Code Contents:** Facility ID + Validation token
-- **Usage:**
-  1. System administrator generates QR codes for all facilities
-  2. QR codes provided as printable PDFs (A4 size)
-  3. Facility displays QR code at reception area
-  4. Workers scan QR code to auto-fill facility info in job applications
-- **Priority:** SHOULD HAVE (Future use for facility self-service)
-
-### 3.8 Notification System (FR-NOTIF)
+### 3.7 Notification System (FR-NOTIF)
 
 **FR-NOTIF-001: Worker Notifications**
 
@@ -409,7 +395,8 @@ The Healthcare Worker Matching System is a web-based platform that automates the
 
 ---
 
-## 4. Technical Architecture### 4.1 System Architecture Overview
+## 4. Technical Architecture
+### 4.1 System Architecture Overview
 
 **Architecture Pattern:** Three-tier web application
 
@@ -464,7 +451,8 @@ The Healthcare Worker Matching System is a web-based platform that automates the
 
 ---
 
-## 5. Data Model and Integration### 5.1 Core Data Entities
+## 5. Data Model and Integration
+### 5.1 Core Data Entities
 
 **Entity: Users**
 
@@ -1249,7 +1237,36 @@ This Product Specification Document requires review and approval from the follow
 
 ## Appendices
 
-### Appendix A: Glossary of Terms
+### Appendix A: Future Enhancements - QR Code System
+
+**Deferred to Version 2.0+ (Post-MVP)**
+
+**QR-001: Facility QR Code Generation**
+
+- **Description:** Generate unique QR codes for each facility for identification and attendance tracking
+- **QR Code Contents:** Facility ID + Validation token + Timestamp
+- **Use Cases:**
+  1. **Facility Identification:** Workers scan QR code to auto-fill facility info in job applications
+  2. **Attendance Tracking:** Workers scan QR code when arriving at shift for automated clock-in
+- **Implementation:**
+  - System administrator generates QR codes for all facilities
+  - QR codes provided as printable PDFs (A4 size)
+  - Facility displays QR code at reception area
+  - Mobile app or web portal supports QR scanning
+  - Validation logic ensures QR code is current and matches assignment
+- **Benefits:**
+  - Reduces manual data entry
+  - Automated attendance verification
+  - Improved accuracy of location tracking
+  - Supports facility self-service portal (Phase 2)
+- **Requirements:**
+  - QR code printing and display at facilities
+  - Camera/scanning capability on worker devices
+  - Real-time validation infrastructure
+- **Estimated Timeline:** Version 2.0 (Months 4-6 post-launch)
+- **Priority:** OPTIONAL - Deferred to future release
+
+### Appendix B: Glossary of Terms
 
 | Term | Definition |
 |------|------------|
@@ -1262,7 +1279,7 @@ This Product Specification Document requires review and approval from the follow
 | API | Application Programming Interface |
 | JWT | JSON Web Token (authentication method) |
 
-### Appendix B: Reference Documents
+### Appendix C: Reference Documents
 
 1. Meeting Minutes - Prestige Health Care Agency Ltd (Nov 24, 2025)
 2. Existing ERP System Documentation
@@ -1270,7 +1287,7 @@ This Product Specification Document requires review and approval from the follow
 4. Current WhatsApp Workflow Screenshots
 5. Hong Kong Personal Data (Privacy) Ordinance Guidelines
 
-### Appendix C: Contact Information
+### Appendix D: Contact Information
 
 **Project Team:**
 

@@ -32,9 +32,8 @@ This document specifies the functional and technical requirements for the Presti
 **Target Users:**
 
 1. **Nursing Assistants (500+)** - Receive shift assignments via WhatsApp, confirm via web portal
-2. **Care Home Supervisors (100+)** - Verify attendance via web portal
-3. **PHC Administrators (5-10)** - Monitor operations, handle exceptions via admin dashboard
-4. **ERP System** - Bidirectional data sync (13 API endpoints)
+2. **PHC Administrators (5-10)** - Monitor operations, handle exceptions, verify attendance via admin dashboard
+3. **ERP System** - Bidirectional data sync (13 API endpoints)
 
 ---
 
@@ -58,8 +57,7 @@ The PHC system automates dispatch of nursing assistants to care home shifts usin
 
 **Primary Users:**
 - Nursing assistants (recipients of assignments)
-- Care home supervisors (attendance verification)
-- PHC administrators (monitoring, overrides)
+- PHC administrators (monitoring, overrides, attendance verification)
 
 ### 1.3 System Boundaries
 
@@ -69,7 +67,7 @@ The PHC system automates dispatch of nursing assistants to care home shifts usin
 - WhatsApp + Firebase hybrid notifications (FR-3)
 - Admin dashboard (FR-4)
 - ERP integration (13 APIs) (FR-5)
-- Attendance tracking (QR code or supervisor verification) (FR-6)
+- Attendance tracking (admin-based verification) (FR-6)
 - Penalty management (FR-7)
 - Emergency file upload and distribution (FR-8)
 - Emergency job posting (FR-9)
@@ -88,6 +86,7 @@ The PHC system automates dispatch of nursing assistants to care home shifts usin
 - WhatsApp Business API (using manual templates for MVP)
 
 **Future Enhancements (Version 2.0+):**
+- QR Code System (facility identification and attendance tracking)
 - Geographic intelligence (distance-based matching)
 - WhatsApp Business API automation
 - Predictive analytics
@@ -103,24 +102,23 @@ The PHC system automates dispatch of nursing assistants to care home shifts usin
 | Role | Description | Key Permissions |
 |------|-------------|----------------|
 | **System Administrator** | Full system access | All permissions, user management, system settings |
-| **PHC Administrator** | Operations management | Create/edit/delete jobs, assign workers, view all data, manual overrides |
-| **Care Home Supervisor** | Facility oversight | Verify attendance, view facility schedule, mark no-shows |
+| **PHC Administrator** | Operations management | Create/edit/delete jobs, assign workers, view all data, manual overrides, verify attendance |
 | **Nursing Assistant** | Frontline staff | Receive assignments, confirm/cancel shifts, view score/history |
 | **ERP Integration** | System-to-system | API access for data sync (read staff/locations, write assignments/attendance) |
 
 ### 2.2 Permission Matrix
 
-| Function | Admin | Supervisor | Worker | ERP |
-|----------|-------|-----------|--------|-----|
-| View Dashboard | ✓ | ✓ | ✓ | ✗ |
-| Create Job Post | ✓ | ✗ | ✗ | ✓ |
-| Edit Job Post | ✓ | ✗ | ✗ | ✗ |
-| Assign Worker | ✓ | ✗ | ✗ | ✗ |
-| Confirm/Cancel Shift | ✗ | ✗ | ✓ | ✗ |
-| Verify Attendance | ✓ | ✓ | ✗ | ✗ |
-| View Score | ✗ | ✗ | ✓ | ✗ |
-| Manual Override | ✓ | ✗ | ✗ | ✗ |
-| ERP API Access | ✓ | ✗ | ✗ | ✓ |
+| Function | Admin | Worker | ERP |
+|----------|-------|--------|-----|
+| View Dashboard | ✓ | ✓ | ✗ |
+| Create Job Post | ✓ | ✗ | ✓ |
+| Edit Job Post | ✓ | ✗ | ✗ |
+| Assign Worker | ✓ | ✗ | ✗ |
+| Confirm/Cancel Shift | ✗ | ✓ | ✗ |
+| Verify Attendance | ✓ | ✗ | ✗ |
+| View Score | ✗ | ✓ | ✗ |
+| Manual Override | ✓ | ✗ | ✗ |
+| ERP API Access | ✓ | ✗ | ✓ |
 
 ---
 
@@ -448,50 +446,47 @@ Please confirm: {confirmation_link}
 
 ### 3.6 Attendance Tracking (FR-6)
 
-**Description:** Verify staff presence at shifts (Option A: QR code OR Option B: Supervisor verification)
+**Description:** Admin-based attendance verification via centralized portal
 
-**Option A: QR Code Attendance**
-
-**How it works:**
-1. Each location displays unique QR code (generated in PHC, printed as PDF)
-2. QR contains: location_id + validation token + shift information
-3. Staff scans QR code with phone when arriving
-4. System validates QR and records clock-in time
-5. Supervisor can view real-time attendance in portal
-
-**Clock-in Rules:**
-- Valid window: within 1 hour of shift start (earlier rejected)
-- Staff must have confirmed assignment for that shift
-- System records: clock_in timestamp, location, staff_id
-- If scanned >1 hour before shift: reject with message
-- If assignment not confirmed: reject with warning
-
-**Option B: Supervisor Manual Verification**
+**Admin Portal Verification:**
 
 **How it works:**
-1. Supervisor opens PHC portal on tablet at facility
-2. Views "Today's Schedule" for location
-3. See list of confirmed staff with photos
-4. Clicks "Confirm Arrival" for each staff present
-5. Records clock-in time (defaults to current time, editable)
-6. Can mark as "no-show" if staff absent
+1. PHC Administrator opens admin portal
+2. Views "Attendance Dashboard" with all facilities
+3. Filters by facility and date
+4. Sees list of confirmed staff with photos
+5. Marks attendance status for each staff:
+   - ✅ Present (clock-in time recorded)
+   - ❌ No-show (penalty applied automatically)
+   - ⏰ Late (with notes)
+   - 🏠 Early departure (with notes)
+6. System records all timestamps
+7. Calculates actual hours worked
+8. Syncs to ERP within 1 hour
 
-**Supervisor Workflow:**
-- View all confirmed assignments for today
-- See staff name, photo, shift time, contact number
-- One-tap confirmation per staff
-- Total time: ~2 minutes for full roster
-- Option to add notes (late arrival, early departure)
+**Admin Workflow:**
+- Centralized view of all facilities
+- Batch processing capability
+- Can delegate to facility contacts via phone confirmation
+- Total time: ~5 minutes for 20 facilities
+- Add notes for deviations (late arrival, early departure)
 
-**Clock-out Recording:**
-- Staff clock out at shift end (QR scan or supervisor confirmation)
-- Actual hours worked calculated
+**Facility Contact Phone Confirmation:**
+- Admin calls facility contact person
+- Verbally confirms staff attendance
+- Admin records in system
+- Maintains single source of truth in PHC system
+
+**Clock-in/Clock-out Recording:**
+- Admin records clock-in time (via facility contact confirmation)
+- Admin records clock-out time at shift end
+- Actual hours calculated automatically
 - Deviation alerts: >1 hour difference from scheduled hours
-- Requires supervisor approval for significant deviations
+- Admin reviews and approves/adjusts as needed
 
 **No-Show Detection:**
-- Automatic: If shift end passes with no clock-in
-- Supervisor can manually mark "no-show" after shift end + 15 minutes
+- Automatic: If shift end + 15 minutes passes with no attendance record
+- Admin can manually mark earlier if confirmed by facility
 - System applies penalty automatically (FR-7)
 - Triggers re-matching for urgent replacement
 
@@ -501,16 +496,26 @@ Please confirm: {confirmation_link}
 - Status: completed, partial, no_show
 - Calculated payment by ERP based on hours (rate TBD)
 
+**Benefits:**
+- No additional user role needed
+- No tablet/device requirements at facilities
+- Centralized control and oversight
+- Maintains audit trail
+- Simpler permission model
+
+**Trade-offs:**
+- Slightly more admin workload (5 min vs 2 min distributed)
+- Requires phone communication with facilities
+- Less real-time (but acceptable for post-shift verification)
+
 **Acceptance Criteria:**
 ✅ Attendance recorded accurately (timestamp precision)
-✅ Deviation > 1 hour flagged for supervisor approval
+✅ Deviation > 1 hour flagged for admin review
 ✅ No-show detected automatically if no clock-in by shift end + 15min
 ✅ ERP submitted within 1 hour
-✅ QR code validation works (rejects invalid/expired codes)
-✅ Supervisor can confirm entire roster in < 3 minutes
+✅ Admin can process entire day's attendance in < 10 minutes
 ✅ Works offline with sync when connection restored
-
-**Decision Note:** QR code vs supervisor verification to be confirmed before implementation. Both options supported in MVP.
+✅ Audit trail complete for all attendance records
 
 ---
 
@@ -1024,13 +1029,15 @@ n- Export logs to CSV for analysis
 6. Staff notified via WhatsApp (urgent template)
 7. Dashboard shows real-time filling progress
 
-**Journey 3: Supervisor Verifies Attendance**
-1. Open PHC portal on tablet at facility
-2. View today's schedule for location
-3. List shows confirmed staff with photos
-4. Confirm each staff arrival (1 tap/staff)
-5. Mark no-shows if applicable
-6. Done (~2 minutes total)
+**Journey 3: Admin Verifies Attendance (via facility contact)**
+1. Login to PHC admin portal
+2. Navigate to "Attendance Dashboard"
+3. Filter by facility and today's date
+4. Call facility contact person to confirm attendance
+5. Mark each staff as Present/No-show/Late based on confirmation
+6. Add notes for any deviations
+7. System auto-calculates hours and syncs to ERP
+8. Done (~5 minutes for 20 facilities)
 
 ---
 
@@ -1183,6 +1190,27 @@ n- Export logs to CSV for analysis
 
 ### Version 2.0 (Months 4-6)
 
+**QR Code System:**
+- **Facility Identification:** Workers scan QR code to auto-fill facility info in job applications
+- **Attendance Tracking:** Workers scan QR code when arriving at shift for automated clock-in
+- **Implementation:**
+  - System administrator generates QR codes for all facilities
+  - QR codes provided as printable PDFs (A4 size)
+  - Facility displays QR code at reception area
+  - Mobile app or web portal supports QR scanning
+  - Validation logic ensures QR code is current and matches assignment
+- **Benefits:**
+  - Reduces manual data entry
+  - Automated attendance verification
+  - Improved accuracy of location tracking
+  - Eliminates phone confirmation requirement
+- **Requirements:**
+  - QR code printing and display at facilities
+  - Camera/scanning capability on worker devices
+  - Real-time validation infrastructure
+- **Estimated Timeline:** Version 2.0 (Months 4-6 post-launch)
+- **Priority:** OPTIONAL - Deferred to future release
+
 **WhatsApp Business API Integration:**
 - Automated message sending (no manual copy-paste)
 - Message templates pre-approved by Meta
@@ -1233,8 +1261,19 @@ n- Export logs to CSV for analysis
 - Added rationale for all technology decisions
 - Aligned terminology with PRD (nursing assistant vs worker)
 
+**Version 1.1 → 1.2 (2025-11-25)**
+- **REMOVED:** Care Home Supervisor role entirely
+- **UPDATED:** FR-6 Attendance Tracking - Changed from QR/Supervisor options to Admin-based verification
+- **UPDATED:** User Roles - Reduced from 5 to 4 roles (removed supervisor)
+- **UPDATED:** Permission Matrix - Removed supervisor column
+- **UPDATED:** User Journey 3 - Changed from supervisor verification to admin verification
+- **MOVED:** QR Code System to Future Enhancements (Version 2.0+)
+- **UPDATED:** Executive Summary - Removed supervisor from target users
+- **UPDATED:** System Context - Removed supervisor from primary users
+- **RATIONALE:** Simplifies MVP scope, reduces infrastructure requirements, centralizes control
+
 ---
 
-**Document Status:** ✓ ALIGNED WITH PRD
+**Document Status:** ✓ ALIGNED WITH PRD (v1.2 - Supervisor Removed, QR Optional)
 **Architecture Approval:** ⏳ Ready for review
-**Last Updated:** November 24, 2025
+**Last Updated:** November 25, 2025
