@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "SlashCommand(/bmad:bmm:workflows:create-ux-design)"
+      "SlashCommand(/bmad:bmm:workflows:create-ux-design)",
+      "Bash(mkdir -p /Users/user/Documents/GitHub/brain-storm/docs/diagrams)",
+      "Bash(node -e:*)"
     ],
     "deny": [],
     "ask": []
