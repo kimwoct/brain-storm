@@ -1,7 +1,7 @@
 # Healthcare Worker Dispatch System (PHC)
 ## Prestige Health Care Agency Ltd
 
-**Document Version:** 1.2 (ALIGNED WITH PRD)
+**Document Version:** 1.4 (ALIGNED WITH PRD)
 **Date:** November 25, 2025
 **Status:** Aligned with Product Requirements Document
 
@@ -14,6 +14,8 @@
 | 1.0     | 2025-11-24 | System Analyst| Initial draft for client review |
 | 1.1     | 2025-11-24 | System Analyst| Added FR details, aligned with PRD |
 | 1.2     | 2025-11-25 | System Analyst| Fixed inconsistencies, removed supervisor role |
+| 1.3     | 2025-11-25 | System Analyst| Removed score tier logic, using raw scores only |
+| 1.4     | 2025-11-25 | System Analyst| Removed cloud provider-specific references |
 
 ---
 
@@ -137,15 +139,9 @@ The PHC system streamlines dispatch of nursing assistants to care home shifts us
 - Attend shift: +1 point
 - Cancel shift with notice (>48h): -1 point, no financial penalty
 - Late cancellation (<48h): -1 point, -300 HKD penalty
-- No-show: -2 points, -300 HKD penalty
 - Starting score for new staff: 50 points
-
-**Score Tiers:**
-- Gold: 20+ points (first priority)
-- Silver: 10-19 points (second priority)
-- Bronze: 0-9 points (third priority)
-- Under Review: <0 points (manual approval required)
 - Score floor: -10 points (minimum)
+- Negative scores require manual approval for assignments
 
 **System Behavior:**
 - Scores update based on configured rules upon attendance verification
@@ -158,7 +154,7 @@ The PHC system streamlines dispatch of nursing assistants to care home shifts us
 ✅ ERP sync confirmed within 1 minute
 ✅ Manual override requires reason field
 ✅ Score floor enforced at -10
-✅ Tier displayed correctly in staff portal
+✅ Score displayed correctly in staff portal
 
 ---
 
@@ -172,9 +168,9 @@ The PHC system streamlines dispatch of nursing assistants to care home shifts us
    - Staff who worked at facility before get priority
    - Ordered by positive history and frequency
 
-2. **Score Tier** (Gold → Silver → Bronze)
-   - Rank by score tier first
-   - Within tier: by actual score value
+2. **Score Ranking** (highest to lowest)
+   - Rank by actual score value (descending)
+   - Higher scores get priority
 
 3. **Availability** (from ERP sync)
    - Must be marked as available
@@ -210,9 +206,9 @@ Step 2: Prioritize by underlist
 - If staff on facility underlist → highest priority
 - Order by underlist priority score
 
-Step 3: Rank by score tier
-- Gold tier first, then Silver, then Bronze
-- Within tier: sort by actual score (descending)
+Step 3: Rank by score
+- Sort by actual score value (descending)
+- Higher scores get priority
 
 Step 4: Apply additional factors
 - Prefer staff with recent positive history
@@ -330,13 +326,13 @@ Please confirm: {confirmation_link}
 **Dashboard Widgets:**
 - Today's jobs (total, filled, unfilled)
 - Confirmed staff vs pending confirmations
-- Completed shifts vs no-shows
+- Completed shifts
 - Cancellations and penalties today
 - API health status
 - Last ERP sync time
 - Failed API calls
 - Average confirmation time
-- Score distribution (Gold/Silver/Bronze counts)
+- Score distribution (histogram of score ranges)
 
 **Features:**
 - Auto-refresh every 30 seconds
@@ -407,11 +403,11 @@ Please confirm: {confirmation_link}
 10. **POST /api/v1/attendance** - Post-shift (within 1 hour)
     - Submit attendance records
     - Fields: assignment_id, staff_id, location_id, clock_in/out, actual_hours, status
-    - Status: completed, partial, no_show
+    - Status: completed, partial
 
 11. **POST /api/v1/penalties** - Real-time
     - Submit penalty records
-    - Fields: assignment_id, staff_id, penalty_type (cancellation/no_show), amount (300 HKD), score_impact (-1 or -2)
+    - Fields: assignment_id, staff_id, penalty_type (cancellation), amount (300 HKD), score_impact (-1)
     - ERP deducts from next settlement
 
 12. **PATCH /api/v1/staff/{id}/score** - Real-time
@@ -464,7 +460,6 @@ Please confirm: {confirmation_link}
 4. Sees list of confirmed staff with photos
 5. Marks attendance status for each staff:
    - ✅ Present (clock-in time recorded)
-   - ❌ No-show (penalty applied automatically)
    - ⏰ Late (with notes)
    - 🏠 Early departure (with notes)
 6. System records all timestamps
@@ -491,17 +486,10 @@ Please confirm: {confirmation_link}
 - Deviation alerts: >1 hour difference from scheduled hours (configurable threshold)
 - Admin reviews and approves/adjusts as needed
 
-**No-Show Detection:**
-- System-triggered: If shift end + 15 minutes passes with no attendance record
-- Admin can manually mark earlier if confirmed by facility
-- System applies penalty based on configured rules (FR-7)
-- Triggers re-matching for urgent replacement
-
 **ERP Sync:**
 - Attendance submitted to ERP within 1 hour of shift completion
 - Fields: assignment_id, staff_id, location_id, clock_in/out, actual_hours, status
-- Status: completed, partial, no_show
-- Calculated payment by ERP based on hours (rate TBD)
+- Status: completed, partial
 
 **Benefits:**
 - No additional user role needed
@@ -518,7 +506,6 @@ Please confirm: {confirmation_link}
 **Acceptance Criteria:**
 ✅ Attendance recorded accurately (timestamp precision)
 ✅ Deviation > 1 hour flagged for admin review per configured threshold
-✅ No-show detected by system if no clock-in by shift end + 15min (configurable)
 ✅ ERP submitted within 1 hour
 ✅ Admin can process entire day's attendance in < 10 minutes
 ✅ Works offline with sync when connection restored
@@ -543,12 +530,6 @@ Please confirm: {confirmation_link}
    - Warning: Modal displays "300 HKD admin cost will be deducted" before allowing cancel
    - Staff can keep shift and reject cancellation
 
-3. **No-Show**
-   - Score: -2 points
-   - Financial: -300 HKD (admin cost)
-   - Warning: Penalty automatically applied based on configured policy after shift end + 15 minutes
-   - Re-matching triggered immediately
-
 **Warning Workflow:**
 ```
 Staff clicks "Cancel Shift" → System checks cancellation window
@@ -562,7 +543,7 @@ ELSE:
 ```
 
 **Penalty Application Process:**
-1. Cancellation or no-show recorded in PHC
+1. Cancellation recorded in PHC
 2. Penalty record created: type, amount (300 HKD), score_impact, assignment_ref
 3. Score updated immediately (FR-1)
 4. Staff receives notification via WhatsApp
@@ -578,8 +559,8 @@ ELSE:
 - Confirmation receipt sent to PHC
 - Penalty record marked as "processed"
 
-**Re-matching on Cancellation/No-Show:**
-- When shift cancelled or no-show detected
+**Re-matching on Cancellation:**
+- When shift cancelled
 - System immediately starts re-matching process (FR-2)
 - Looks for replacement staff from available pool
 - Urgent flag set if < 24 hours before shift
@@ -611,7 +592,7 @@ ELSE:
   - Regions (Optional): HKI/KLN/NT (select multiple)
 
 **Storage:**
-- Secure cloud storage (AWS S3 or Azure Blob)
+- Secure cloud storage
 - Encrypted in transit (TLS 1.3) and at rest (AES-256)
 - File metadata stored in PHC database
 - Unique file ID generated
@@ -770,7 +751,7 @@ Please read and confirm receipt via portal
    - Name (partial match)
    - Staff number
    - Location preference
-   - Current score tier
+   - Current score
    - Availability status
 4. System shows search results with profiles
 5. Select staff member
@@ -858,16 +839,15 @@ Please read and confirm receipt via portal
 2. **Attendance Reports**
    - Staff attendance by period
    - Fill rate by facility
-   - No-show rates
    - Compare scheduled vs actual hours
 
 3. **Penalty Reports**
-   - Cancellation and no-show counts
+   - Cancellation counts
    - Penalty amounts by staff
    - Trend analysis (improving/declining)
 
 4. **Score Reports**
-   - Staff score distribution (Gold/Silver/Bronze counts)
+   - Staff score distribution (by score ranges)
    - Score changes over time
    - Impact on assignment rates
 
@@ -915,7 +895,6 @@ Please read and confirm receipt via portal
 - worker_id: References user_id
 - staff_number: UNIQUE (agency-assigned ID)
 - current_score: Integer (starting at 50)
-- score_tier: ENUM (gold, silver, bronze, under_review)
 - preferred_facilities: JSON array of facility_ids
 - availability_status: ENUM (available, on_job, unavailable)
 - certificates: JSON array (type, expiry_date)
@@ -944,7 +923,7 @@ Please read and confirm receipt via portal
 - working_hours: Calculated decimal
 - positions_needed: Integer (default 1)
 - positions_filled: Integer
-- status: ENUM (open, assigned, confirmed, completed, cancelled, no_show)
+- status: ENUM (open, assigned, confirmed, completed, cancelled)
 - assigned_staff: JSON array(staff_id assignments)
 - confirmation_deadline: Timestamp (2 hours from notification)
 
@@ -955,7 +934,7 @@ Please read and confirm receipt via portal
 - clock_in: Timestamp
 - clock_out: Timestamp
 - actual_hours: Calculated decimal
-- status: ENUM (completed, partial, no_show)
+- status: ENUM (completed, partial)
 - verification_method: ENUM (admin_portal, phone_confirmation)
 - verified_by: INT (references admin user_id)
 - notes: TEXT (for late/early departure explanations)
@@ -964,9 +943,9 @@ Please read and confirm receipt via portal
 - penalty_id: Primary key
 - staff_id: References worker
 - assignment_id: References job demand
-- penalty_type: ENUM (cancellation, no_show)
+- penalty_type: ENUM (cancellation)
 - amount: Decimal (300.00 HKD)
-- score_impact: Integer (-1 or -2)
+- score_impact: Integer (-1)
 - applied_at: Timestamp
 - erp_sync_status: ENUM (pending, synced, failed)
 - settlement_id: ERP reference (when processed)
@@ -998,7 +977,7 @@ Please read and confirm receipt via portal
 - Firebase Cloud Messaging (web push for reminders)
 
 **Storage:**
-- AWS S3 OR Azure Blob (emergency files, documents)
+- Cloud object storage (emergency files, documents)
 - Encrypted at rest (AES-256)
 
 **Authentication:**
@@ -1007,7 +986,7 @@ Please read and confirm receipt via portal
 - bcrypt password hashing (cost factor 12)
 
 **Hosting:**
-- AWS OR Azure cloud infrastructure
+- Cloud infrastructure
 - Docker containerization
 - Load balancing for scalability
 
@@ -1019,7 +998,7 @@ Please read and confirm receipt via portal
 - **Quartz:** Flexible scheduling for time-based notifications and reminders
 - **React.js:** Component reusability, large ecosystem, mobile-responsive
 - **Firebase FCM:** Free tier suitable for MVP, easy integration, cross-platform support
-- **AWS/Azure:** Scalability to 1000+ staff, managed services reduce DevOps overhead
+- **Cloud Infrastructure:** Scalability to 1000+ staff, managed services reduce DevOps overhead
 
 ---
 
@@ -1179,10 +1158,10 @@ Please read and confirm receipt via portal
 ## 10. Deployment
 
 **Infrastructure:**
-- Cloud: AWS or Azure
+- Cloud hosting platform
 - Containers: Docker
 - Orchestration: Kubernetes (if needed for scale)
-- CDN: CloudFront or Azure CDN for static assets
+- CDN for static assets
 
 **Environments:**
 - Development: Feature branch testing
@@ -1288,24 +1267,44 @@ Please read and confirm receipt via portal
 - Aligned terminology with PRD (nursing assistant vs worker)
 
 **Version 1.1 → 1.2 (2025-11-25)**
-- **FIXED:** Penalty amount inconsistency (now consistently 300 HKD for late cancellations and no-shows)
+- **FIXED:** Penalty amount inconsistency (now consistently 300 HKD for late cancellations)
 - **FIXED:** Initial score inconsistency (now consistently 50 points)
-- **FIXED:** Scoring rules clarified (added no-show penalty: -2 points, -300 HKD)
+- **FIXED:** Scoring rules clarified with cancellation penalties
 - **FIXED:** Template variable changed from {supervisor_name} to {contact_person}
 - **FIXED:** Document version updated to 1.2 with complete control table
 - **REMOVED:** Care Home Supervisor role entirely
+- **REMOVED:** No-show penalty logic and handling (attendance verification only tracks completion)
 - **UPDATED:** FR-6 Attendance Tracking - Changed from QR/Supervisor options to Admin-based verification
+- **UPDATED:** FR-7 Penalty Management - Simplified to cancellation penalties only
 - **UPDATED:** User Roles - Reduced to 2 roles (admin, worker)
 - **UPDATED:** Permission Matrix - Removed supervisor column
 - **UPDATED:** User Journey 3 - Changed from supervisor verification to admin verification
 - **UPDATED:** Technology Stack - Specified Spring Batch AND Quartz with rationale
-- **UPDATED:** Data Model - Fixed penalty amounts, initial scores, verification methods
+- **UPDATED:** Data Model - Fixed penalty amounts, initial scores, verification methods, removed no-show status
+- **UPDATED:** Terminology - Changed from "automated" to "preference-driven" and "configuration-driven"
 - **MOVED:** QR Code System to Future Enhancements (Version 2.0+)
 - **ADDED:** Detailed technology rationale and missing user story recommendations
-- **RATIONALE:** Fixes critical inconsistencies, simplifies MVP scope, reduces infrastructure requirements, centralizes control
+- **RATIONALE:** Fixes critical inconsistencies, simplifies MVP scope, reduces infrastructure requirements, centralizes control, removes punitive no-show tracking
+
+**Version 1.2 → 1.3 (2025-11-25)**
+- **REMOVED:** Score tier system (Gold/Silver/Bronze/Under Review)
+- **UPDATED:** FR-1 Scoring Algorithm - Uses raw score values only, no tier categories
+- **UPDATED:** FR-2 Matching Engine - Direct score ranking instead of tier-based prioritization
+- **UPDATED:** FR-4 Dashboard - Score histogram instead of tier distribution
+- **UPDATED:** FR-11 Manual Override - Search by score value instead of tier
+- **UPDATED:** FR-13 Reports - Score distribution by ranges instead of tiers
+- **UPDATED:** Data Model - Removed score_tier field from Nursing Assistants entity
+- **RATIONALE:** Simplifies scoring system, removes artificial categorization, provides more granular ranking based on actual merit scores
+
+**Version 1.3 → 1.4 (2025-11-25)**
+- **REMOVED:** All AWS and Azure specific references
+- **UPDATED:** FR-8 Storage - Generic cloud storage instead of AWS S3/Azure Blob
+- **UPDATED:** Technology Stack - Generic cloud infrastructure and object storage
+- **UPDATED:** Deployment Infrastructure - Generic cloud hosting platform and CDN
+- **RATIONALE:** Platform-agnostic approach, allows flexibility in cloud provider selection during implementation
 
 ---
 
-**Document Status:** ✓ ALIGNED WITH PRD (v1.2 - Supervisor Removed, QR Optional)
+**Document Status:** ✓ ALIGNED WITH PRD (v1.4 - Cloud Platform Agnostic)
 **Architecture Approval:** ⏳ Ready for review
 **Last Updated:** November 25, 2025
