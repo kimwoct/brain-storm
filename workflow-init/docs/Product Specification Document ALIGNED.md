@@ -7,6 +7,14 @@
 
 ---
 
+## Document Control
+
+| Version | Date       | Author        | Changes                      |
+|---------|------------|---------------|------------------------------|
+| 1.0     | 2025-11-24 | System Analyst| Initial draft for client review |
+
+---
+
 ## Executive Summary
 
 This document specifies the functional and technical requirements for the Prestige Health Dispatch System (PHC), a web-based platform designed to automate healthcare worker-to-facility matching based on merit-based scoring and real-time availability.
@@ -451,12 +459,6 @@ Please confirm: {confirmation_link}
 4. System validates QR and records clock-in time
 5. Supervisor can view real-time attendance in portal
 
-**QR Code Generation:**
-- System admin generates QR codes for all locations
-- Provided as printable PDFs (A4 size) for display
-- QR token expires after shift end time
-- Unique per location, reusable
-
 **Clock-in Rules:**
 - Valid window: within 1 hour of shift start (earlier rejected)
 - Staff must have confirmed assignment for that shift
@@ -520,13 +522,13 @@ Please confirm: {confirmation_link}
 
 1. **Cancellation** (with notice, >48 hours before shift)
    - Score: -1 point
-   - Financial: -100 HKD
+   - Financial: --- HKD (admin cost)
    - Warning: None (acceptable notice period)
 
 2. **Late Cancellation** (<48 hours before shift)
    - Score: -1 point
-   - Financial: -100 HKD
-   - Warning: Modal displays "100 HKD will be deducted" before allowing cancel
+   - Financial: -300 HKD (admin cost)
+   - Warning: Modal displays "300 HKD admin cost will be deducted" before allowing cancel
    - Staff can keep shift and reject cancellation
 
 **Warning Workflow:**
@@ -543,7 +545,7 @@ ELSE:
 
 **Penalty Application Process:**
 1. Cancellation or no-show recorded in PHC
-2. Penalty record created: type, amount (100 HKD), score_impact, assignment_ref
+2. Penalty record created: type, amount (300 HKD), score_impact, assignment_ref
 3. Score updated immediately (FR-1)
 4. Staff receives notification via WhatsApp
 5. Notification appears in portal inbox
@@ -553,7 +555,7 @@ ELSE:
 
 **Financial Deduction:**
 - API to ERP: POST /api/v1/finance/deduction (TBD - awaiting ERP specification)
-- Staff ID, amount (100 HKD), reason, assignment reference
+- Staff ID, amount (300 HKD), reason, assignment reference
 - ERP deducts from payment in next payroll cycle
 - Confirmation receipt sent to PHC
 - Penalty record marked as "processed"
