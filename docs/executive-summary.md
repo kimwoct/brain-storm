@@ -38,7 +38,7 @@ PHC automatically matches nursing assistants to care home shifts based on perfor
 **Core Features:**
 ✅ Four-stage workflow automation (Registration, Job Posting, Matching, Settlement)
 ✅ Scoring system (+1 attend, -1 cancel)
-✅ Financial penalties (−100 HKD for cancellation/no-show)
+✅ Financial penalties (−300 HKD for cancellation/no-show)
 ✅ Firebase web push notifications and confirmations
 ✅ Admin portal for monitoring and overrides
 ✅ Emergency file upload and distribution
