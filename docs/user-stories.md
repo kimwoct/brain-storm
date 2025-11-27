@@ -1,8 +1,10 @@
 # User Stories & Test Cases
 **Prestige Health Dispatch System (PHC)**
 
-**Version:** 1.0
-**Date:** 2025-11-24
+**Version:** 1.1
+**Date:** 2025-11-27
+
+**Aligned With:** Product Specification v1.5 (Human Screening Workflow)
 
 ---
 
@@ -12,20 +14,23 @@
 
 | User Story | Related FRs            | Description                     |
 | ---------- | ---------------------- | ------------------------------- |
-| US-NA-01   | FR-2, FR-3             | Receive assignment notification |
-| US-NA-02   | FR-1, FR-2, FR-3       | Confirm shift assignment        |
-| US-NA-03   | FR-1, FR-3, FR-7       | Cancel shift with warning       |
-| US-NA-04   | FR-1                   | View score and tier             |
-| US-NA-05   | FR-1, FR-3, FR-6, FR-7 | No-show penalty notification    |
-| US-CS-01   | FR-2                   | View today's assigned staff     |
-| US-CS-02   | FR-6                   | Verify staff clock-in           |
-| US-CS-03   | FR-6, FR-7             | Mark staff as no-show           |
+| US-NA-01   | FR-2, FR-3             | Receive job notification via WhatsApp |
+| US-NA-02   | FR-1, FR-2, FR-3       | Apply for available shift       |
+| US-NA-03   | FR-1, FR-3, FR-7       | Cancel shift with penalty warning |
+| US-NA-04   | FR-1                   | View current score *(Deferred)*   |
+| US-NA-05   | FR-1, FR-6             | View job history                |
+| US-NA-06   | FR-7                   | View penalty history            |
+| US-NA-07   | FR-8                   | Acknowledge required documents  |
+| US-CS-01   | FR-2                   | *(Removed - Supervisor role deprecated)* |
+| US-CS-03   | FR-6, FR-7             | *(Removed - Supervisor role deprecated)* |
 | US-ADM-01  | FR-4, FR-5             | View real-time dashboard        |
 | US-ADM-02  | FR-2, FR-11            | Manual assignment override      |
 | US-ADM-03  | FR-8                   | Upload emergency protocol       |
 | US-ADM-04  | FR-3, FR-8             | Distribute emergency files      |
 | US-ADM-05  | FR-9                   | Post emergency job              |
 | US-ADM-06  | FR-5, FR-12, FR-13     | View system logs and reports    |
+| US-ADM-07  | FR-2                   | View job applications overview  |
+| US-ADM-08  | FR-8                   | Verify document acknowledgment  |
 | US-ERP-01  | FR-5                   | Staff master data sync          |
 | US-ERP-02  | FR-5                   | Location master data sync       |
 | US-ERP-03  | FR-5                   | Job demand sync                 |
@@ -37,95 +42,143 @@
 
 ### 1. Nursing Assistant (護理員) User Stories
 
-#### US-NA-01: Receive Shift Assignment Notification
+#### US-NA-01: Receive Job Notification via Web Push Notification/WhatsApp
 **As a** nursing assistant,
-**I want** to receive platform notifications (via Firebase) when assigned to a shift,
-**So that** I can respond quickly and confirm my availability.
-
-**Acceptance Criteria:**
-✅ Notification includes: date, location name, shift time, contact person
-✅ Firebase push notification delivered within 5 minutes of assignment
-✅ Contains confirmation button
-✅ Contains cancellation button
-✅ Reminder sent if not confirmed within 2 hours
-✅ Works on both desktop and mobile browsers
-
-**Priority:** Critical
-
----
-
-#### US-NA-02: Confirm Shift Assignment
-**As a** nursing assistant,
-**I want** to confirm my shift assignment via the PHC platform,
-**So that** the care home knows I'm coming and my score increases.
+**I want** to receive job notifications via Web Push Notification/WhatsApp when shifts are available,
+**So that** I can apply for suitable shifts quickly.
 
 **Scenario:**
 ```gherkin
-Given: I receive a platform notification about a new assignment
-When: I open the PHC platform (web or mobile)
-And: I click "Apply" button
-Then: My response is recorded
-And: Assignment status changes to "confirmed"
-And: My score increases by 1 point
-And: I receive confirmation push notification
+Given: PHC System has sent the web push notifcation when receive the new job posting from ERP system
+Given: PHC coordinator has generated a WhatsApp template for available shifts
+When: Coordinator sends the message to my WhatsApp (individual or broadcast)
+Then: I receive notification with shift details
+And: Message includes: date, location name, shift time, contact person
+And: Message includes a application link to the PHC portal
+And: I can click the link to view and apply for the shift
 ```
 
 **Acceptance Criteria:**
-✅ Confirmation recorded immediately
-✅ Score increases (+1 point)
-✅ ERP updated via API
-✅ Confirmation Firebase push notification delivered
-✅ Confirmation visible in platform
+✅ WhatsApp message includes: date, location name, shift time, contact person
+✅ Application link opens PHC web portal with shift details
+✅ Web push reminder sent if not applied within 2 hours (if logged into portal)
+✅ Works on both mobile and desktop browsers
+✅ Bilingual support (English + Traditional Chinese)
 
 **Priority:** Critical
 
+**Note:** WhatsApp is primary channel (manual template-based). Web push notification is secondary for portal alerts only.
+
 ---
 
-#### US-NA-03: Cancel Shift with Warning
+#### US-NA-02: Apply for Available Shift
 **As a** nursing assistant,
-**I want** to cancel a shift when needed via the PHC platform,
-**So that** the system can find a replacement, but I understand the penalty.
+**I want** to apply for available shifts via the PHC web portal,
+**So that** I can be considered for assignment by the PHC administrator.
 
-**Scenario:**
+**Scenario - Apply for Shift:**
 ```gherkin
-Given: I have a pending assignment
-When: I open the PHC platform
-And: I view my assignment
+Given: I click the application link from WhatsApp message
+When: I open the PHC web portal
+Then: I see the shift details (date, location, time, contact person, special notes)
+And: I see the cancellation penalty warning
+When: I click "Apply" button
+Then: My application is recorded with status "pending_approval"
+And: PHC administrator receives notification of my application
+```
+
+**Scenario - Application Approved:**
+```gherkin
+Given: I have applied for a shift
+When: PHC administrator approves my application
+Then: Assignment status changes to "confirmed"
+And: I receive confirmation notification (WhatsApp or web push)
+And: Assignment appears in "My Shifts" with confirmed status
+And: My score will increase by +1 point upon attendance verification
+```
+
+**Acceptance Criteria:**
+✅ Application recorded immediately with "pending_approval" status
+✅ Cancellation penalty warning displayed before applying
+✅ Admin notified of new application
+✅ Score increases (+1 point) only after attendance verification (not upon confirmation)
+✅ ERP updated via API after admin approval
+✅ Confirmation visible in "My Shifts" section
+✅ Conflict check: Cannot apply if already assigned to overlapping shift
+
+**Priority:** Critical
+
+**Note:** This implements the Human Screening Workflow per Product Spec v1.5 - staff apply, admin screens and approves.
+
+---
+
+#### US-NA-03: Cancel Shift with Penalty Warning
+**As a** nursing assistant,
+**I want** to cancel a confirmed shift when needed via the PHC portal,
+**So that** the system can find a replacement, and I understand the consequences.
+
+**Scenario - Early Cancellation (>48 hours before shift):**
+```gherkin
+Given: I have a confirmed assignment more than 48 hours before shift start
+When: I navigate to "My Shifts" in the PHC portal
 And: I click "Cancel Shift"
-Then: I see warning modal: "300HKD admin cost will be deducted when you apply AL within 48 hours before coming job!"
-And: I see penalty details (-1 score, -300 HKD)
+Then: I see confirmation modal: "You are cancelling with sufficient notice."
+And: I see penalty details: -1 score, no financial penalty
 When: I confirm cancellation
-Then: Assignment cancelled
+Then: Assignment status changes to "cancelled"
 And: Score decreases by 1 point
-And: 300 HKD deducted from payment
-And: I receive cancellation confirmation via push notification
+And: No financial penalty applied
+And: I receive cancellation confirmation
+And: Re-matching triggered for the vacancy
+```
+
+**Scenario - Late Cancellation (<48 hours before shift):**
+```gherkin
+Given: I have a confirmed assignment less than 48 hours before shift start
+When: I navigate to "My Shifts" in the PHC portal
+And: I click "Cancel Shift"
+Then: I see warning modal: "⚠️ Late Cancellation Warning: 300 HKD admin cost will be deducted!"
+And: I see penalty details: -1 score AND -300 HKD
+And: I see buttons: [Keep Shift] [Confirm Cancellation]
+When: I click "Confirm Cancellation"
+Then: Assignment status changes to "cancelled"
+And: Score decreases by 1 point
+And: 300 HKD penalty recorded for next settlement deduction
+And: I receive cancellation confirmation
+And: Re-matching triggered with urgent flag
 ```
 
 **Acceptance Criteria:**
-✅ Warning modal displayed clearly in platform
-✅ Penalty applied immediately (score + financial)
-✅ Staff can keep shift (reject cancellation)
-✅ ERP updated via API
-✅ Re-matching triggered
+✅ System checks cancellation window (48-hour threshold)
+✅ Warning modal displayed clearly for late cancellations
+✅ Early cancellation: -1 score only, no financial penalty
+✅ Late cancellation: -1 score AND 300 HKD penalty
+✅ Staff can keep shift (reject cancellation) after seeing warning
+✅ ERP updated via penalty API (POST /api/v1/penalties)
+✅ Re-matching triggered for vacancy (urgent if <24 hours)
 ✅ Cancellation recorded in staff's assignment history
+✅ Admin alerted if unfilled after 30 minutes
 
 **Priority:** High
 
+**Note:** Per Product Spec FR-7, only late cancellations (<48h) incur financial penalty.
+
 ---
 
-#### US-NA-04: View My Score and Tier (will be removed)
+#### US-NA-04: View My Score *(Deferred to Phase 2)*
 **As a** nursing assistant,
-**I want** to view my current score and tier,
-**So that** I understand my priority level and can improve it.
+**I want** to view my current score and score history,
+**So that** I understand my reliability standing and can improve it.
 
 **Acceptance Criteria:**
-✅ Current score displayed (number)
-✅ Tier displayed (Gold/Silver/Bronze/UnderReview)
+✅ Current score displayed as number (starting at 50, floor at -10)
 ✅ Score history available (last 10 changes)
-✅ Reason for each change shown
-✅ Tips provided for improving score
+✅ Each change shows: date, reason (attended/cancelled), impact (+1/-1)
+✅ Assignment reference for each score change
 
-**Priority:** Medium
+**Priority:** Medium *(Deferred)*
+
+**Note:** Per Product Spec v1.3, tier system (Gold/Silver/Bronze) was removed. System uses raw score values only for ranking. Negative scores require manual admin approval for assignments.
 
 ---
 
@@ -154,8 +207,8 @@ Then: I see detailed information including assignment date, shift times, locatio
 ✅ Job history displays past assignments (last 12 months)
 ✅ Each record shows: date, location, shift time, status
 ✅ Status clearly indicated: Completed, Cancelled, No-Show
-✅ Score impact shown: +1 (attended), -1 (cancelled), -2 (no-show)
-✅ Penalties displayed with amount (100 HKD) and reason
+✅ Score impact shown: +1 (attended), -1 (cancelled)
+✅ Penalties displayed with amount (300 HKD for late cancellation) and reason
 ✅ Filter by date range available
 ✅ Filter by status available
 ✅ Pagination supported (20 records per page)
@@ -166,27 +219,27 @@ Then: I see detailed information including assignment date, shift times, locatio
 
 ---
 
-#### US-NA-06: Penalty List
+#### US-NA-06: View Penalty History
 **As a** nursing assistant,
-**If** I don't show up for a confirmed shift,
-**Then** I receive penalty score deduction via platform and understand consequences.
+**I want** to view my penalty history,
+**So that** I can understand past deductions and improve my reliability.
 
 **Scenario:**
 ```gherkin
-Given: I confirmed a shift but didn't attend
-When: Shift end time passes
-Then: Supervisor marks me as absent in platform
-And: I receive push notification: "You were marked absent. 300 HKD penalty applied. Score: -1 points"
-And: I see the penalty in my platform notification center
+Given: I am logged into the PHC platform
+When: I navigate to "My Penalties" section
+Then: I see a list of all penalties applied to my account
+And: Each record shows: date, type (late cancellation), amount (300 HKD), score impact (-1)
+And: I can see the related assignment details
 ```
 
 **Acceptance Criteria:**
-✅ Penalty notification delivered via Firebase push
-✅ Notification appears in platform inbox
-✅ Score decreases by 1 points
-✅ 300 HKD deducted
-✅ ERP penalty record created
-✅ Penalty visible in staff's penalty history
+✅ Penalty history displays all past penalties
+✅ Each record shows: date, penalty type, amount, score impact
+✅ Related assignment details accessible
+✅ Filter by date range available
+✅ Penalties synced with ERP records
+✅ Clear explanation of penalty reason shown
 
 **Priority:** High
 
@@ -194,88 +247,100 @@ And: I see the penalty in my platform notification center
 
 ### 2. Care Home Supervisor User Stories
 
-#### US-CS-00:  Jobs Overview Update (Manually Update) [fixme]
-**As a** care home supervisor,
-**If** I don't show up for a confirmed shift,
-**Then** I receive penalty score deduction via platform and understand consequences.
+#### US-ADM-07: View Job Applications Overview
+**As a** PHC administrator,
+**I want** to view all staff applications for each job posting,
+**So that** I can screen candidates and approve assignments.
 
 **Scenario:**
 ```gherkin
-Given: I confirmed a shift but didn't attend
-When: Shift end time passes
-Then: Supervisor marks me as absent in platform
-And: I receive push notification: "You were marked absent. 300 HKD penalty applied. Score: -1 points"
-And: I see the penalty in my platform notification center
+Given: A job posting has received staff applications
+When: I navigate to the job posting details
+Then: I see a list of all staff who have applied
+And: Each applicant shows: name, score, availability status, relevant history
+And: I can approve or reject each application
+When: I approve an application
+Then: The assignment is confirmed and staff is notified
 ```
 
 **Acceptance Criteria:**
-✅ Penalty notification delivered via Firebase push
-✅ Notification appears in platform inbox
-✅ Score decreases by 1 points
-✅ 300 HKD deducted
-✅ ERP penalty record created
-✅ Penalty visible in staff's penalty history
+✅ All applications visible for each job posting
+✅ Applicant details include score and work history
+✅ Approve/reject actions available
+✅ Bulk approval supported for multiple applicants
+✅ Rejected applicants notified with reason (optional)
+✅ Approved assignments synced to ERP
+
+**Priority:** High
+
+**Note:** This replaces the removed Care Home Supervisor role. PHC Admin now handles application screening.
+
+---
+
+#### US-ADM-08: Verify Staff Document Acknowledgment
+**As a** PHC administrator,
+**I want** to verify that staff have read and acknowledged required documents (remarks, supplements, protocols) before starting their duty,
+**So that** I can ensure compliance and staff preparedness.
+
+**Scenario - View Document Acknowledgment Status:**
+```gherkin
+Given: A job posting has required documents attached (remarks, supplements, protocols)
+When: I navigate to the job posting details
+Then: I see a list of assigned staff with their document acknowledgment status
+And: Each staff shows: name, documents required, documents viewed, documents acknowledged
+And: Staff who have not acknowledged are highlighted in red
+```
+
+**Scenario - Send Reminder for Unacknowledged Documents:**
+```gherkin
+Given: Staff have not acknowledged required documents before shift start
+When: I click "Send Reminder" for specific staff
+Then: A push notification is sent reminding them to review documents
+And: Reminder is logged in the system
+```
+
+**Acceptance Criteria:**
+✅ Document acknowledgment status visible per staff per job
+✅ Shows: document name, view timestamp, acknowledgment timestamp
+✅ Unacknowledged documents clearly highlighted (red indicator)
+✅ Filter by acknowledgment status (All/Acknowledged/Pending)
+✅ Bulk reminder option for all staff with pending acknowledgments
+✅ Individual reminder option per staff
+✅ Report exportable showing acknowledgment compliance rate
+✅ Staff cannot be marked as "ready for duty" until all required documents acknowledged
+✅ Acknowledgment tracking synced with emergency file distribution (FR-8)
 
 **Priority:** High
 
 ---
-#### US-CS-01: View Job Applied Staff
-**As a** care home supervisor,
-**I want** to see who is assigned to work today,
-**So that** I can prepare and verify attendance.
 
-**Acceptance Criteria:**
-✅ List shows all applied assignments for this job posting
-✅ Shows staff name, contact number, shift time
-✅ Shows photo (if available)
-✅ Shows expected arrival time
+#### US-NA-07: Acknowledge Required Documents
+**As a** nursing assistant,
+**I want** to view and acknowledge required documents before my shift,
+**So that** I am prepared and compliant with duty requirements.
 
-**Priority:** High
-
----
-
-#### US-CS-02: Verify Staff Clock-In (Optional)
-**As a** care home supervisor,
-**I want** to verify staff clock-in/out,
-**So that** attendance is accurately recorded.
-
-**Scenario (Option A - QR Code):**
+**Scenario:**
 ```gherkin
-Given: Staff scans QR code at location
-When: QR contains valid assignment data
-Then: Clock-in time recorded
-And: Supervisor notified
-```
-
-**Scenario (Option B - Manual Verification):**
-```gherkin
-Given: Staff arrives at location
-When: Supervisor confirms presence in portal
-Then: Clock-in time recorded
-And: Attendance marked as "present"
+Given: I have a confirmed assignment with required documents
+When: I navigate to my assignment details
+Then: I see a list of required documents to review
+And: Each document shows: title, priority (Normal/High/Critical), status (Unread/Read/Acknowledged)
+When: I open and read a document
+Then: The document is marked as "Read" with timestamp
+When: I click "I Acknowledge" checkbox
+Then: The document is marked as "Acknowledged" with timestamp
+And: Admin can see my acknowledgment status
 ```
 
 **Acceptance Criteria:**
-✅ Clock-in time within 1 hour of shift start accepted
-✅ Clock-out time recorded at shift end
-✅ Deviations > 1 hour flagged for approval
-✅ QR code or manual verification works
-
-**Priority:** Low
-
----
-
-#### US-CS-03: Mark Staff as No-Show/Penalty
-**As a** care home supervisor,
-**I want** to mark staff as absent when they don't arrive,
-**So that** penalty is applied and replacement can be found.
-
-**Acceptance Criteria:**
-✅ No-show button shown after shift end + 15 minutes
-✅ Requires supervisor confirmation (Are you sure?)
-✅ Penalties automatically applied
-✅ Re-matching triggered immediately
-✅ Admin notified of no-show
+✅ Required documents displayed prominently on assignment details
+✅ Documents accessible via link (opens in new tab or viewer)
+✅ Read status tracked when document is opened
+✅ Acknowledgment requires explicit action (checkbox or button)
+✅ Acknowledgment timestamp recorded
+✅ Push notification reminder if documents not acknowledged 24h before shift
+✅ Critical priority documents highlighted
+✅ Acknowledgment status visible in "My Job History"
 
 **Priority:** High
 
@@ -284,52 +349,73 @@ And: Attendance marked as "present"
 ### 3. PHC Admin User Stories
 
 #### US-ADM-01: View Real-Time Dashboard
-**As a** PHC admin,
-**I want** to see real-time metrics on dashboard,
-**So that** I can monitor system health and performance.
+**As a** PHC administrator,
+**I want** to see real-time operational metrics on the dashboard,
+**So that** I can monitor system health, track job fill rates, and identify issues.
 
 **Dashboard Widgets:**
 - Today's jobs (total/filled/unfilled)
-- Confirmed staff vs pending confirmations
-- Completed shifts vs no-shows
+- Confirmed staff vs pending applications
+- Completed shifts
 - Cancellations and penalties today
 - API health status
-- Last sync time
+- Last ERP sync time
 - Failed API calls
+- Average confirmation time
+- Score distribution histogram
 
 **Acceptance Criteria:**
-✅ All metrics update every 30 seconds
-✅ Click to drill down to details
-✅ Color-coded status (green/yellow/red)
+✅ All metrics auto-refresh every 60 seconds
+✅ Click any metric to drill down to details
+✅ Color-coded status indicators (green/yellow/red)
+✅ Load time < 30 seconds
+✅ Filter by date range, facility, shift type
+✅ Export to PDF/Excel for management reports
 
 **Priority:** High
+
+**Note:** Per Product Spec v1.2, no-show tracking was removed. Dashboard shows completed vs cancelled shifts only.
 
 ---
 
 #### US-ADM-02: Manual Assignment Override
-**As a** PHC admin,
-**I want** to manually assign staff to jobs,
-**So that** I can handle special cases and emergencies.
+**As a** PHC administrator,
+**I want** to manually assign specific staff to jobs,
+**So that** I can handle special facility requests, unique qualifications, and emergency situations.
 
 **Scenario:**
 ```gherkin
-Given: A job demand is unfilled
-When: I search for available staff
-And: Select specific staff member
-And: Provide override reason
-Then: Assignment created (assigned_by: manual_admin)
-And: WhatsApp notification sent
-And: Override logged with my admin ID
+Given: A job demand is unfilled or requires specific staff
+When: I click "Manual Assignment" on the job details
+And: I search for staff by name, staff number, or availability
+Then: I see search results with staff profiles (from ERP)
+And: Each result shows: name, score, availability, recent history
+When: I select a staff member
+Then: System displays conflict warnings if any:
+  - Staff already assigned to overlapping shift
+  - Staff on facility blacklist
+  - Staff unavailable that day
+  - Staff will exceed fair sharing limits
+When: I enter override reason (minimum 20 characters, required)
+And: I confirm assignment
+Then: Assignment created with assigned_by = "manual_admin"
+And: WhatsApp template generated for coordinator to send
+And: Override logged with: admin ID, timestamp, reason, original match (if any)
 ```
 
 **Acceptance Criteria:**
-✅ Search by name, location, score, availability
-✅ Conflict warnings displayed
-✅ Reason required for all overrides
-✅ Audit log complete
-✅ ERP updated via API
+✅ Search by name, staff number, score, location preference, availability status
+✅ Staff profiles fetched from ERP with current data
+✅ Conflict warnings displayed clearly (from ERP data)
+✅ Override reason required (minimum 20 characters)
+✅ Audit trail complete and immutable
+✅ ERP updated with manual assignment flag
+✅ WhatsApp template ready for coordinator
+✅ Original algorithm selection recorded for analysis
 
 **Priority:** Medium
+
+**Note:** Per Product Spec FR-11, audit trail cannot be deleted or modified after creation.
 
 ---
 
@@ -341,7 +427,7 @@ And: Override logged with my admin ID
 **Acceptance Criteria:**
 ✅ Upload PDF, DOC, DOCX, JPG, PNG (max 10MB)
 ✅ Enter title (required), description, priority, regions
-✅ Files stored securely (S3/Azure Blob)
+✅ Files stored securely (secure file server)
 ✅ Unique file ID generated
 ✅ Upload logged with my admin ID
 
@@ -350,49 +436,73 @@ And: Override logged with my admin ID
 ---
 
 #### US-ADM-04: Distribute Emergency Files
-**As a** PHC admin,
-**I want** to notify staff of new emergency protocols via platform push notifications,
-**So that** they receive critical information quickly without leaving the platform.
+**As a** PHC administrator,
+**I want** to distribute emergency protocols to relevant staff via WhatsApp and web push,
+**So that** they receive critical information quickly.
 
 **Scenario:**
 ```gherkin
-Given: I uploaded emergency file with Critical priority
-When: File uploaded successfully
-Then: System identifies affected staff
-And: Sends Firebase push notification to all relevant staff within 5 minutes
-And: Staff receive in-app alert for Critical priority
-And: Notifications appear in platform inbox
-And: Tracks who viewed the file in platform
-And: Tracks who confirmed in platform
+Given: I uploaded an emergency file with priority = Critical
+And: I specified target regions (e.g., HKI, KLN)
+When: File upload completes successfully
+Then: System identifies affected staff based on regions
+And: Generates WhatsApp message template with file link
+And: Coordinator sends WhatsApp to affected staff
+And: For Critical priority: Firebase web push sent as in-app alert
+And: Notification appears in staff's portal inbox
+And: System tracks who viewed the file
+And: System tracks who confirmed receipt
 ```
 
 **Acceptance Criteria:**
-✅ Firebase push notifications sent within 5 minutes
-✅ Only affected staff notified (by region if specified)
-✅ View tracking works in platform
-✅ Confirmation tracking works in platform
-✅ Reports show delivery/confirmation rates
-✅ In-app alert for Critical priority
-✅ Notifications appear in platform inbox
+✅ WhatsApp template generated with file link within 5 minutes
+✅ Only affected staff notified (filtered by region if specified)
+✅ Web push notification for Critical priority
+✅ View tracking works (accurate counts per staff)
+✅ Confirmation tracking works (explicit acknowledgment)
+✅ Admin dashboard shows: sent count, viewed count, confirmed count
+✅ Staff who haven't viewed highlighted in red
+✅ Report exportable for compliance documentation
 
 **Priority:** Medium
+
+**Note:** WhatsApp is primary channel per Product Spec FR-3. Firebase web push is supplementary for in-portal alerts.
 
 ---
 
 #### US-ADM-05: Post Emergency Job
-**As a** PHC admin,
+**As a** PHC administrator,
 **I want** to post emergency jobs manually,
-**So that** urgent staffing needs are filled immediately.
+**So that** urgent staffing needs are filled immediately without waiting for the standard polling cycle.
+
+**Scenario:**
+```gherkin
+Given: There is an urgent staffing need (e.g., 2 staff needed today 18:00-22:00)
+When: I click "Emergency Job Posting" in the admin portal
+And: I fill the form: facility, date/time, staff count, urgency reason
+And: I click "Post Emergency Job"
+Then: Job posted immediately (bypasses 15-minute polling delay)
+And: Matching engine runs instantly
+And: Urgent WhatsApp template generated for shortlisted staff
+And: Coordinator sends WhatsApp with urgent flag
+And: In-app alert sent via Firebase (Critical priority)
+And: Dashboard shows real-time filling progress
+And: If unfilled after 30 minutes: admin receives push/email alert
+```
 
 **Acceptance Criteria:**
-✅ Emergency job posted immediately (bypasses standard workflow)
-✅ Bypasses 15-minute polling delay
-✅ Real-time matching triggered
-✅ Urgent Firebase push notification sent with in-app alert
-✅ Real-time dashboard shows filling progress
-✅ Admin alerted if shortage after 30 minutes
+✅ No delay in posting (bypasses standard 15-minute polling)
+✅ Matching triggered instantly
+✅ Urgent WhatsApp template with "URGENT" badge
+✅ Firebase in-app alert for Critical priority
+✅ Dashboard updates with real-time filling progress
+✅ Admin alert sent if unfilled after 30 minutes
+✅ Staff can accept immediately via portal
+✅ ERP updated within 1 minute of confirmation
 
 **Priority:** High
+
+**Note:** Per Product Spec FR-9, emergency jobs receive highest priority in the matching engine.
 
 ---
 
@@ -492,21 +602,26 @@ And: Tracks who confirmed in platform
 
 #### US-ERP-04: Receive Assignment Submission
 **As an** ERP system,
-**I want** to receive staff assignments from PHC,
+**I want** to receive approved staff assignments from PHC,
 **So that** I can track confirmed placements and process payroll.
 
 **API:** POST /api/v1/jobs/assignments
+**Trigger:** When PHC admin approves a staff application
 **Data Received:**
-- Assignment ID, demand ID, staff ID, location ID
+- PHC assignment ID, demand ID, staff ID, location ID
 - Date, shift times, assigned timestamp
+- assigned_by: "system_auto" or "manual_admin"
 
 **Acceptance Criteria:**
 ✅ Accepts valid assignment data
-✅ Returns assignment ID
+✅ Returns ERP assignment ID
 ✅ Validates staff availability (no conflicts)
-✅ Returns 409 if staff unavailable
+✅ Returns 409 if staff unavailable or already assigned
+✅ Response time < 3 seconds
 
 **Priority:** Critical
+
+**Note:** Per Product Spec v1.5, assignments submitted after admin screening approval.
 
 ---
 
@@ -516,66 +631,90 @@ And: Tracks who confirmed in platform
 **So that** I can calculate accurate payroll.
 
 **API:** POST /api/v1/attendance
+**Trigger:** Post-shift verification by PHC admin (within 1 hour of shift completion)
 **Data Received:**
 - Assignment ID, staff ID, location ID
-- Clock-in/out times
-- Actual hours worked
-- Status (completed/partial/no_show)
+- Shift date
+- Actual hours worked (calculated decimal)
+- Status: completed, partial
+- Verification method: admin_portal, phone_confirmation
+- Verified by: admin user_id
+- Notes (for late arrival, early departure)
 
 **Acceptance Criteria:**
 ✅ Accepts valid attendance data
-✅ Calculates payment based on hours
-✅ Returns calculated amount
+✅ Calculates payment based on actual hours
+✅ Returns calculated payment amount
 ✅ Links to assignment and staff records
+✅ Submitted within 1 hour of shift completion
 
 **Priority:** High
+
+**Note:** Per Product Spec v1.2, no-show status was removed. Admin verifies attendance via phone confirmation with facility contacts.
 
 ---
 
 #### US-ERP-06: Receive Penalty Records
 **As an** ERP system,
 **I want** to receive penalty records from PHC,
-**So that** I can deduct 100 HKD from staff payments.
+**So that** I can deduct amounts from staff settlements.
 
 **API:** POST /api/v1/penalties
+**Trigger:** When staff cancels a confirmed shift
 **Data Received:**
-- Penalty type (cancellation/no_show)
-- Amount (100 HKD)
-- Score impact (-1 or -2)
-- Assignment reference
+- Assignment ID, staff ID
+- Penalty type: "cancellation" (>48h) or "late_cancellation" (<48h)
+- Amount: 0 HKD (cancellation) or 300 HKD (late_cancellation)
+- Score impact: -1
+- Reason text
 
 **Acceptance Criteria:**
 ✅ Accepts valid penalty data
-✅ Deducts from next settlement
-✅ Returns deduction confirmation
+✅ Deducts 300 HKD from next settlement (for late_cancellation only)
+✅ Returns deduction confirmation with penalty_id
+✅ Links to original assignment record
 
 **Priority:** High
 
-**Note:** Actual deduction API TBD before development
+**Note:** Per Product Spec FR-7:
+- Cancellation (>48h): -1 score only, NO financial penalty
+- Late cancellation (<48h): -1 score AND 300 HKD penalty
+- No-show penalties removed in v1.2
 
 ---
-
-### 7. Reporting Test Cases (Removed)
-
 #### TC-RPT-01: Settlement Reconciliation Accuracy
-**Objective:** Verify settlement reconciliation report is accurate
+**Objective:** Verify settlement reconciliation report correctly identifies discrepancies
+
+**Test Data:**
+- Period: November 2025
+- PHC assignments: 150 staff worked
+- PHC penalties: 15 late cancellations (300 HKD each = 4,500 HKD total)
+- ERP penalties: 13 applied (3,900 HKD)
+- Expected discrepancy: 2 penalties missing in ERP (600 HKD)
 
 **Preconditions:**
-- November 2025: 150 staff worked
-- PHC shows: 145 penalties totaling $14,500
-- ERP shows: 143 penalties totaling $14,300
-- 2 penalties in PHC not in ERP (discrepancy to find)
+- November 2025 assignments completed
+- ERP settlement data available via API
+- Finance administrator logged in
 
 **Test Steps:**
-1. Generate settlement reconciliation report for November 2025
-2. Review unmatched records section
+1. Navigate to Reports → Settlement Reconciliation
+2. Select Period: November 2025
+3. Click "Generate Report"
+4. Review Summary tab
+5. Review Unmatched tab
+6. Review Action List tab
 
 **Expected Results:**
-✅ Report shows 145 PHC penalties vs 143 ERP penalties
-✅ Identifies the 2 missing penalties in ERP
-✅ Shows $14,500 PHC vs $14,300 ERP ($200 difference)
-✅ Match rate calculated: 98.6% (143/145)
-✅ Discrepancies properly categorized and documented
+✅ Report generated within 30 seconds
+✅ Match rate displayed: 13/15 = 86.7% (penalties)
+✅ Summary shows: 150 assignments, 15 PHC penalties, 13 ERP penalties
+✅ Unmatched tab lists 2 missing penalties with details:
+   - Staff ID, assignment date, location, amount (300 HKD)
+   - Discrepancy type: "Penalty not applied"
+✅ Action List provides ERP reference format for manual update
+✅ Export to Excel includes all tabs (Summary, Matched, Unmatched, Action List)
+✅ Discrepancies can be marked for investigation
 
 **Priority:** High
 
@@ -590,23 +729,24 @@ And: Tracks who confirmed in platform
 - 475 assignments filled (confirmed)
 - 25 assignments unfilled
 - 450 attended (from confirmed)
-- 20 no-shows (from confirmed)
-- 5 cancelled before shift
+- 25 cancelled (from confirmed)
 
 **Test Steps:**
 1. View Attendance Performance Dashboard for November 2025
 2. Check fill rate metric
-3. Check no-show rate metric
+3. Check attendance rate metric
 4. Verify visualization data
 
 **Expected Results:**
 ✅ Fill rate: 475/500 = 95.0%
 ✅ Attendance rate: 450/475 = 94.7%
-✅ No-show rate: 20/475 = 4.2%
+✅ Cancellation rate: 25/475 = 5.3%
 ✅ Chart shows trend correctly (improving/declining)
 ✅ Table shows top/bottom performing facilities
 
 **Priority:** High
+
+**Note:** Per Product Spec v1.2, no-show tracking was removed. Metrics show completed vs cancelled only.
 
 ---
 
@@ -616,9 +756,9 @@ And: Tracks who confirmed in platform
 
 **As a** finance administrator,
 **I want** to generate a monthly settlement reconciliation report,
-**So that** I can verify PHC records match ERP settlements and identify discrepancies.
+**So that** I can verify PHC records match ERP settlements, identify discrepancies, and generate action lists for manual ERP updates.
 
-**Scenario:**
+**Scenario - Generate Monthly Report:**
 ```gherkin
 Given: It is December 3, 2025
 And: PHC has processed 150 staff assignments for November 2025
@@ -626,20 +766,45 @@ And: ERP has processed settlements for the same period
 When: I select Reports → Settlement Reconciliation
 And: I choose Period: November 2025
 And: I click "Generate Report"
-Then: System fetches settlement data from ERP via API
+Then: System fetches settlement data from ERP via GET /api/v1/settlements/{period}
 And: Compares each PHC assignment with ERP settlement record
-And: Calculates match rate
-And: Lists all discrepancies
-And: Generates Excel export
+And: Matches on: staff_id, assignment_id, hours worked, penalties
+And: Calculates match rate (target: >99%)
+And: Lists all discrepancies with categorization
+And: Generates Excel export with Matched/Unmatched tabs
 ```
 
+**Scenario - Generate Penalty Action List:**
+```gherkin
+Given: PHC has 15 late cancellation penalties for November 2025
+And: 13 penalties have been applied in ERP
+And: 2 penalties are missing in ERP
+When: I generate the Settlement Reconciliation Report
+Then: Report includes "Penalty Action List" section
+And: Lists 2 missing penalties with: staff_id, assignment details, amount (300 HKD), date
+And: Provides ERP reference numbers for manual update
+And: I can export Action List as separate worksheet
+```
+
+**Discrepancy Categories:**
+- Missing attendance record (PHC has, ERP missing)
+- Penalty not applied (PHC penalty, ERP not deducted)
+- Hours mismatch (actual hours differ)
+- Rate discrepancy (payment amount differs)
+- Missing assignment (ERP has, PHC missing)
+
 **Acceptance Criteria:**
+✅ Settlement data fetched from ERP by 1st of month
 ✅ Report generated by 3rd of each month
-✅ Match rate calculated and displayed
-✅ All discrepancies listed with details
-✅ Export to Excel format
+✅ Match rate calculated and displayed (target: >99%)
+✅ All discrepancies categorized and listed with details
+✅ Penalty Action List generated for manual ERP updates
+✅ Export to Excel format (tabs: Summary, Matched, Unmatched, Action List)
+✅ Historical reports accessible for audit trail
 
 **Priority:** High
+
+**Note:** Per Meeting Minutes (Section 6.1 - "Safe Mode"), PHC does NOT directly modify ERP financial data. The Settlement Reconciliation generates Action Lists for finance team to manually update ERP.
 
 ---
 
@@ -647,15 +812,47 @@ And: Generates Excel export
 
 **As a** finance administrator,
 **I want** to investigate a flagged discrepancy,
-**So that** I can resolve it and update records.
+**So that** I can resolve it by updating ERP manually and mark it as completed in PHC.
+
+**Scenario - Investigate Missing Penalty:**
+```gherkin
+Given: Settlement Report shows 2 missing penalties in ERP
+When: I click on a discrepancy row in the Action List
+Then: I see full discrepancy details:
+  - Staff ID, name, contact
+  - Assignment date, location, shift time
+  - Penalty type: late_cancellation
+  - Amount: 300 HKD
+  - PHC penalty record timestamp
+  - ERP sync status: "Not Found"
+And: I see related API call logs (POST /api/v1/penalties)
+And: I can see if API call failed or was never triggered
+```
+
+**Scenario - Resolve Discrepancy:**
+```gherkin
+Given: I have investigated the discrepancy
+And: I have manually updated ERP with the penalty
+When: I click "Mark as Resolved"
+And: I enter resolution notes: "Manually applied in ERP. Ref: ERP-PEN-12345"
+Then: Discrepancy status changes to "Resolved"
+And: Resolution logged with: my admin ID, timestamp, notes
+And: Match rate recalculates for the period
+```
 
 **Acceptance Criteria:**
-✅ Can view discrepancy details
-✅ Access to assignment and API logs
-✅ Add investigation notes
-✅ Update status (Resolved/Escalated)
+✅ Can view full discrepancy details with all related data
+✅ Access to API call logs for debugging
+✅ Add investigation notes (minimum 10 characters)
+✅ Update status: Pending → In Progress → Resolved / Escalated
+✅ Resolution requires notes (ERP reference number recommended)
+✅ Audit trail: who resolved, when, what notes
+✅ Cannot delete discrepancy records (immutable for audit)
+✅ Escalated items notify finance manager via email
 
 **Priority:** High
+
+**Note:** PHC tracks resolution status but the actual financial correction is done manually in ERP. This maintains the "Safe Mode" principle from Meeting Minutes.
 
 ---
 
@@ -686,14 +883,19 @@ And: Generates Excel export
 
 **As a** PHC administrator,
 **I want** to generate a penalty summary report,
-**So that** I can track cancellations and no-shows.
+**So that** I can track cancellations and late cancellation penalties.
 
 **Acceptance Criteria:**
-✅ Lists all penalties by type
-✅ Shows amounts and trends
+✅ Lists all penalties by type (cancellation, late_cancellation)
+✅ Shows amounts (300 HKD for late cancellation only)
+✅ Shows score impacts (-1 for each)
+✅ Trend analysis (improving/declining by period)
+✅ Filter by date range, staff, facility
 ✅ Export to Excel/PDF
 
 **Priority:** High
+
+**Note:** Per Product Spec v1.2, no-show penalties were removed.
 
 ---
 
@@ -701,14 +903,19 @@ And: Generates Excel export
 
 **As a** PHC administrator,
 **I want** to generate a staff score performance report,
-**So that** I can identify top performers and at-risk staff.
+**So that** I can identify top performers and staff needing attention.
 
 **Acceptance Criteria:**
-✅ Shows tier distribution
-✅ Lists staff with score changes
-✅ Identifies those needing review
+✅ Shows score distribution histogram (by score ranges)
+✅ Lists staff with significant score changes
+✅ Identifies staff with negative scores (requiring manual approval)
+✅ Shows correlation between score and assignment success
+✅ Filter by date range, score range, facility
+✅ Export to Excel/PDF
 
 **Priority:** Medium
+
+**Note:** Per Product Spec v1.3, tier system (Gold/Silver/Bronze) was removed. Report uses raw score values only.
 
 ---
 
@@ -719,11 +926,11 @@ And: Generates Excel export
 | Test Case | Related FRs | Objective |
 |-----------|-------------|-----------|
 | TC-001 | FR-5 | Verify staff sync from ERP |
-| TC-002 | FR-1, FR-2 | Test matching algorithm |
-| TC-003 | FR-1, FR-5, FR-6 | Score update on attendance |
-| TC-004 | FR-1, FR-3, FR-7 | Penalty on cancellation |
-| TC-005 | FR-1, FR-3, FR-7 | Penalty on no-show |
-| TC-006 | FR-6 | QR code clock-in |
+| TC-002 | FR-1, FR-2 | Matching algorithm with underlist and score ranking |
+| TC-003 | FR-1, FR-5, FR-6 | Score update on attendance verification |
+| TC-004 | FR-1, FR-3, FR-7 | Penalty on early cancellation (>48h) |
+| TC-005 | FR-1, FR-3, FR-7 | Penalty on late cancellation (<48h) |
+| TC-006 | FR-6 | QR code clock-in *(Deferred to v2.0)* |
 | TC-007 | FR-3, FR-8 | Emergency file upload |
 | TC-008 | FR-3, FR-9 | Emergency job posting |
 | TC-ERP-01 | FR-5 | ERP staff API response |
@@ -747,36 +954,39 @@ And: Generates Excel export
 
 **Updated Coverage Tracker:**
 
-| FR | Feature | Stories | Test Cases | Coverage |
-|----|---------|---------|------------|----------|
-| FR-1 | Scoring Algorithm | US-NA-02, US-NA-03, US-NA-05, US-ERP-06 | TC-003, TC-004, TC-005 | ✓ Complete |
-| FR-2 | Matching Engine | US-NA-01, US-ERP-04, US-ADM-02 | TC-002, TC-ERP-02, TC-ERP-03, TC-PERF-01 | ✓ Complete |
-| FR-3 | WhatsApp + Firebase | US-NA-01, US-NA-02, US-NA-05, US-ADM-04, US-ADM-05 | TC-007, TC-008 | ✓ Complete |
-| FR-4 | Admin Dashboard | US-ADM-01 | - | ⚠️ Needs test case |
-| FR-5 | ERP Integration | US-ERP-01, US-ERP-02, US-ERP-03, US-ERP-05, US-ERP-06, US-ADM-06 | TC-001, TC-003, TC-ERP-01 through TC-ERP-08, TC-PERF-02 | ✓ Complete |
-| FR-6 | Attendance Tracking | US-CS-02, US-CS-03, US-NA-05 | TC-006, TC-ERP-04, TC-RPT-02 | ✓ Complete |
-| FR-7 | Penalty Management | US-NA-03, US-NA-05 | TC-004, TC-005, TC-ERP-05 | ✓ Complete |
-| FR-8 | Emergency File Upload | US-ADM-03, US-ADM-04 | TC-007 | ✓ Complete |
-| FR-9 | Emergency Job Posting | US-ADM-05 | TC-008 | ✓ Complete |
-| FR-10 | Settlement Reconciliation | US-FIN-01, US-FIN-02 | TC-RPT-01 | ✅ Now Complete |
-| FR-11 | Manual Override | US-ADM-02 | TC-ERP-02 | ✓ Complete |
-| FR-12 | System Monitoring | US-ADM-06 | TC-ERP-07 | ✓ Complete |
-| FR-13 | Reporting | US-RPT-01, US-RPT-02, US-RPT-03 | TC-RPT-02 | ✅ Now Complete |
+| FR    | Feature                   | Stories                                                          | Test Cases                                              | Coverage                   |
+| ----- | ------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------- | -------------------------- |
+| FR-1  | Scoring Algorithm         | US-NA-02, US-NA-03, US-NA-05, US-ERP-06                          | TC-003, TC-004, TC-005                                  | ✓ Complete                 |
+| FR-2  | Matching Engine           | US-NA-01, US-ERP-04, US-ADM-02                                   | TC-002, TC-ERP-02, TC-ERP-03, TC-PERF-01                | ✓ Complete                 |
+| FR-3  | WhatsApp + Firebase       | US-NA-01, US-NA-02, US-NA-05, US-ADM-04, US-ADM-05               | TC-007, TC-008                                          | ✓ Complete                 |
+| FR-4  | Admin Dashboard           | US-ADM-01                                                        | -                                                       | ⚠️ Needs test case         |
+| FR-5  | ERP Integration           | US-ERP-01, US-ERP-02, US-ERP-03, US-ERP-05, US-ERP-06, US-ADM-06 | TC-001, TC-003, TC-ERP-01 through TC-ERP-08, TC-PERF-02 | ✓ Complete                 |
+| FR-6  | Attendance Tracking       | US-NA-05                                                         | TC-006, TC-ERP-04, TC-RPT-02                            | ⚠️ TC-006 Deferred to v2.0 |
+| FR-7  | Penalty Management        | US-NA-03, US-NA-05                                               | TC-004, TC-005, TC-ERP-05                               | ✓ Complete                 |
+| FR-8  | Emergency File Upload     | US-ADM-03, US-ADM-04                                             | TC-007                                                  | ✓ Complete                 |
+| FR-9  | Emergency Job Posting     | US-ADM-05                                                        | TC-008                                                  | ✓ Complete                 |
+| FR-10 | Settlement Reconciliation | US-FIN-01, US-FIN-02                                             | TC-RPT-01                                               | ✅ Complete                 |
+| FR-11 | Manual Override           | US-ADM-02                                                        | TC-ERP-02                                               | ✓ Complete                 |
+| FR-12 | System Monitoring         | US-ADM-06                                                        | TC-ERP-07                                               | ✓ Complete                 |
+| FR-13 | Reporting                 | US-RPT-01, US-RPT-02, US-RPT-03                                  | TC-RPT-02                                               | ✅ Now Complete             |
 
-**FR-10 Coverage:** Now complete with 2 user stories (finance administrators) and 1 test case
-**FR-13 Coverage:** Now complete with 3 user stories (admin reports) and 1 test case
+**FR-10 Coverage:** Complete with 2 user stories (US-FIN-01, US-FIN-02) and 1 test case (TC-RPT-01)
+**FR-13 Coverage:** Complete with 3 user stories (admin reports) and 1 test case (TC-RPT-02)
 
 ---
 
 ### STORY SUMMARY
 
-**Total Stories: 23**
-- Nursing Assistant stories (US-NA-01 to US-NA-05): 5
-- Care Home Supervisor stories (US-CS-01 to US-CS-03): 3
-- Admin stories (US-ADM-01 to US-ADM-06): 6
+**Total Stories: 24** *(26 minus 2 deprecated)*
+- Nursing Assistant stories (US-NA-01 to US-NA-07): 7
+- Care Home Supervisor stories: 0 *(Deprecated per Product Spec v1.2)*
+- Admin stories (US-ADM-01 to US-ADM-08): 8
 - ERP System stories (US-ERP-01 to US-ERP-06): 6
-- **Finance Team stories (NEW):** US-FIN-01 to US-FIN-02: **2**
-- **Reports stories (NEW):** US-RPT-01 to US-RPT-03: **3**
+- **Finance Team stories:** US-FIN-01 to US-FIN-02: **2**
+- **Reports stories:** US-RPT-01 to US-RPT-03: **3**
+
+**Deprecated Stories:** US-CS-01, US-CS-03 (Supervisor role removed)
+**Deferred Stories:** US-NA-04 (Score tiers removed, raw scores only)
 
 **Priorities:**
 - Critical: 6 stories
@@ -789,11 +999,11 @@ And: Generates Excel export
 ## TEST CASES
 |-----------|-------------|-----------|
 | TC-001 | FR-5 | Verify staff sync from ERP |
-| TC-002 | FR-1, FR-2 | Test matching algorithm |
-| TC-003 | FR-1, FR-5, FR-6 | Score update on attendance |
-| TC-004 | FR-1, FR-3, FR-7 | Penalty on cancellation |
-| TC-005 | FR-1, FR-3, FR-7 | Penalty on no-show |
-| TC-006 | FR-6 | QR code clock-in |
+| TC-002 | FR-1, FR-2 | Matching algorithm with underlist and score ranking |
+| TC-003 | FR-1, FR-5, FR-6 | Score update on attendance verification |
+| TC-004 | FR-1, FR-3, FR-7 | Penalty on early cancellation (>48h) |
+| TC-005 | FR-1, FR-3, FR-7 | Penalty on late cancellation (<48h) |
+| TC-006 | FR-6 | QR code clock-in *(Deferred to v2.0)* |
 | TC-007 | FR-3, FR-8 | Emergency file upload |
 | TC-008 | FR-3, FR-9 | Emergency job posting |
 | TC-ERP-01 | FR-5 | ERP staff API response |
@@ -839,13 +1049,13 @@ And: Generates Excel export
 ---
 
 #### TC-002: Matching Algorithm - Basic Match
-**Objective:** Verify matching selects appropriate staff
+**Objective:** Verify matching selects appropriate staff based on underlist priority and score ranking
 
 **Preconditions:**
 - Job demand: 2025-11-25, 08:00-20:00, 1 staff needed
 - Location: Hong Kong Care Home (CH_HKI_001)
 - Underlist: Staff A (priority 1), Staff B (priority 2)
-- Staff scores: A=15 (Silver), B=25 (Gold), C=8 (Bronze)
+- Staff scores: A=15, B=25, C=8
 - All staff: available, valid docs, not blacklisted
 
 **Test Steps:**
@@ -853,99 +1063,108 @@ And: Generates Excel export
 2. Run matching algorithm
 
 **Expected Results:**
-✅ Underlist applied first: Staff A selected
-✅ If Staff A unavailable: Staff B selected
-✅ If both unavailable: Staff C selected (highest score)
+✅ Underlist applied first: Staff A selected (highest underlist priority)
+✅ If Staff A unavailable: Staff B selected (next on underlist)
+✅ If both unavailable: Staff B selected (highest raw score = 25)
 ✅ Blacklisted staff not considered
 ✅ Unavailable staff not considered
+✅ Matching completed within 5 minutes
 
 **Priority:** Critical
 
+**Note:** Per Product Spec v1.3, tier system removed. Ranking by raw score only.
+
 ---
 
-#### TC-003: Score Update on Attendance
-**Objective:** Verify score increases when staff attends shift
+#### TC-003: Score Update on Attendance Verification
+**Objective:** Verify score increases when admin verifies staff attendance
 
 **Preconditions:**
 - Staff has score = 10
-- Shift assignment confirmed
+- Shift assignment confirmed and completed
 
 **Test Steps:**
-1. Verify staff score = 10
-2. Supervisor verifies attendance (present)
-3. Submit attendance to PHC
+1. Verify staff score = 10 before shift
+2. Admin opens Attendance Dashboard
+3. Admin verifies attendance as "Present" via phone confirmation with facility
+4. System submits attendance to PHC
 
 **Expected Results:**
-✅ Staff score = 11 (+1)
-✅ Score history record created
-✅ Tier updated (if applicable)
-✅ ERP API 4.4 called with score update
-✅ Attendance submitted to ERP
+✅ Staff score = 11 (+1 point)
+✅ Score history record created with reason "attended_shift"
+✅ ERP API PATCH /api/v1/staff/{id}/score called
+✅ Attendance submitted to ERP via POST /api/v1/attendance
+✅ Score update visible in staff portal
 
 **Priority:** Critical
 
+**Note:** Per Product Spec v1.5, score updates upon admin attendance verification, not upon confirmation.
+
 ---
 
-#### TC-004: Penalty on Cancellation
-**Objective:** Verify penalties applied correctly
+#### TC-004: Penalty on Early Cancellation (>48h)
+**Objective:** Verify early cancellation applies score penalty only, no financial penalty
 
 **Preconditions:**
-- Staff has pending assignment
+- Staff has confirmed assignment (shift in 3 days)
 - Staff score = 12
-- No previous penalties
+- Cancellation >48 hours before shift
 
 **Test Steps:**
-1. Staff opens PHC platform
-2. Staff navigates to assignment
+1. Staff opens PHC portal
+2. Staff navigates to "My Shifts"
 3. Staff clicks "Cancel Shift"
-4. Reviews warning modal in platform
+4. Reviews confirmation modal (no financial penalty warning)
 5. Confirms cancellation
 6. Check staff record
 
 **Expected Results:**
-✅ Warning modal displayed: "100HKD will be deducted..."
-✅ Cancellation confirmation received via Firebase push
+✅ Confirmation modal displayed (no financial penalty mentioned)
+✅ Cancellation confirmation notification sent
 ✅ Assignment status = cancelled
-✅ Staff score = 11 (-1)
-✅ Penalty record created (100 HKD, -1 score)
-✅ ERP API 4.2 called (penalty submission)
-✅ ERP API 4.4 called (score update)
+✅ Staff score = 11 (-1 point)
+✅ NO financial penalty applied (amount = 0)
+✅ Penalty record created (type: "cancellation", amount: 0, score_impact: -1)
 ✅ Re-matching triggered for vacancy
+✅ ERP API POST /api/v1/penalties NOT called (or called with 0 amount)
 
 **Priority:** Critical
 
+**Note:** Per Product Spec FR-7, cancellation >48h has NO financial penalty, only score impact.
+
 ---
 
-#### TC-005: Penalty on No-Show
-**Objective:** Verify no-show penalties (heavier than cancellation)
+#### TC-005: Penalty on Late Cancellation (<48h)
+**Objective:** Verify late cancellation penalties applied correctly
 
 **Preconditions:**
-- Staff confirmed assignment
-- Staff does not arrive
-- Shift end time passed
-- Supervisor notified
+- Staff has confirmed assignment
+- Cancellation requested < 48 hours before shift
 - Staff score = 15
 
 **Test Steps:**
-1. Supervisor marks staff as absent in portal
-2. Supervisor confirms no-show
+1. Staff clicks "Cancel Shift" in portal
+2. Warning modal displayed with penalty details
+3. Staff confirms cancellation
 
 **Expected Results:**
-✅ Staff score = 13 (-2)
-✅ Penalty record created (100 HKD, -2 score)
+✅ Warning modal displayed: "300 HKD admin cost will be deducted"
+✅ Staff score = 14 (-1)
+✅ Penalty record created (300 HKD, -1 score)
 ✅ Staff receives Firebase push notification
-✅ Notification appears in platform inbox
-✅ ERP API 4.2 called (penalty submission)
-✅ ERP API 4.4 called (score update)
+✅ ERP API called (penalty submission)
+✅ Re-matching triggered for vacancy
 
 **Priority:** High
 
 ---
 
-#### TC-006: QR Code Clock-In
+#### TC-006: QR Code Clock-In *(Deferred to v2.0)*
 **Objective:** Verify QR code attendance tracking
 
-**Preconditions:**
+**Status:** DEFERRED - QR Code System moved to Future Enhancements (v2.0) per Product Spec v1.5
+
+**Preconditions:****
 - Staff has confirmed assignment
 - QR code displayed at location
 - QR contains: location_id, assignment_id, shift_date
@@ -1164,13 +1383,13 @@ And: Generates Excel export
 
 **API Call:** POST /api/v1/penalties
 
-**Request (Cancellation):**
+**Request (Late Cancellation):**
 ```json
 {
   "assignment_id": "ERP-ASSIGN-001",
   "staff_id": "STF123",
-  "penalty_type": "cancellation",
-  "amount": 100.00,
+  "penalty_type": "late_cancellation",
+  "amount": 300.00,
   "score_impact": -1,
   "reason": "Cancelled within 48 hours"
 }
@@ -1182,14 +1401,14 @@ And: Generates Excel export
   "status": "success",
   "penalty_id": "PEN-001",
   "payment_adjusted": true,
-  "adjusted_amount": 100.00
+  "adjusted_amount": 300.00
 }
 ```
 
 **Validation:**
 ✅ Penalty ID returned
 ✅ Payment adjusted = true
-✅ Correct amount (100 HKD)
+✅ Correct amount (300 HKD)
 
 **Priority:** High
 
@@ -1383,5 +1602,41 @@ And: Generates Excel export
 
 ---
 
-**Last Updated:** 2025-11-24
+## CHANGE LOG
+
+| Version | Date       | Author          | Changes                                                      |
+| ------- | ---------- | --------------- | ------------------------------------------------------------ |
+| 1.0     | 2025-11-24 | System Analyst  | Initial draft                                                |
+| 1.1     | 2025-11-27 | System Analyst  | Aligned with Product Spec v1.5 (Human Screening Workflow)    |
+
+**v1.1 Changes (2025-11-27):**
+
+**Terminology Alignment:**
+- US-NA-01: Renamed to "Receive Job Notification via WhatsApp" (WhatsApp primary, Firebase secondary)
+- US-NA-02: Renamed to "Apply for Available Shift" with Human Screening Workflow (staff apply, admin screens)
+- US-NA-03: Clarified early vs late cancellation penalties per FR-7
+
+**Removed/Deprecated:**
+- Supervisor role stories (US-CS-01, US-CS-03): Deprecated per Product Spec v1.2
+- Score tier system references: Removed per Product Spec v1.3 (raw scores only)
+- No-show penalty references: Removed per Product Spec v1.2
+
+**Updated:**
+- US-NA-04: Deferred to Phase 2 (tier system removed)
+- US-ADM-01: Dashboard auto-refresh changed to 60 seconds (was 30)
+- US-ADM-02: Enhanced with full conflict warning and audit trail details
+- US-ERP-04/05/06: Updated to reflect Human Screening Workflow and attendance verification
+- TC-002/003/004/005: Updated test case names and scenarios
+- TC-006: Marked as Deferred to v2.0 (QR Code System)
+
+**Clarifications:**
+- Score increases upon attendance verification, not confirmation
+- Early cancellation (>48h): -1 score only, NO financial penalty
+- Late cancellation (<48h): -1 score AND 300 HKD penalty
+
+---
+
+**Last Updated:** 2025-11-27
 **Next Review:** Before testing begins
+**Aligned With:** Product Specification v1.5, PHC Meeting Minutes, PHC Requirements
+
