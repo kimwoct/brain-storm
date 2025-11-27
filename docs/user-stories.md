@@ -10,28 +10,28 @@
 
 ### REQUIREMENTS TRACEABILITY MATRIX
 
-| User Story | Related FRs | Description |
-|------------|-------------|-------------|
-| US-NA-01 | FR-2, FR-3 | Receive assignment notification |
-| US-NA-02 | FR-1, FR-2, FR-3 | Confirm shift assignment |
-| US-NA-03 | FR-1, FR-3, FR-7 | Cancel shift with warning |
-| US-NA-04 | FR-1 | View score and tier |
-| US-NA-05 | FR-1, FR-3, FR-6, FR-7 | No-show penalty notification |
-| US-CS-01 | FR-2 | View today's assigned staff |
-| US-CS-02 | FR-6 | Verify staff clock-in |
-| US-CS-03 | FR-6, FR-7 | Mark staff as no-show |
-| US-ADM-01 | FR-4, FR-5 | View real-time dashboard |
-| US-ADM-02 | FR-2, FR-11 | Manual assignment override |
-| US-ADM-03 | FR-8 | Upload emergency protocol |
-| US-ADM-04 | FR-3, FR-8 | Distribute emergency files |
-| US-ADM-05 | FR-9 | Post emergency job |
-| US-ADM-06 | FR-5, FR-12, FR-13 | View system logs and reports |
-| US-ERP-01 | FR-5 | Staff master data sync |
-| US-ERP-02 | FR-5 | Location master data sync |
-| US-ERP-03 | FR-5 | Job demand sync |
-| US-ERP-04 | FR-2, FR-5 | Receive assignment submission |
-| US-ERP-05 | FR-5, FR-6 | Receive attendance records |
-| US-ERP-06 | FR-1, FR-5, FR-7 | Receive penalty records |
+| User Story | Related FRs            | Description                     |
+| ---------- | ---------------------- | ------------------------------- |
+| US-NA-01   | FR-2, FR-3             | Receive assignment notification |
+| US-NA-02   | FR-1, FR-2, FR-3       | Confirm shift assignment        |
+| US-NA-03   | FR-1, FR-3, FR-7       | Cancel shift with warning       |
+| US-NA-04   | FR-1                   | View score and tier             |
+| US-NA-05   | FR-1, FR-3, FR-6, FR-7 | No-show penalty notification    |
+| US-CS-01   | FR-2                   | View today's assigned staff     |
+| US-CS-02   | FR-6                   | Verify staff clock-in           |
+| US-CS-03   | FR-6, FR-7             | Mark staff as no-show           |
+| US-ADM-01  | FR-4, FR-5             | View real-time dashboard        |
+| US-ADM-02  | FR-2, FR-11            | Manual assignment override      |
+| US-ADM-03  | FR-8                   | Upload emergency protocol       |
+| US-ADM-04  | FR-3, FR-8             | Distribute emergency files      |
+| US-ADM-05  | FR-9                   | Post emergency job              |
+| US-ADM-06  | FR-5, FR-12, FR-13     | View system logs and reports    |
+| US-ERP-01  | FR-5                   | Staff master data sync          |
+| US-ERP-02  | FR-5                   | Location master data sync       |
+| US-ERP-03  | FR-5                   | Job demand sync                 |
+| US-ERP-04  | FR-2, FR-5             | Receive assignment submission   |
+| US-ERP-05  | FR-5, FR-6             | Receive attendance records      |
+| US-ERP-06  | FR-1, FR-5, FR-7       | Receive penalty records         |
 
 ---
 
@@ -63,7 +63,7 @@
 ```gherkin
 Given: I receive a platform notification about a new assignment
 When: I open the PHC platform (web or mobile)
-And: I click "Confirm" button
+And: I click "Apply" button
 Then: My response is recorded
 And: Assignment status changes to "confirmed"
 And: My score increases by 1 point
@@ -92,12 +92,12 @@ Given: I have a pending assignment
 When: I open the PHC platform
 And: I view my assignment
 And: I click "Cancel Shift"
-Then: I see warning modal: "100HKD will be deducted when you apply AL within 48 hours before coming job!"
-And: I see penalty details (-1 score, -100 HKD)
+Then: I see warning modal: "300HKD admin cost will be deducted when you apply AL within 48 hours before coming job!"
+And: I see penalty details (-1 score, -300 HKD)
 When: I confirm cancellation
 Then: Assignment cancelled
 And: Score decreases by 1 point
-And: 100 HKD deducted from payment
+And: 300 HKD deducted from payment
 And: I receive cancellation confirmation via push notification
 ```
 
@@ -113,7 +113,7 @@ And: I receive cancellation confirmation via push notification
 
 ---
 
-#### US-NA-04: View My Score and Tier
+#### US-NA-04: View My Score and Tier (will be removed)
 **As a** nursing assistant,
 **I want** to view my current score and tier,
 **So that** I understand my priority level and can improve it.
@@ -129,25 +129,62 @@ And: I receive cancellation confirmation via push notification
 
 ---
 
-#### US-NA-05: Receive No-Show Penalty Notification
+#### US-NA-05: View Job History
+**As a** nursing assistant,
+**I want** to view my job history and attendance records,
+**So that** I can track completed shifts, review penalties, and verify my work history.
+
+**Scenario - View Job History List:**
+```gherkin
+Given: I am logged into the PHC platform
+When: I navigate to "My Job History" section
+Then: I see a list of my past assignments sorted by date (newest first)
+And: each record shows date, location name, shift time, and status
+And: I can filter by date range and status
+```
+
+**Scenario - View Job Details:**
+```gherkin
+Given: I am viewing my job history list
+When: I click on a specific job record
+Then: I see detailed information including assignment date, shift times, location, clock-in/out times, attendance status, score impact, and any penalties applied
+```
+
+**Acceptance Criteria:**
+✅ Job history displays past assignments (last 12 months)
+✅ Each record shows: date, location, shift time, status
+✅ Status clearly indicated: Completed, Cancelled, No-Show
+✅ Score impact shown: +1 (attended), -1 (cancelled), -2 (no-show)
+✅ Penalties displayed with amount (100 HKD) and reason
+✅ Filter by date range available
+✅ Filter by status available
+✅ Pagination supported (20 records per page)
+✅ Clock-in/out times displayed for completed shifts
+✅ Export to PDF available
+
+**Priority:** High
+
+---
+
+#### US-NA-06: Penalty List
 **As a** nursing assistant,
 **If** I don't show up for a confirmed shift,
-**Then** I receive penalty notification via platform and understand consequences.
+**Then** I receive penalty score deduction via platform and understand consequences.
 
 **Scenario:**
 ```gherkin
 Given: I confirmed a shift but didn't attend
 When: Shift end time passes
 Then: Supervisor marks me as absent in platform
-And: I receive push notification: "You were marked absent. 100 HKD penalty applied. Score: -2 points"
+And: I receive push notification: "You were marked absent. 300 HKD penalty applied. Score: -1 points"
 And: I see the penalty in my platform notification center
 ```
 
 **Acceptance Criteria:**
 ✅ Penalty notification delivered via Firebase push
 ✅ Notification appears in platform inbox
-✅ Score decreases by 2 points
-✅ 100 HKD deducted
+✅ Score decreases by 1 points
+✅ 300 HKD deducted
 ✅ ERP penalty record created
 ✅ Penalty visible in staff's penalty history
 
@@ -157,13 +194,38 @@ And: I see the penalty in my platform notification center
 
 ### 2. Care Home Supervisor User Stories
 
-#### US-CS-01: View Today's Assigned Staff
+#### US-CS-00:  Jobs Overview Update (Manually Update) [fixme]
+**As a** care home supervisor,
+**If** I don't show up for a confirmed shift,
+**Then** I receive penalty score deduction via platform and understand consequences.
+
+**Scenario:**
+```gherkin
+Given: I confirmed a shift but didn't attend
+When: Shift end time passes
+Then: Supervisor marks me as absent in platform
+And: I receive push notification: "You were marked absent. 300 HKD penalty applied. Score: -1 points"
+And: I see the penalty in my platform notification center
+```
+
+**Acceptance Criteria:**
+✅ Penalty notification delivered via Firebase push
+✅ Notification appears in platform inbox
+✅ Score decreases by 1 points
+✅ 300 HKD deducted
+✅ ERP penalty record created
+✅ Penalty visible in staff's penalty history
+
+**Priority:** High
+
+---
+#### US-CS-01: View Job Applied Staff
 **As a** care home supervisor,
 **I want** to see who is assigned to work today,
 **So that** I can prepare and verify attendance.
 
 **Acceptance Criteria:**
-✅ List shows all confirmed assignments for today
+✅ List shows all applied assignments for this job posting
 ✅ Shows staff name, contact number, shift time
 ✅ Shows photo (if available)
 ✅ Shows expected arrival time
@@ -172,7 +234,7 @@ And: I see the penalty in my platform notification center
 
 ---
 
-#### US-CS-02: Verify Staff Clock-In
+#### US-CS-02: Verify Staff Clock-In (Optional)
 **As a** care home supervisor,
 **I want** to verify staff clock-in/out,
 **So that** attendance is accurately recorded.
@@ -199,11 +261,11 @@ And: Attendance marked as "present"
 ✅ Deviations > 1 hour flagged for approval
 ✅ QR code or manual verification works
 
-**Priority:** High
+**Priority:** Low
 
 ---
 
-#### US-CS-03: Mark Staff as No-Show
+#### US-CS-03: Mark Staff as No-Show/Penalty
 **As a** care home supervisor,
 **I want** to mark staff as absent when they don't arrive,
 **So that** penalty is applied and replacement can be found.
@@ -493,7 +555,7 @@ And: Tracks who confirmed in platform
 
 ---
 
-### 7. Reporting Test Cases
+### 7. Reporting Test Cases (Removed)
 
 #### TC-RPT-01: Settlement Reconciliation Accuracy
 **Objective:** Verify settlement reconciliation report is accurate
