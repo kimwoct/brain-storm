@@ -21,8 +21,6 @@
 | US-NA-05   | FR-1, FR-6             | View job history                |
 | US-NA-06   | FR-7                   | View penalty history            |
 | US-NA-07   | FR-8                   | Acknowledge required documents  |
-| US-CS-01   | FR-2                   | *(Removed - Supervisor role deprecated)* |
-| US-CS-03   | FR-6, FR-7             | *(Removed - Supervisor role deprecated)* |
 | US-ADM-01  | FR-4, FR-5             | View real-time dashboard        |
 | US-ADM-02  | FR-2, FR-11            | Manual assignment override      |
 | US-ADM-03  | FR-8                   | Upload emergency protocol       |
@@ -245,7 +243,7 @@ And: I can see the related assignment details
 
 ---
 
-### 2. Care Home Supervisor User Stories
+### 2. PHC Admin User Stories (Continued)
 
 #### US-ADM-07: View Job Applications Overview
 **As a** PHC administrator,
@@ -448,7 +446,7 @@ When: File upload completes successfully
 Then: System identifies affected staff based on regions
 And: Generates WhatsApp message template with file link
 And: Coordinator sends WhatsApp to affected staff
-And: For Critical priority: Firebase web push sent as in-app alert
+And: For Critical priority: Web push notification sent as in-app alert
 And: Notification appears in staff's portal inbox
 And: System tracks who viewed the file
 And: System tracks who confirmed receipt
@@ -466,7 +464,7 @@ And: System tracks who confirmed receipt
 
 **Priority:** Medium
 
-**Note:** WhatsApp is primary channel per Product Spec FR-3. Firebase web push is supplementary for in-portal alerts.
+**Note:** WhatsApp is primary channel per Product Spec FR-3. Web push notification is supplementary for in-portal alerts.
 
 ---
 
@@ -485,7 +483,7 @@ Then: Job posted immediately (bypasses 15-minute polling delay)
 And: Matching engine runs instantly
 And: Urgent WhatsApp template generated for shortlisted staff
 And: Coordinator sends WhatsApp with urgent flag
-And: In-app alert sent via Firebase (Critical priority)
+And: In-app alert sent via web push notification (Critical priority)
 And: Dashboard shows real-time filling progress
 And: If unfilled after 30 minutes: admin receives push/email alert
 ```
@@ -494,7 +492,7 @@ And: If unfilled after 30 minutes: admin receives push/email alert
 ✅ No delay in posting (bypasses standard 15-minute polling)
 ✅ Matching triggered instantly
 ✅ Urgent WhatsApp template with "URGENT" badge
-✅ Firebase in-app alert for Critical priority
+✅ Web push notification in-app alert for Critical priority
 ✅ Dashboard updates with real-time filling progress
 ✅ Admin alert sent if unfilled after 30 minutes
 ✅ Staff can accept immediately via portal
@@ -930,9 +928,9 @@ And: Match rate recalculates for the period
 | TC-003 | FR-1, FR-5, FR-6 | Score update on attendance verification |
 | TC-004 | FR-1, FR-3, FR-7 | Penalty on early cancellation (>48h) |
 | TC-005 | FR-1, FR-3, FR-7 | Penalty on late cancellation (<48h) |
-| TC-006 | FR-6 | QR code clock-in *(Deferred to v2.0)* |
 | TC-007 | FR-3, FR-8 | Emergency file upload |
 | TC-008 | FR-3, FR-9 | Emergency job posting |
+| TC-ADM-01 | FR-4 | Admin dashboard functionality |
 | TC-ERP-01 | FR-5 | ERP staff API response |
 | TC-ERP-02 | FR-2, FR-5 | Assignment submission to ERP |
 | TC-ERP-03 | FR-2 | Assignment conflict handling |
@@ -954,21 +952,21 @@ And: Match rate recalculates for the period
 
 **Updated Coverage Tracker:**
 
-| FR    | Feature                   | Stories                                                          | Test Cases                                              | Coverage                   |
-| ----- | ------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------- | -------------------------- |
-| FR-1  | Scoring Algorithm         | US-NA-02, US-NA-03, US-NA-05, US-ERP-06                          | TC-003, TC-004, TC-005                                  | ✓ Complete                 |
-| FR-2  | Matching Engine           | US-NA-01, US-ERP-04, US-ADM-02                                   | TC-002, TC-ERP-02, TC-ERP-03, TC-PERF-01                | ✓ Complete                 |
-| FR-3  | WhatsApp + Firebase       | US-NA-01, US-NA-02, US-NA-05, US-ADM-04, US-ADM-05               | TC-007, TC-008                                          | ✓ Complete                 |
-| FR-4  | Admin Dashboard           | US-ADM-01                                                        | -                                                       | ⚠️ Needs test case         |
-| FR-5  | ERP Integration           | US-ERP-01, US-ERP-02, US-ERP-03, US-ERP-05, US-ERP-06, US-ADM-06 | TC-001, TC-003, TC-ERP-01 through TC-ERP-08, TC-PERF-02 | ✓ Complete                 |
-| FR-6  | Attendance Tracking       | US-NA-05                                                         | TC-006, TC-ERP-04, TC-RPT-02                            | ⚠️ TC-006 Deferred to v2.0 |
-| FR-7  | Penalty Management        | US-NA-03, US-NA-05                                               | TC-004, TC-005, TC-ERP-05                               | ✓ Complete                 |
-| FR-8  | Emergency File Upload     | US-ADM-03, US-ADM-04                                             | TC-007                                                  | ✓ Complete                 |
-| FR-9  | Emergency Job Posting     | US-ADM-05                                                        | TC-008                                                  | ✓ Complete                 |
-| FR-10 | Settlement Reconciliation | US-FIN-01, US-FIN-02                                             | TC-RPT-01                                               | ✅ Complete                 |
-| FR-11 | Manual Override           | US-ADM-02                                                        | TC-ERP-02                                               | ✓ Complete                 |
-| FR-12 | System Monitoring         | US-ADM-06                                                        | TC-ERP-07                                               | ✓ Complete                 |
-| FR-13 | Reporting                 | US-RPT-01, US-RPT-02, US-RPT-03                                  | TC-RPT-02                                               | ✅ Now Complete             |
+| FR    | Feature                          | Stories                                                          | Test Cases                                              | Coverage   |
+| ----- | -------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------- | ---------- |
+| FR-1  | Scoring Algorithm                | US-NA-02, US-NA-03, US-NA-05, US-ERP-06                          | TC-003, TC-004, TC-005                                  | ✓ Complete |
+| FR-2  | Matching Engine                  | US-NA-01, US-ERP-04, US-ADM-02                                   | TC-002, TC-ERP-02, TC-ERP-03, TC-PERF-01                | ✓ Complete |
+| FR-3  | WhatsApp + Web Push Notification | US-NA-01, US-NA-02, US-NA-05, US-ADM-04, US-ADM-05               | TC-007, TC-008                                          | ✓ Complete |
+| FR-4  | Admin Dashboard                  | US-ADM-01                                                        | TC-ADM-01                                               | ✓ Complete |
+| FR-5  | ERP Integration                  | US-ERP-01, US-ERP-02, US-ERP-03, US-ERP-05, US-ERP-06, US-ADM-06 | TC-001, TC-003, TC-ERP-01 through TC-ERP-08, TC-PERF-02 | ✓ Complete |
+| FR-6  | Attendance Tracking              | US-NA-05                                                         | TC-ERP-04, TC-RPT-02                                    | ✓ Complete |
+| FR-7  | Penalty Management               | US-NA-03, US-NA-05                                               | TC-004, TC-005, TC-ERP-05                               | ✓ Complete |
+| FR-8  | Emergency File Upload            | US-ADM-03, US-ADM-04                                             | TC-007                                                  | ✓ Complete |
+| FR-9  | Emergency Job Posting            | US-ADM-05                                                        | TC-008                                                  | ✓ Complete |
+| FR-10 | Settlement Reconciliation        | US-FIN-01, US-FIN-02                                             | TC-RPT-01                                               | ✓ Complete |
+| FR-11 | Manual Override                  | US-ADM-02                                                        | TC-ERP-02                                               | ✓ Complete |
+| FR-12 | System Monitoring                | US-ADM-06                                                        | TC-ERP-07                                               | ✓ Complete |
+| FR-13 | Reporting                        | US-RPT-01, US-RPT-02, US-RPT-03                                  | TC-RPT-02                                               | ✓ Complete |
 
 **FR-10 Coverage:** Complete with 2 user stories (US-FIN-01, US-FIN-02) and 1 test case (TC-RPT-01)
 **FR-13 Coverage:** Complete with 3 user stories (admin reports) and 1 test case (TC-RPT-02)
@@ -977,15 +975,13 @@ And: Match rate recalculates for the period
 
 ### STORY SUMMARY
 
-**Total Stories: 24** *(26 minus 2 deprecated)*
+**Total Stories: 24**
 - Nursing Assistant stories (US-NA-01 to US-NA-07): 7
-- Care Home Supervisor stories: 0 *(Deprecated per Product Spec v1.2)*
 - Admin stories (US-ADM-01 to US-ADM-08): 8
 - ERP System stories (US-ERP-01 to US-ERP-06): 6
 - **Finance Team stories:** US-FIN-01 to US-FIN-02: **2**
 - **Reports stories:** US-RPT-01 to US-RPT-03: **3**
 
-**Deprecated Stories:** US-CS-01, US-CS-03 (Supervisor role removed)
 **Deferred Stories:** US-NA-04 (Score tiers removed, raw scores only)
 
 **Priorities:**
@@ -1003,9 +999,9 @@ And: Match rate recalculates for the period
 | TC-003 | FR-1, FR-5, FR-6 | Score update on attendance verification |
 | TC-004 | FR-1, FR-3, FR-7 | Penalty on early cancellation (>48h) |
 | TC-005 | FR-1, FR-3, FR-7 | Penalty on late cancellation (<48h) |
-| TC-006 | FR-6 | QR code clock-in *(Deferred to v2.0)* |
 | TC-007 | FR-3, FR-8 | Emergency file upload |
 | TC-008 | FR-3, FR-9 | Emergency job posting |
+| TC-ADM-01 | FR-4 | Admin dashboard functionality |
 | TC-ERP-01 | FR-5 | ERP staff API response |
 | TC-ERP-02 | FR-2, FR-5 | Assignment submission to ERP |
 | TC-ERP-03 | FR-2 | Assignment conflict handling |
@@ -1151,35 +1147,9 @@ And: Match rate recalculates for the period
 ✅ Warning modal displayed: "300 HKD admin cost will be deducted"
 ✅ Staff score = 14 (-1)
 ✅ Penalty record created (300 HKD, -1 score)
-✅ Staff receives Firebase push notification
+✅ Staff receives web push notification
 ✅ ERP API called (penalty submission)
 ✅ Re-matching triggered for vacancy
-
-**Priority:** High
-
----
-
-#### TC-006: QR Code Clock-In *(Deferred to v2.0)*
-**Objective:** Verify QR code attendance tracking
-
-**Status:** DEFERRED - QR Code System moved to Future Enhancements (v2.0) per Product Spec v1.5
-
-**Preconditions:****
-- Staff has confirmed assignment
-- QR code displayed at location
-- QR contains: location_id, assignment_id, shift_date
-
-**Test Steps:**
-1. Staff scans QR with phone (15 minutes before shift - valid)
-2. System validates QR data
-3. Clock-in recorded
-
-**Expected Results:**
-✅ Clock-in time recorded accurately
-✅ Attendance status = checked_in
-✅ Supervisor notified
-✅ QR rejected if scanned >1 hour before shift
-✅ QR rejected if assignment not confirmed
 
 **Priority:** High
 
@@ -1226,9 +1196,54 @@ And: Match rate recalculates for the period
 **Expected Results:**
 ✅ Job posted immediately (no 15-min delay)
 ✅ Matching runs instantly
-✅ Urgent Firebase push notification sent with in-app alert
+✅ Urgent web push notification sent with in-app alert
 ✅ Real-time dashboard shows progress
 ✅ Admin alerted if not filled in 30 minutes
+
+**Priority:** High
+
+---
+
+#### TC-ADM-01: Admin Dashboard Functionality
+**Objective:** Verify admin dashboard displays real-time metrics correctly
+
+**Preconditions:**
+- Admin user logged in
+- System has active data (jobs, assignments, staff)
+- ERP sync completed within last 24 hours
+
+**Test Data:**
+- Today's jobs: 20 total, 18 filled, 2 unfilled
+- Pending applications: 5
+- Completed shifts today: 15
+- Cancellations today: 2
+- Last ERP sync: 02:00 AM today
+
+**Test Steps:**
+1. Admin navigates to Dashboard
+2. Verify all widgets load
+3. Check Today's Jobs widget
+4. Check Pending Applications widget
+5. Check Completed Shifts widget
+6. Check Cancellations widget
+7. Check ERP Sync Status widget
+8. Wait 60 seconds for auto-refresh
+9. Click on a metric to drill down
+10. Apply date filter
+11. Export report
+
+**Expected Results:**
+✅ Dashboard loads within 30 seconds
+✅ Today's Jobs shows: 20 total, 18 filled (90%), 2 unfilled
+✅ Pending Applications shows: 5 awaiting review
+✅ Completed Shifts shows: 15
+✅ Cancellations shows: 2 with penalty breakdown
+✅ ERP Sync Status shows: "Last sync: 02:00 AM" with green indicator
+✅ All widgets auto-refresh after 60 seconds
+✅ Click drill-down opens detailed view
+✅ Date filter updates all widgets correctly
+✅ Export generates PDF/Excel with current data
+✅ Color indicators correct: green (good), yellow (warning), red (critical)
 
 **Priority:** High
 
@@ -1523,13 +1538,14 @@ And: Match rate recalculates for the period
 **Test:** Measure response time for key APIs
 
 **Expected Results:**
-| API | Target | Acceptable |
-|-----|--------|------------|
-| POST /assignments | <2s | <3s |
-| PATCH /status | <1s | <2s |
-| POST /attendance | <2s | <3s |
-| GET /dashboard | <3s | <5s |
-| ERP API calls | <3s | <5s |
+
+| API                | Target | Acceptable |
+| ------------------ | ------ | ---------- |
+| POST /assignments  | <2s    | <3s        |
+| PATCH /status      | <1s    | <2s        |
+| POST /attendance   | <2s    | <3s        |
+| GET /dashboard     | <3s    | <5s        |
+| ERP API calls      | <3s    | <5s        |
 
 **Priority:** Medium
 
@@ -1612,12 +1628,12 @@ And: Match rate recalculates for the period
 **v1.1 Changes (2025-11-27):**
 
 **Terminology Alignment:**
-- US-NA-01: Renamed to "Receive Job Notification via WhatsApp" (WhatsApp primary, Firebase secondary)
+- US-NA-01: Renamed to "Receive Job Notification via WhatsApp" (WhatsApp primary, web push notification secondary)
 - US-NA-02: Renamed to "Apply for Available Shift" with Human Screening Workflow (staff apply, admin screens)
 - US-NA-03: Clarified early vs late cancellation penalties per FR-7
 
-**Removed/Deprecated:**
-- Supervisor role stories (US-CS-01, US-CS-03): Deprecated per Product Spec v1.2
+**Removed:**
+- Supervisor role stories (US-CS-01, US-CS-03): Removed per Product Spec v1.2
 - Score tier system references: Removed per Product Spec v1.3 (raw scores only)
 - No-show penalty references: Removed per Product Spec v1.2
 
