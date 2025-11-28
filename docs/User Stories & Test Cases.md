@@ -1,10 +1,10 @@
 
-# User Stories v1.1
+# User Stories v1.3
 
 **Prestige Health Care Match/Dispatch System (PHC)**
 
-**Version:** 1.1
-**Date:** 2025-11-27
+**Version:** 1.3
+**Date:** 2025-11-28
 
 **Aligned With:** Product Specification v1.5 (Human Screening Workflow)
 
@@ -82,13 +82,18 @@ Given: PHC System has sent the web push notifcation when receive the new job pos
 Given: PHC coordinator has generated a WhatsApp template for available shifts
 When: Coordinator sends the message to my WhatsApp (individual or broadcast)
 Then: I receive notification with shift details
-And: Message includes: date, location name, shift time, contact person
-And: Message includes a application link to the PHC portal
+And: Message includes complete job information:
+  - Facility name and address/location
+  - Date and shift times (start time, end time)
+  - Worker type / skillset required
+  - Gender requirement (if any)
+  - Contact person
+And: Message includes an application link to the PHC portal
 And: I can click the link to view and apply for the shift
 ```
 
 **Acceptance Criteria:**
-✅ WhatsApp message includes: date, location name, shift time, contact person
+✅ WhatsApp message includes: facility name, address, date, shift start/end times, worker type, gender requirement, contact person
 ✅ Application link opens PHC web portal with shift details
 ✅ Web push reminder sent if not applied within 2 hours (if logged into portal)
 ✅ Works on both mobile and desktop browsers
@@ -109,7 +114,14 @@ And: I can click the link to view and apply for the shift
 ```gherkin
 Given: I click the application link from WhatsApp message
 When: I open the PHC web portal
-Then: I see the shift details (date, location, time, contact person, special notes)
+Then: I see the complete shift details:
+  - Facility name and full address/location
+  - Date and shift times (start time, end time, duration)
+  - Worker type / skillset required
+  - Gender requirement (if applicable)
+  - Hourly rate and estimated total pay
+  - Contact person and phone number
+  - Special notes/requirements
 And: I see the cancellation penalty warning
 When: I click "Apply" button
 Then: My application is recorded with status "pending_approval"
@@ -204,7 +216,11 @@ And: Re-matching triggered with urgent flag
 Given: I am logged into the PHC platform
 When: I navigate to "My Job History" section
 Then: I see a list of my past assignments sorted by date (newest first)
-And: each record shows date, location name, shift time, and status
+And: each record shows:
+  - Facility name and location
+  - Date and shift times (start, end)
+  - Worker type / skillset
+  - Status (Completed, Cancelled, etc.)
 And: I can filter by date range and status
 ```
 
@@ -212,12 +228,21 @@ And: I can filter by date range and status
 ```gherkin
 Given: I am viewing my job history list
 When: I click on a specific job record
-Then: I see detailed information including assignment date, shift times, location, clock-in/out times, attendance status, score impact, and any penalties applied
+Then: I see detailed information including:
+  - Facility name and full address
+  - Assignment date
+  - Shift start time and end time
+  - Worker type / skillset required
+  - Gender requirement (if applicable)
+  - Clock-in/out times
+  - Attendance status
+  - Score impact
+  - Any penalties applied
 ```
 
 **Acceptance Criteria:**
 ✅ Job history displays past assignments (last 12 months)
-✅ Each record shows: date, location, shift time, status
+✅ Each record shows: facility name, address, date, shift start/end times, worker type, status
 ✅ Status clearly indicated: Completed, Cancelled, No-Show
 ✅ Score impact shown: +1 (attended), -1 (cancelled)
 ✅ Penalties displayed with amount (300 HKD for late cancellation) and reason
@@ -268,8 +293,14 @@ And: I can see the related assignment details
 ```gherkin
 Given: A job posting has received staff applications
 When: I navigate to the job posting details
-Then: I see a list of all staff who have applied
-And: Each applicant shows: name, score, availability status, relevant history
+Then: I see the complete job information:
+  - Facility name and full address/location
+  - Date, shift start time, shift end time
+  - Worker type / skillset required
+  - Gender requirement (if applicable)
+  - Contact person
+And: I see a list of all staff who have applied
+And: Each applicant shows: name, score, availability status, relevant history, matching skillset
 And: I can approve or reject each application
 When: I approve an application
 Then: The assignment is confirmed and staff is notified
@@ -491,7 +522,14 @@ And: System tracks who confirmed receipt
 ```gherkin
 Given: There is an urgent staffing need (e.g., 2 staff needed today 18:00-22:00)
 When: I click "Emergency Job Posting" in the admin portal
-And: I fill the form: facility, date/time, staff count, urgency reason
+And: I fill the form with complete job details:
+  - Facility name and full address/location
+  - Date, shift start time, shift end time
+  - Worker type / skillset required
+  - Gender requirement (if any)
+  - Number of staff needed
+  - Urgency reason
+  - Contact person and phone number
 And: I click "Post Emergency Job"
 Then: Job posted immediately (bypasses 15-minute polling delay)
 And: Matching engine runs instantly
@@ -552,6 +590,9 @@ And: If unfilled after 30 minutes: admin receives push/email alert
 **Sync Frequency:** Daily 02:00 AM
 **Data Provided:**
 - Staff ID, names, contact info, HKID
+- Worker type (e.g., Nursing Assistant, Care Worker)
+- Skillsets (e.g., elderly_care, dementia_care, medication_admin)
+- Gender
 - Bank account details
 - Certificate expiry dates
 - Status (active/inactive)
@@ -573,8 +614,11 @@ And: If unfilled after 30 minutes: admin receives push/email alert
 
 **Sync Frequency:** Daily 03:00 AM
 **Data Provided:**
-- Location ID, name, address, contact
+- Location ID, facility name, full address, contact
 - Region, district
+- Worker types accepted (e.g., Nursing Assistant, Care Worker)
+- Skillset requirements (e.g., elderly_care, dementia_care)
+- Gender preferences (if any)
 - Underlist (priority staff list)
 - Blacklist
 - Special requirements
@@ -596,16 +640,21 @@ And: If unfilled after 30 minutes: admin receives push/email alert
 
 **Sync Frequency:** Every 15 minutes (or webhook push)
 **Data Provided:**
-- Demand ID, location, date, time
+- Demand ID
+- Facility name and full address/location
+- Date, shift start time, shift end time
+- Worker type / skillset required
+- Gender requirement (M/F/Any)
 - Required staff count
 - Assigned count
 - Status (open/filled/cancelled)
 - Priority, special requirements
+- Contact person and phone number
 
 **Acceptance Criteria:**
 ✅ API responds in <3 seconds
 ✅ Unfilled demands (status: open) returned
-✅ Full demand details provided
+✅ Full demand details provided (facility, address, times, worker type, gender)
 ✅ Webhook supported (optional)
 
 **Priority:** Critical
@@ -978,10 +1027,14 @@ And: Match rate recalculates for the period
 
 **Preconditions:**
 - Job demand: 2025-11-25, 08:00-20:00, 1 staff needed
-- Location: Hong Kong Care Home (CH_HKI_001)
+- Facility: Hong Kong Care Home (CH_HKI_001)
+- Facility Address: 123 Queen's Road, Central, Hong Kong
+- Worker Type: Nursing Assistant
+- Skillset: elderly_care, basic_nursing
+- Gender Requirement: Female
 - Underlist: Staff A (priority 1), Staff B (priority 2)
 - Staff scores: A=15, B=25, C=8
-- All staff: available, valid docs, not blacklisted
+- All staff: available, valid docs, not blacklisted, matching skillset
 
 **Test Steps:**
 1. Create job demand
@@ -1198,6 +1251,9 @@ And: Match rate recalculates for the period
       "contact_number": "91234567",
       "whatsapp_number": "91234567",
       "email": "chan@email.com",
+      "worker_type": "Nursing Assistant",
+      "skillsets": ["elderly_care", "dementia_care", "medication_admin"],
+      "gender": "F",
       "status": "active",
       "certificates": [ ... ],
       "bank_account": { ... }
@@ -1209,7 +1265,7 @@ And: Match rate recalculates for the period
 
 **Validation:**
 ✅ Response time < 3 seconds
-✅ All required fields present
+✅ All required fields present (including worker_type, skillsets, gender)
 ✅ HKID format valid
 ✅ Phone numbers 8 digits
 ✅ Staff status = active
@@ -1229,10 +1285,15 @@ And: Match rate recalculates for the period
   "phc_assignment_id": "PHC-001",
   "demand_id": "DEM456",
   "location_id": "LOC789",
+  "facility_name": "Hong Kong Care Home",
+  "facility_address": "123 Queen's Road, Central, HK",
   "staff_id": "STF123",
   "assignment_date": "2025-11-25",
   "shift_start": "08:00",
   "shift_end": "20:00",
+  "worker_type": "Nursing Assistant",
+  "skillset_required": ["elderly_care"],
+  "gender_requirement": "F",
   "assigned_by": "system_auto"
 }
 ```
@@ -1422,12 +1483,19 @@ And: Match rate recalculates for the period
   "timestamp": "2025-11-20T10:00:00Z",
   "data": {
     "demand_id": "DEM789",
+    "facility_name": "Tseung Kwan O Care Home",
+    "facility_address": "123 TKO Road, Tseung Kwan O, NT",
     "location_id": "LOC456",
     "required_date": "2025-11-25",
     "shift_start": "14:00",
     "shift_end": "22:00",
+    "worker_type": "Nursing Assistant",
+    "skillset": ["elderly_care", "medication_admin"],
+    "gender_requirement": "F",
     "required_count": 2,
-    "priority": "urgent"
+    "priority": "urgent",
+    "contact_person": "Mr. Wong",
+    "contact_phone": "91234567"
   }
 }
 ```
@@ -1676,6 +1744,18 @@ And: Match rate recalculates for the period
 | 1.0     | 2025-11-24 | System Analyst  | Initial draft                                                |
 | 1.1     | 2025-11-27 | System Analyst  | Aligned with Product Spec v1.5 (Human Screening Workflow)    |
 | 1.2     | 2025-11-28 | System Analyst  | Added Staff Login (US-NA-00)                                 |
+| 1.3     | 2025-11-28 | System Analyst  | Added complete job details (facility, worker type, gender)   |
+
+**v1.3 Changes (2025-11-28):**
+- Enhanced all job-related stories to include complete facility information:
+  - Facility name and full address/location
+  - Shift start time and end time
+  - Worker type / skillset required
+  - Gender requirement (M/F/Any)
+  - Contact person and phone number
+- Updated US-NA-01, US-NA-02, US-NA-05, US-ADM-05, US-ADM-07
+- Updated US-ERP-01, US-ERP-02, US-ERP-03 data sync specifications
+- Updated TC-002, TC-ERP-01, TC-ERP-02, TC-ERP-08 test cases
 
 **v1.2 Changes (2025-11-28):**
 - Added US-NA-00: Staff Login (using ERP credentials)
