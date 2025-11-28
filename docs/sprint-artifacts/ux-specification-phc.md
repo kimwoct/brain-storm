@@ -1,4 +1,4 @@
-# PHC - Prestige Health Dispatch System
+# PHC - Prestige Health Match or Dispatch System
 ## User Experience Specification Document
 
 **Project:** PHC - Automated Staff Dispatch System
@@ -327,28 +327,24 @@ End of day: Exhausted, 30 shifts handled, no strategic work done
 ### Journey 1: Nursing Assistant - "I want that shift!"
 
 ```
-Future State (Proactive):
-PHC System reads preferences (availability, location, skills)
+Future State (Application Workflow):
+PHC System receives job demand from ERP
     ↓
-Matching engine identifies shift match
+System sends WhatsApp/Push Notification to eligible staff
     ↓
-System calculates performance score ranking
+Nursing assistant receives notification
     ↓
-If in top 5 candidates: Send notification
+Opens mobile web app → sees shift details
     ↓
-Nursing assistant receives WhatsApp/push notification
+Reviews: Location, time, rate, cancellation policy
     ↓
-Opens mobile web app → sees shift details + ranking
+Clicks "Apply" (Status: Pending Approval)
     ↓
-Reviews: Location, time, rate, her score
+Admin reviews application (screens candidate)
     ↓
-One-tap "Accept" (or "Not Available")
+Admin approves application
     ↓
-System receives response in real-time
-    ↓
-If first acceptance: Assign shift → send confirmation
-    ↓
-Nursing assistant receives: Assignment + QR check-in code
+Nursing assistant receives: "Application Approved" + Confirmation
     ↓
 Shows up → supervisor scans QR → attendance confirmed
     ↓
@@ -356,12 +352,10 @@ Performance score updates (+1 for attendance)
 ```
 
 **Value Delivered:**
-- **Proactive:** Don't wait for calls
-- **Transparent:** See ranking and why
-- **Control:** Accept/decline on own schedule
-- **Fair:** Merit-based, not relationships
+- **Fairness:** Admin screens candidates before assignment
+- **Transparent:** Clear status updates (Pending -> Confirmed)
+- **Control:** Apply for shifts that fit schedule
 - **Mobile:** Works on their phone, no desktop needed
-- **Instant:** No waiting for callback
 
 ---
 
@@ -371,32 +365,26 @@ Performance score updates (+1 for attendance)
 Future State (Automated Support):
 6:00 AM: Staff calls in sick
     ↓
-Supervisor opens PHC mobile app → marks shift "unfilled"
+Supervisor updates ERP (or Admin posts Emergency Job)
     ↓
-System automatically triggers matching (no coordinator call needed!)
+System syncs job demand (or Emergency Job triggers instantly)
     ↓
-Matching engine: filters → scores → ranks → suggests
+Notification sent to eligible staff
     ↓
-Coordinator receives: "5 candidates suggested, needs approval"
+Staff apply for the shift
     ↓
-Coordinator reviews, approves, clicks "notify"
+Admin reviews and approves best candidate
     ↓
-System sends notifications to top 5 staff
-    ↓
-Supervisor sees real-time dashboard: "3 notified, 2 accepted"
+Supervisor sees real-time dashboard: "Staff Assigned"
     ↓
 Supervisor receives: "Chan Wai-Ling assigned, ETA 7:30 AM"
     ↓
 7:30 AM: Chan arrives → QR code scanned → attendance confirmed
-    ↓
-Shift status updates: "Filled → In Progress → Completed"
 ```
 
 **Value Delivered:**
-- **Instant:** No 2-3 hour wait
 - **Visible:** Real-time status tracking
-- **Reliable:** Performance score ensures quality
-- **No coordinator call:** Self-service for supervisors
+- **Reliable:** Admin screening ensures quality
 - **Predictable:** Know WHO is coming, when
 - **Accountable:** QR check-in proves attendance
 
@@ -405,44 +393,33 @@ Shift status updates: "Filled → In Progress → Completed"
 ### Journey 3: Coordinator - "Strategic oversight, not firefighting"
 
 ```
-Future State (Exception Handling):
-Supervisor marks shift "unfilled" → triggers matching
+Future State (Screening & Approval):
+System receives job demands from ERP
     ↓
-System does 3-second matching computation:
-    - Filters 500 staff → available + qualified
-    - Scores by performance + preferences
-    - Ranks top 5 candidates
+Notifications sent to staff → Staff apply
     ↓
-Coordinator receives notification: "Approval needed"
+Coordinator opens "Job Applications" dashboard
     ↓
-Opens desktop dashboard → reviews suggested candidates
+Sees list of applicants for each job
     ↓
-Sees: Performance scores, preferences, history
+Reviews: Performance scores, history, conflicts
     ↓
-Makes human judgment: approves/changes selections
+Makes human judgment: Approves best candidate
     ↓
-One-click: "Notify selected staff" (system sends all notifications)
+System sends "Confirmed" notification to staff
     ↓
-Real-time responses flow in: "Accepted", "Declined", "No response"
+Auto-sync to ERP upon approval
     ↓
-First acceptance = auto-assignment → ERP sync
+If no applicants: Coordinator uses "Manual Assignment"
     ↓
-If no responses after 15 minutes: Escalation alert to coordinator
-    ↓
-Coordinator manually intervenes (exception handling)
-    ↓
-End of day: Reviews metrics dashboard, not exhausted from calls
-    ↓
-Strategic work: Analyzes patterns, coaches low-scoring staff, optimizes
+End of day: Reviews metrics dashboard
 ```
 
 **Value Delivered:**
-- **Efficient:** 3-second computation vs. 2-hour phone calls
-- **Strategic:** Focus on exceptions, not routine
-- **Fair:** Data-driven suggestions remove bias
+- **Control:** Human approval ensures right fit
+- **Efficient:** Reviewing applications is faster than calling
+- **Fair:** Data-driven selection from applicants
 - **Trackable:** Every decision logged → analytics
-- **Scalable:** Can handle 2× shifts without 2× staff
-- **Sustainable:** Not burned out, can do value-added work
 
 ---
 
@@ -465,11 +442,11 @@ Strategic work: Analyzes patterns, coaches low-scoring staff, optimizes
 2. **Shift Details View**
    - Location, time, care home, supervisor
    - Hourly rate, shift duration
-   - **Her performance score and ranking** (transparency)
-   - One-tap "Accept" or "Decline"
+   - **Cancellation Penalty Warning** (if applicable)
+   - "Apply for Shift" button (Status: Pending)
 
 3. **Assignment Confirmation**
-   - Shift assigned notification
+   - "Application Approved" notification
    - QR code for attendance check-in
    - Calendar integration
    - Directions to care home
@@ -477,7 +454,7 @@ Strategic work: Analyzes patterns, coaches low-scoring staff, optimizes
 4. **Performance Dashboard**
    - Current performance score
    - History: shifts completed, attendance record
-   - Explanation of scoring: +1 attend, -1 cancel, -2 no-show
+   - Explanation of scoring: +1 attend, -1 cancel
    - Goal setting: "Attend 10 more shifts to reach 95 score"
 
 5. **Profile & Preferences**
@@ -507,20 +484,19 @@ Strategic work: Analyzes patterns, coaches low-scoring staff, optimizes
 **Core Features:**
 1. **Shift Management**
    - View schedule for their care home
-   - Mark shifts "unfilled" (triggers matching)
-   - Real-time status: "Searching", "Candidates Found", "Assigned"
-   - One-tap re-trigger if no responses
+   - Real-time status: "Searching", "Staff Applied", "Assigned"
+   - View assigned staff details
 
 2. **Assignment Tracking**
    - Real-time dashboard: unfilled shifts
-   - Staff responses: "Notified → Accepted → Assigned"
+   - Staff application status
    - Staff profile preview: reliability score, history
    - ETA tracking for assigned staff
 
 3. **Attendance Verification**
    - QR code scanner for check-in
    - Alternatives: manual verification, supervisor PIN
-   - No-show flagging (triggers penalty)
+   - No-show flagging (triggers score penalty)
    - Early/late tracking
 
 4. **Staff Performance View**
@@ -529,12 +505,7 @@ Strategic work: Analyzes patterns, coaches low-scoring staff, optimizes
    - Attendance history
    - Notes/feedback
 
-5. **Emergency Requests**
-   - "I need staff in next 1 hour" (high urgency)
-   - "Weekend shift needs coverage" (normal urgency)
-   - System adjusts matching based on urgency
-
-6. **Communication Hub**
+5. **Communication Hub**
    - Message assigned staff
    - Broadcast to all staff at care home
    - Receive messages from staff
@@ -551,27 +522,26 @@ Strategic work: Analyzes patterns, coaches low-scoring staff, optimizes
 ### 5.3 Coordinator Desktop Interface
 
 **Core Features:**
-1. **Intelligent Suggestion Engine**
-   - Auto-matching computation (3 seconds)
-   - Suggests top 5 candidates per shift
-   - Ranking algorithm: performance score + preferences + location
-   - Confidence indicator: "High match" vs. "Low match"
+1. **Application Screening**
+   - View all applications for each job
+   - Applicant details: Score, History, Conflicts
+   - Approve/Reject applications
+   - Bulk approval capabilities
 
-2. **Approval Workflow**
-   - Review suggested candidates
-   - Override selections based on human judgment
-   - Multi-select approval (bulk actions)
-   - One-click "Notify selected staff"
+2. **Manual Assignment**
+   - Search staff by name/score
+   - Override system matching
+   - Conflict warnings (e.g., double booking)
+   - Audit log for manual overrides
 
-3. **Real-Time Response Dashboard**
-   - Live view: "Accepted", "Declined", "No Response"
-   - Auto-assignment on first acceptance
-   - Timer: "No response in 15 minutes → Escalate"
-   - Manual intervention for escalations
+3. **Job Posting Management**
+   - View jobs synced from ERP
+   - Post "Emergency Jobs" (bypasses sync)
+   - Monitor fill rates in real-time
 
 4. **Exception Management**
    - Complex shifts requiring human judgment
-   - Last-minute unfilled shifts (no responders)
+   - Last-minute unfilled shifts (no applicants)
    - Special requests from supervisors
    - Quality issues or complaints
 
@@ -622,7 +592,7 @@ Strategic work: Analyzes patterns, coaches low-scoring staff, optimizes
    - System health: API uptime, errors
 
 3. **Financial Reporting**
-   - Penalty deductions tracked: -100 HKD per no-show
+   - Penalty deductions tracked: -300 HKD per late cancellation
    - Coordinator salary savings: hours × rate
    - Revenue protection: unfilled shifts prevented
    - ROI calculation: Year 1, Year 2 projections
@@ -677,13 +647,13 @@ Strategic work: Analyzes patterns, coaches low-scoring staff, optimizes
 6. GET /locations - Get care home locations, addresses
 7. GET /qualifications - Retrieve certification requirements
 8. GET /pay-rates - Get hourly rates by location/role
-9. GET /penalties - Retrieve penalty history (no-shows)
+9. GET /penalties - Retrieve penalty history (cancellations)
 10. GET /availability - Get staff availability calendars
 
 **Writing to ERP (3-5 endpoints):**
 11. POST /attendance - Submit attendance confirmation (QR scan)
 12. PUT /shifts/{id} - Update shift status (filled/unfilled/assigned)
-13. POST /penalties - Submit no-show penalty (-100 HKD)
+13. POST /penalties - Submit late cancellation penalty (-300 HKD)
 14. PUT /staff/{id}/performance - Update performance score (merit system)
 15. POST /shift-history - Log matching/assignment history
 
@@ -708,9 +678,9 @@ Base Score: 80 points (starting/midpoint)
 
 Scoring Events:
 +1 point: Successfully attended shift
--1 point: Cancelled with notice (reduces score)
--2 points: No-show without notice (reduces score)
--100 HKD penalty for no-show
+-1 point: Cancelled with notice (Early >48h)
+-1 point: Late Cancellation (<48h) + 300 HKD Penalty
+(No-show penalties removed in v1.2)
 
 Score Range: 60-100 (with potential exceptions)
 
@@ -727,7 +697,7 @@ Ranking Weight: Higher score = priority matching
 
 **Rules:**
 - Scores never go below 60 (poor performance) or above 100 (perfect)
-- 3 no-shows within 30 days = system flag for coordinator review
+- 3 late cancellations within 30 days = system flag for coordinator review
 - Perfect attendance bonus: +5 after 20 consecutive shifts
 - Trend indicator: Rising (improving) vs. Falling (declining)
 
@@ -754,23 +724,22 @@ Ranking Weight: Higher score = priority matching
 **Notification Types:**
 
 **For Nursing Assistants:**
-- "[URGENT] Shift available at Tseung Kwan O Care Home, 7am-3pm, $110/hr. You're ranked #3. Accept: [link]"
-- "✅ Shift confirmed! Tseung Kwan O, 7am-3pm. Check-in QR: [link]"
-- "⚠️ Penalty applied: No-show on March 15 = -2 pts, -100 HKD. Current score: 84"
+- "[URGENT] Shift available at Tseung Kwan O Care Home, 7am-3pm, $110/hr. Tap to Apply: [link]"
+- "✅ Application Approved! Tseung Kwan O, 7am-3pm. Check-in QR: [link]"
+- "⚠️ Penalty applied: Late Cancellation on March 15 = -1 pts, -300 HKD. Current score: 84"
 
 **For Supervisors:**
-- "🚨 Unfilled shift: Mar 20, 7am-3pm. Matching in progress..."
 - "✅ Shift filled! Chan Wai-Ling assigned. ETA: 7:20am. Score: 89/100"
 - "⏰ 15 min warning: Staff not checked in for shift starting at 7am"
 
 **For Coordinators:**
-- "⚠️ Approval needed: 3 shifts unfilled, candidates suggested"
+- "⚠️ New Applications: 3 shifts have pending applications"
 - "📊 Daily report: 42 shifts filled, avg time 4.2 min, 1 escalation"
-- "🚨 Escalation: Tseung Kwan O shift (7am) no responses after 20 min"
+- "🚨 Escalation: Tseung Kwan O shift (7am) no applicants after 20 min"
 
 **Delivery Rules:**
-- Initial notification: Simultaneous to top 5 candidates
-- Escalation: If no response in 15 min, notify coordinator
+- Initial notification: Simultaneous to eligible candidates
+- Escalation: If no applicants in 15 min, notify coordinator
 - Reminder: 24 hours before shift (confirmation)
 - Urgency: SMS fallback if critical and no response
 
@@ -866,7 +835,7 @@ RANK: Top 5 candidates by Final Score
 - Don't overwhelm with options - show what's needed, when needed
 
 **6. Error Prevention > Error Recovery**
-- No-show penalty: Confirm acceptance 3 times before assigning
+- Late Cancellation penalty: Confirm cancellation 3 times before processing
 - Double-booking prevention: Check availability before notification
 - Fat finger protection: "Are you sure?" for consequential actions
 - Undo capability within 60 seconds
@@ -976,8 +945,8 @@ RANK: Top 5 candidates by Final Score
    - Optimized: 2 FTE coordinators = $XXX,XXX/year
    - Savings: 1 FTE salary + benefits
 
-2. **No-Show Penalties**
-   - Collected: -100 HKD per no-show
+2. **Cancellation Penalties**
+   - Collected: -300 HKD per late cancellation
    - Reduced no-shows: 5% → 2% = 60% reduction
    - Additional revenue from penalties
 
@@ -1248,17 +1217,17 @@ ROI = (Total Savings - Total Investment) ÷ Total Investment × 100
 - Feedback: "Account locked after 5 failed attempts" (Error state)
 
 **Screen 1: Notification (WhatsApp / Push)**
-- Message: "[URGENT] Shift at Tseung Kwan O, 7am-3pm, $110/hr. You're ranked #3. Tap to view."
+- Message: "[URGENT] Shift at Tseung Kwan O, 7am-3pm, $110/hr. Tap to Apply."
 
 **Screen 2: Shift Details**
 - Large text: "Tseung Kwan O Care Home"
 - Time: "Today, 7:00 AM - 3:00 PM (8 hours)"
 - Rate: "$110/hour = $880 total"
-- Your ranking: "You're #3 of 5 candidates (Score: 86/100)"
-- Large buttons: "✅ Accept Shift" / "❌ Not Available"
+- Cancellation Policy: "Late cancel (<48h) = -300 HKD"
+- Large buttons: "✅ Apply for Shift" / "❌ Not Interested"
 
 **Screen 3: Confirmation**
-- Success message: "Shift accepted!"
+- Success message: "Application Approved!"
 - Details: Location, time, supervisor contact
 - QR code: Large, scannable (for check-in)
 - Add to calendar button
@@ -1273,27 +1242,27 @@ ROI = (Total Savings - Total Investment) ÷ Total Investment × 100
 
 ### 11.3 Coordinator Dashboard Design
 
-**Left Panel (1/3):** Unfilled Shifts Queue
-- List: Location, time, urgency, waiting time
+**Left Panel (1/3):** Job Postings Queue
+- List: Location, time, urgency, applicant count
 - Filter: By location, time, priority
-- Sort: Newest, longest waiting, closest to shift start
+- Sort: Newest, most applicants, urgent
 
-**Center Panel (1/2):** Selected Shift Details
+**Center Panel (1/2):** Application Screening
 - Shift info: Location, time, requirements
-- Suggested candidates: Top 5 ranked list
+- Applicant List:
   - Name, photo, performance score, distance
   - History: "Worked this location 12 times, 100% attendance"
-- Action: "Approve Suggestions" / "Modify Selection"
+- Action: "Approve Application" / "Reject"
 
-**Right Panel (1/6):** Real-Time Responses
-- Live feed: Staff responses
-- Icons: ✅ Accepted | ❌ Declined | ⏰ Waiting
-- Timer: "Auto-assign in 3 minutes if no response"
+**Right Panel (1/6):** Application Status
+- Live feed: New applications
+- Icons: 📝 Applied | ✅ Approved | ❌ Rejected
+- Timer: "Unfilled for 20 minutes"
 
 **Bottom Panel (Full Width):** Daily Metrics
 - Fill rate progress bar: "92% of 95% target"
 - Avg time to fill: "38 minutes"
-- No-show rate: "1.2% (target: <2%)"
+- Cancellation rate: "1.2% (target: <2%)"
 
 ---
 
