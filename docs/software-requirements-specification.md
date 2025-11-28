@@ -34,6 +34,7 @@ This Software Requirements Specification (SRS) defines the complete functional a
 - Automated matching of nursing assistants to care home shifts
 - Four-stage workflow automation (Registration, Job Posting, Matching, Completion)
 - Real-time ERP integration (bi-directional sync)
+- Staff Web Portal for login, dashboard, and shift management
 - Scoring algorithm with attendance-based points system
 - Financial penalty system (−100 HKD, score deductions)
 - Manual emergency protocol management
@@ -42,7 +43,7 @@ This Software Requirements Specification (SRS) defines the complete functional a
 **Out of Scope:**
 - Geographic intelligence (distance-based matching)
 - Automated fair sharing (manually controlled in ERP)
-- Mobile app development (WhatsApp-based notifications only)
+- Native Mobile app development (Web Portal + WhatsApp only)
 - Billing/invoicing beyond penalty deductions
 
 ### 1.3 System Overview
@@ -91,7 +92,7 @@ This Software Requirements Specification (SRS) defines the complete functional a
 
 | User Class | Description | Key Functions |
 |------------|-------------|---------------|
-| **Nursing Assistant** | Care workers receiving shift assignments | View assignments, confirm/cancel shifts, receive WhatsApp notifications |
+| **Nursing Assistant** | Care workers receiving shift assignments | Login to portal, view dashboard, apply for shifts, confirm/cancel assignments |
 | **Care Home Supervisor** | On-site staff verifying attendance | Verify clock-in/out, mark absent, view assigned staff |
 | **PHC Admin** | System administrators managing operations | Manual overrides, emergency protocols, file uploads, system monitoring |
 | **ERP Admin** | Existing ERP system users | Manage master data (staff, locations), configure fair sharing rules |
@@ -108,6 +109,51 @@ This Software Requirements Specification (SRS) defines the complete functional a
 ---
 
 ## 3. FUNCTIONAL REQUIREMENTS
+
+### 3.0 Flow 0: Authentication
+
+#### 3.0.1 FR-AUTH-01: Staff Login
+**Priority:** Critical
+**Description:** Staff must be able to log in using credentials synced from ERP.
+
+**System Actions:**
+1. User enters Mobile Number, Username, or Email
+2. User enters Password
+3. System validates credentials against PHC database (synced from ERP)
+4. If valid:
+   - Generate JWT token
+   - Create session
+   - Redirect to Staff Dashboard
+5. If invalid:
+   - Increment failure count
+   - Show error message
+6. If failure count >= 5:
+   - Lock account for 30 minutes
+   - Send alert email/SMS
+
+**Acceptance Criteria:**
+- Login works with Mobile, Username, Email
+- Account locking works
+- Session timeout after 30 mins
+
+#### 3.0.2 FR-AUTH-02: Forgot Password
+**Priority:** High
+**Description:** Staff can reset password via OTP.
+
+**System Actions:**
+1. User clicks "Forgot Password"
+2. Enters Mobile Number or Email
+3. System generates 6-digit OTP
+4. Sends OTP via SMS/Email
+5. User enters OTP
+6. System validates OTP
+7. User sets new password
+
+**Acceptance Criteria:**
+- OTP delivered < 1 min
+- Password reset successful
+
+---
 
 ### 3.1 Flow 1: Registration (开卡) - Daily ERP Sync
 
@@ -1361,23 +1407,31 @@ See detailed data mapping tables in Appendix A.
 - Active job postings list
 - Create/edit/delete postings
 - Manual emergency posting
-- Unfilled jobs view
-- Matching status
+### 6.2 Staff Portal Interface
 
-#### 6.1.6 Assignments
-- Assignment list (pending/confirmed/cancelled)
-- Assignment details
-- Confirmation status
-- Resend notifications
-- Manual override
+#### 6.2.1 Login Page
+- Fields: Mobile/Username/Email, Password
+- "Forgot Password" link
+- "Remember Me" checkbox
+- Language toggle (EN/ZH)
 
-#### 6.1.7 Attendance
-- Today's attendance
-- Clock-in/out verification
-- No-show marking
-- Attendance history
-- Shift verification
+#### 6.2.2 Staff Dashboard
+- **My Score:** Current score and tier
+- **Upcoming Shifts:** List of confirmed assignments
+- **Available Shifts:** List of open jobs matching criteria
+- **Notifications:** Recent alerts
 
+#### 6.2.3 My Shifts
+- List of all assignments (Pending, Confirmed, Completed, Cancelled)
+- Details view for each assignment
+- Action buttons: Confirm, Cancel
+
+#### 6.2.4 Profile
+- Personal details (read-only, synced from ERP)
+- Certificate status
+- Availability calendar management
+
+### 6.3 Supervisor Portal (Mobile-Friendly)
 #### 6.1.8 Penalties
 - Penalty list (today/historical)
 - Penalty details

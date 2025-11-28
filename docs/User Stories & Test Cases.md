@@ -16,6 +16,7 @@
 
 | User Story | Related FRs        | Description                               |
 | ---------- | ------------------ | ----------------------------------------- |
+| US-NA-00   | FR-5, NFR          | Staff Login (ERP Credentials)             |
 | US-NA-01   | FR-2, FR-3         | Receive job notification                  |
 | US-NA-02   | FR-1, FR-2, FR-3   | Apply for available shift                 |
 | US-NA-03   | FR-1, FR-3, FR-7   | Cancel shift with penalty warning         |
@@ -43,6 +44,33 @@
 ---
 
 ### 1. Nursing Assistant (護理員) User Stories
+
+#### US-NA-00: Staff Login
+**As a** nursing assistant,
+**I want** to log in to the PHC platform using my registered credentials (mobile number, username, or email),
+**So that** I can access my dashboard and apply for shifts.
+
+**Scenario - Login:**
+```gherkin
+Given: My staff account has been synced from ERP
+When: I enter my mobile number, username, or email
+And: I enter my password
+Then: I am successfully logged in
+And: I see my personal dashboard
+```
+
+**Acceptance Criteria:**
+✅ Login supported via Mobile Number, Username, or Email
+✅ Credentials validated against synced ERP data
+✅ Account locked after 5 failed attempts
+✅ "Forgot Password" flow via SMS/Email OTP
+✅ Session timeout after 30 minutes of inactivity
+
+**Priority:** Critical
+
+**Note:** Staff accounts are created automatically via ERP sync (FR-5).
+
+---
 
 #### US-NA-01: Receive Job Notification via Web Push Notification/WhatsApp
 **As a** nursing assistant,
@@ -915,8 +943,8 @@ And: Match rate recalculates for the period
 
 ### STORY SUMMARY
 
-**Total Stories: 24**
-- Nursing Assistant stories (US-NA-01 to US-NA-07): 7
+**Total Stories: 25**
+- Nursing Assistant stories (US-NA-00 to US-NA-07): 8
 - Admin stories (US-ADM-01 to US-ADM-08): 8
 - ERP System stories (US-ERP-01 to US-ERP-06): 6
 - **Finance Team stories:** US-FIN-01 to US-FIN-02: **2**
@@ -1500,6 +1528,28 @@ And: Match rate recalculates for the period
 
 ---
 
+#### TC-SEC-03: Staff Login
+**Objective:** Verify staff can login with ERP credentials
+
+**Preconditions:**
+- Staff data synced from ERP
+- Staff status is "Active"
+
+**Test Steps:**
+1. Enter valid Mobile Number/Email
+2. Enter valid password
+3. Click Login
+
+**Expected Results:**
+✅ Login successful
+✅ User redirected to dashboard
+✅ Invalid credentials show error message
+✅ Inactive staff (in ERP) cannot login
+
+**Priority:** Critical
+
+---
+
 ### 5. Finance Test Cases
 
 #### TC-FIN-01: Settlement Discrepancy Investigation
@@ -1643,6 +1693,11 @@ And: Match rate recalculates for the period
 | ------- | ---------- | --------------- | ------------------------------------------------------------ |
 | 1.0     | 2025-11-24 | System Analyst  | Initial draft                                                |
 | 1.1     | 2025-11-27 | System Analyst  | Aligned with Product Spec v1.5 (Human Screening Workflow)    |
+| 1.2     | 2025-11-28 | System Analyst  | Added Staff Login (US-NA-00)                                 |
+
+**v1.2 Changes (2025-11-28):**
+- Added US-NA-00: Staff Login (using ERP credentials)
+- Added TC-SEC-03: Staff Login Test Case
 
 **v1.1 Changes (2025-11-27):**
 

@@ -87,9 +87,13 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Client Layer                                 │
 ├─────────────────────────────────────────────────────────────────┤
-│  Admin Portal (React)      │   WhatsApp (Business API)          │
-│  - Desktop/Mobile          │   - Notifications                  │
-│  - Dashboards              │   - Confirmations                  │
+│  Admin Portal (React)      │   Staff Portal (React)             │
+│  - Desktop/Mobile          │   - Mobile-First Web App           │
+│  - Dashboards              │   - Dashboard, Shifts, Profile     │
+│                            │                                    │
+│                            │   WhatsApp (Business API)          │
+│                            │   - Notifications                  │
+│                            │   - Confirmations                  │
 └─────────────────────────────────────────────────────────────────┘
                                  ▲
                                  │ HTTPS/TLS
@@ -1334,23 +1338,30 @@ LOG_TO_FILE="true"
 
 ### 5.1 Authentication Flow
 
+**Staff Login:**
 ```
-Login Request
+Login Request (Mobile/Email/Username + Password)
     ↓
 POST /api/v1/auth/login
-{ email, password }
     ↓
-Validate credentials
+Lookup user by identifier (Mobile OR Email OR Username)
+    ↓
+Validate Password (bcrypt)
+    ↓
+Check Account Status (Active/Locked)
     ↓
 Generate JWT (access token + refresh token)
     ↓
-Return tokens
+Return tokens + User Role (Staff)
+```
+
+**Admin Login:**
+```
+Login Request (Email + Password)
     ↓
-Store access token in memory (Redux)
-Store refresh token in httpOnly cookie
+POST /api/v1/auth/login
     ↓
-Include access token in Authorization header
-for all API requests
+... (Same flow)
 ```
 
 ### 5.2 Role-Based Access Control (RBAC)

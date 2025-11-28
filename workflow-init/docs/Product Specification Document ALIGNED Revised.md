@@ -1,7 +1,7 @@
 # Healthcare Worker Dispatch System (PHC)
 ## Prestige Health Care Ltd
 
-**Document Version:** 1.5 (ALIGNED WITH PRD)
+**Document Version:** 1.6 (ALIGNED WITH PRD)
 **Date:** November 25, 2025
 **Status:** Revised for Human Screening Workflow
 
@@ -130,6 +130,31 @@ The PHC system streamlines dispatch of nursing assistants to care home shifts us
 ---
 
 ## 3. Functional Requirements
+
+### 3.0 Staff Login (FR-0)
+
+**Description:** Secure authentication for staff using ERP-synced credentials
+
+**Login Methods:**
+- **Mobile Number:** 8-digit HK phone number
+- **Username:** Unique system username
+- **Email:** Registered email address
+
+**System Behavior:**
+- User enters identifier (Mobile/Username/Email) and password
+- System resolves user and validates hash
+- Successful login grants JWT token
+- Failed login increments failure counter
+- "Forgot Password" triggers OTP flow
+
+**Acceptance Criteria:**
+✅ Staff can login with Mobile OR Username OR Email
+✅ Account locks after 5 failed attempts
+✅ Session expires after 30 minutes of inactivity
+✅ Forgot Password flow sends OTP and allows reset
+✅ Login events logged for audit
+
+---
 
 ### 3.1 Scoring Algorithm (FR-1)
 
@@ -873,8 +898,9 @@ Please read and confirm receipt via portal
 
 **Entity: Users (Staff and Admins)**
 - user_id: Primary key
+- username: UNIQUE, login credential
 - phone_number: UNIQUE, login credential (8-digit HK format)
-- email: UNIQUE (for admins, NULL for workers)
+- email: UNIQUE, login credential
 - password_hash: bcrypt hashed (cost factor 12)
 - full_name: English or Traditional Chinese
 - role: ENUM (admin, worker)
@@ -1092,6 +1118,7 @@ Please read and confirm receipt via portal
 
 | FR | Feature | Covered In | Status |
 |----|---------|------------|--------|
+| FR-0 | Staff Login | US-NA-00, TC-SEC-03 | ✓ |
 | FR-1 | Scoring Algorithm | US-NA-02, US-NA-03, US-NA-05, US-ERP-06 | ✓ |
 | FR-2 | Matching Engine | US-ERP-04, US-ADM-02 | ✓ |
 | FR-3 | WhatsApp + Firebase | US-NA-01, US-NA-02, US-ADM-04, US-ADM-05 | ✓ |
@@ -1330,11 +1357,17 @@ Please read and confirm receipt via portal
   - Future enhancement prioritization (Section 12)
 - **RATIONALE:** Reflects shift from fully automated matching to human-screened application workflow where staff apply for shifts and admins perform final screening/approval; Performance targets adjusted for MVP realism; Multiple review markers added for management input on critical decisions
 
+**Version 1.5 → 1.6 (2025-11-25)**
+- **ADDED:** FR-0 Staff Login - Added authentication requirements (Mobile/Username/Email)
+- **UPDATED:** Data Model - Added username and email as login credentials for Users entity
+- **UPDATED:** Traceability Matrix - Added FR-0 mapping to US-NA-00
+- **RATIONALE:** Ensures staff can login using their preferred ERP-synced credentials
+
 **⚠️ CRITICAL SECURITY ISSUE FLAGGED:** Section 9.3 shows TLS 1.1 which is deprecated and insecure. This must be reverted to TLS 1.3 before implementation.
 
 ---
 
-**Document Status:** ✓ ALIGNED WITH PRD (v1.5 - Human Screening Workflow)
+**Document Status:** ✓ ALIGNED WITH PRD (v1.6 - Staff Login Added)
 **Architecture Approval:** ⏳ Pending management review of [fixme] sections
 **Last Updated:** November 25, 2025
 **Review Priority:** CRITICAL - Section 9.3 Security (TLS 1.1 must be corrected to TLS 1.3)

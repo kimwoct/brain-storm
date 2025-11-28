@@ -102,6 +102,24 @@ See Executive Summary (Section 6)
 
 ### P0: Critical Features (Must-Have)
 
+#### FR-0: Staff Login
+**Description:** Secure login for nursing assistants using ERP credentials
+
+**Requirements:**
+- Login via Mobile Number, Username, or Email
+- Validate against synced ERP data
+- Account locking (5 failed attempts)
+- Forgot Password flow (OTP)
+- Session timeout (30 mins)
+
+**Acceptance Criteria:**
+✅ Login works with all credential types
+✅ Invalid credentials rejected
+✅ Account locked after 5 failures
+✅ OTP sent for password reset
+
+---
+
 #### FR-1: Scoring Algorithm
 **Description:** Merit-based scoring for fair allocation
 
@@ -356,11 +374,12 @@ See Executive Summary (Section 6)
 ### Primary User Journeys
 
 #### Journey 1: Nursing Assistant Gets Assigned
-1. ✅ Receives WhatsApp (5 min)
-2. ✅ Reviews shift details
-3. ✅ Clicks "Confirm" (1 tap)
-4. ✅ Gets confirmation message
-5. ✅ Score increases (+1)
+1. ✅ Logs in to Staff Portal
+2. ✅ Receives WhatsApp/Push Notification
+3. ✅ Reviews shift details on Dashboard
+4. ✅ Clicks "Confirm" (1 tap)
+5. ✅ Gets confirmation message
+6. ✅ Score increases (+1)
 
 #### Journey 2: Admin Posts Emergency Job
 1. ✅ Logs into portal
