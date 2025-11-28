@@ -1,7 +1,7 @@
 
 # User Stories v1.1
 
-**Prestige Health Dispatch System (PHC)**
+**Prestige Health Care Match/Dispatch System (PHC)**
 
 **Version:** 1.1
 **Date:** 2025-11-27
@@ -14,29 +14,31 @@
 
 ### REQUIREMENTS TRACEABILITY MATRIX
 
-| User Story | Related FRs            | Description                     |
-| ---------- | ---------------------- | ------------------------------- |
-| US-NA-01   | FR-2, FR-3             | Receive job notification via WhatsApp |
-| US-NA-02   | FR-1, FR-2, FR-3       | Apply for available shift       |
-| US-NA-03   | FR-1, FR-3, FR-7       | Cancel shift with penalty warning |
-| US-NA-04   | FR-1                   | View current score *(Deferred)*   |
-| US-NA-05   | FR-1, FR-6             | View job history                |
-| US-NA-06   | FR-7                   | View penalty history            |
-| US-NA-07   | FR-8                   | Acknowledge required documents  |
-| US-ADM-01  | FR-4, FR-5             | View real-time dashboard        |
-| US-ADM-02  | FR-2, FR-11            | Manual assignment override      |
-| US-ADM-03  | FR-8                   | Upload emergency protocol       |
-| US-ADM-04  | FR-3, FR-8             | Distribute emergency files      |
-| US-ADM-05  | FR-9                   | Post emergency job              |
-| US-ADM-06  | FR-5, FR-12, FR-13     | View system logs and reports    |
-| US-ADM-07  | FR-2                   | View job applications overview  |
-| US-ADM-08  | FR-8                   | Verify document acknowledgment  |
-| US-ERP-01  | FR-5                   | Staff master data sync          |
-| US-ERP-02  | FR-5                   | Location master data sync       |
-| US-ERP-03  | FR-5                   | Job demand sync                 |
-| US-ERP-04  | FR-2, FR-5             | Receive assignment submission   |
-| US-ERP-05  | FR-5, FR-6             | Receive attendance records      |
-| US-ERP-06  | FR-1, FR-5, FR-7       | Receive penalty records         |
+| User Story | Related FRs        | Description                               |
+| ---------- | ------------------ | ----------------------------------------- |
+| US-NA-01   | FR-2, FR-3         | Receive job notification                  |
+| US-NA-02   | FR-1, FR-2, FR-3   | Apply for available shift                 |
+| US-NA-03   | FR-1, FR-3, FR-7   | Cancel shift with penalty warning         |
+| US-NA-04   | FR-1               | View current score *(Deferred)*           |
+| US-NA-05   | FR-1, FR-6         | View job history                          |
+| US-NA-06   | FR-7               | View penalty history                      |
+| US-NA-07   | FR-8               | Acknowledge required documents            |
+| US-ADM-01  | FR-4, FR-5         | View real-time dashboard                  |
+| US-ADM-02  | FR-2, FR-11        | Manual confirmation + notification        |
+| US-ADM-03  | FR-8               | Upload acknowledgment documents/files     |
+| US-ADM-04  | FR-3, FR-8         | Distribute acknowledgment documents/files |
+| US-ADM-05  | FR-9               | Post emergency job                        |
+| US-ADM-06  | FR-5, FR-12, FR-13 | View system logs and reports              |
+| US-ADM-07  | FR-2               | View job applications overview            |
+| US-ADM-08  | FR-8               | Verify document acknowledgment            |
+| US-ERP-01  | FR-5               | Staff master data sync                    |
+| US-ERP-02  | FR-5               | Location master data sync                 |
+| US-ERP-03  | FR-5               | Job demand sync                           |
+| US-ERP-04  | FR-2, FR-5         | Receive assignment submission             |
+| US-ERP-05  | FR-5, FR-6         | Receive attendance records                |
+| US-ERP-06  | FR-1, FR-5, FR-7   | Receive penalty records                   |
+| US-FIN-01  | FR-10              | Generate settlement reconciliation report |
+| US-FIN-02  | FR-10              | Investigate settlement discrepancy        |
 
 ---
 
@@ -308,7 +310,7 @@ And: Reminder is logged in the system
 ✅ Individual reminder option per staff
 ✅ Report exportable showing acknowledgment compliance rate
 ✅ Staff cannot be marked as "ready for duty" until all required documents acknowledged
-✅ Acknowledgment tracking synced with emergency file distribution (FR-8)
+✅ Acknowledgment tracking synced with acknowledgment document distribution (FR-8)
 
 **Priority:** High
 
@@ -328,7 +330,7 @@ And: Each document shows: title, priority (Normal/High/Critical), status (Unread
 When: I open and read a document
 Then: The document is marked as "Read" with timestamp
 When: I click "I Acknowledge" checkbox
-Then: The document is marked as "Acknowledged" with timestamp
+Then: The document is marked as "Acknowledged" with click action
 And: Admin can see my acknowledgment status
 ```
 
@@ -378,15 +380,15 @@ And: Admin can see my acknowledgment status
 
 ---
 
-#### US-ADM-02: Manual Assignment Override
+#### US-ADM-02: Manual confirmation + notification
 **As a** PHC administrator,
-**I want** to manually assign specific staff to jobs,
+**I want** to manually confirm specific staff to jobs and send confirmation notification,
 **So that** I can handle special facility requests, unique qualifications, and emergency situations.
 
 **Scenario:**
 ```gherkin
 Given: A job demand is unfilled or requires specific staff
-When: I click "Manual Assignment" on the job details
+When: I click "Manual Confirmation" on the job details
 And: I search for staff by name, staff number, or availability
 Then: I see search results with staff profiles (from ERP)
 And: Each result shows: name, score, availability, recent history
@@ -396,10 +398,10 @@ Then: System displays conflict warnings if any:
   - Staff on facility blacklist
   - Staff unavailable that day
   - Staff will exceed fair sharing limits
-When: I enter override reason (minimum 20 characters, required)
+When: I enter override reason (max 100 words)
 And: I confirm assignment
-Then: Assignment created with assigned_by = "manual_admin"
-And: WhatsApp template generated for coordinator to send
+Then: Assignment created with assigned_by = "manual_admin" or "admin_id"
+And: Confimration notification send to staff or copy WhatsApp template generated for coordinator to send
 And: Override logged with: admin ID, timestamp, reason, original match (if any)
 ```
 
@@ -419,13 +421,13 @@ And: Override logged with: admin ID, timestamp, reason, original match (if any)
 
 ---
 
-#### US-ADM-03: Upload Emergency Protocol
+#### US-ADM-03: Upload Acknowledgment Documents/Files
 **As a** PHC admin,
-**I want** to upload emergency documents/files,
+**I want** to upload acknowledgment documents/files,
 **So that** I can quickly distribute critical information to staff.
 
 **Acceptance Criteria:**
-✅ Upload PDF, DOC, DOCX, JPG, PNG (max 10MB)
+✅ Upload/Share PDF, DOC, DOCX, JPG, PNG (max 10MB)
 ✅ Enter title (required), description, priority, regions
 ✅ Files stored securely (secure file server)
 ✅ Unique file ID generated
@@ -435,21 +437,21 @@ And: Override logged with: admin ID, timestamp, reason, original match (if any)
 
 ---
 
-#### US-ADM-04: Distribute Emergency Files
+#### US-ADM-04: Distribute Acknowledgment Documents/Files
 **As a** PHC administrator,
-**I want** to distribute emergency protocols to relevant staff via WhatsApp and web push,
+**I want** to distribute acknowledgment documents/files to relevant staff via WhatsApp and web push,
 **So that** they receive critical information quickly.
 
 **Scenario:**
 ```gherkin
-Given: I uploaded an emergency file with priority = Critical
+Given: I uploaded an acknowledgment document with priority = Critical
 And: I specified target regions (e.g., HKI, KLN)
 When: File upload completes successfully
 Then: System identifies affected staff based on regions
 And: Generates WhatsApp message template with file link
 And: Coordinator sends WhatsApp to affected staff
 And: For Critical priority: Web push notification sent as in-app alert
-And: Notification appears in staff's portal inbox
+And: Notification appears in staff's device
 And: System tracks who viewed the file
 And: System tracks who confirmed receipt
 ```
@@ -681,78 +683,13 @@ And: If unfilled after 30 minutes: admin receives push/email alert
 - Late cancellation (<48h): -1 score AND 300 HKD penalty
 - No-show penalties removed in v1.2
 
----
-#### TC-RPT-01: Settlement Reconciliation Accuracy
-**Objective:** Verify settlement reconciliation report correctly identifies discrepancies
 
-**Test Data:**
-- Period: November 2025
-- PHC assignments: 150 staff worked
-- PHC penalties: 15 late cancellations (300 HKD each = 4,500 HKD total)
-- ERP penalties: 13 applied (3,900 HKD)
-- Expected discrepancy: 2 penalties missing in ERP (600 HKD)
-
-**Preconditions:**
-- November 2025 assignments completed
-- ERP settlement data available via API
-- Finance administrator logged in
-
-**Test Steps:**
-1. Navigate to Reports → Settlement Reconciliation
-2. Select Period: November 2025
-3. Click "Generate Report"
-4. Review Summary tab
-5. Review Unmatched tab
-6. Review Action List tab
-
-**Expected Results:**
-✅ Report generated within 30 seconds
-✅ Match rate displayed: 13/15 = 86.7% (penalties)
-✅ Summary shows: 150 assignments, 15 PHC penalties, 13 ERP penalties
-✅ Unmatched tab lists 2 missing penalties with details:
-   - Staff ID, assignment date, location, amount (300 HKD)
-   - Discrepancy type: "Penalty not applied"
-✅ Action List provides ERP reference format for manual update
-✅ Export to Excel includes all tabs (Summary, Matched, Unmatched, Action List)
-✅ Discrepancies can be marked for investigation
-
-**Priority:** High
-
----
-
-#### TC-RPT-02: Attendance Performance Metrics
-**Objective:** Verify attendance dashboard shows correct metrics
-
-**Test Data:**
-- Period: Nov 1-30, 2025
-- 500 assignments created
-- 475 assignments filled (confirmed)
-- 25 assignments unfilled
-- 450 attended (from confirmed)
-- 25 cancelled (from confirmed)
-
-**Test Steps:**
-1. View Attendance Performance Dashboard for November 2025
-2. Check fill rate metric
-3. Check attendance rate metric
-4. Verify visualization data
-
-**Expected Results:**
-✅ Fill rate: 475/500 = 95.0%
-✅ Attendance rate: 450/475 = 94.7%
-✅ Cancellation rate: 25/475 = 5.3%
-✅ Chart shows trend correctly (improving/declining)
-✅ Table shows top/bottom performing facilities
-
-**Priority:** High
-
-**Note:** Per Product Spec v1.2, no-show tracking was removed. Metrics show completed vs cancelled only.
 
 ---
 
 ### 8. Finance Team User Stories
 
-#### US-FIN-01: Generate Settlement Reconciliation Report
+#### US-FIN-01: Generate Settlement Reconciliat ion Report
 
 **As a** finance administrator,
 **I want** to generate a monthly settlement reconciliation report,
@@ -930,7 +867,7 @@ And: Match rate recalculates for the period
 | TC-003 | FR-1, FR-5, FR-6 | Score update on attendance verification |
 | TC-004 | FR-1, FR-3, FR-7 | Penalty on early cancellation (>48h) |
 | TC-005 | FR-1, FR-3, FR-7 | Penalty on late cancellation (<48h) |
-| TC-007 | FR-3, FR-8 | Emergency file upload |
+| TC-007 | FR-3, FR-8 | Acknowledgment document upload |
 | TC-008 | FR-3, FR-9 | Emergency job posting |
 | TC-ADM-01 | FR-4 | Admin dashboard functionality |
 | TC-ERP-01 | FR-5 | ERP staff API response |
@@ -947,6 +884,7 @@ And: Match rate recalculates for the period
 | TC-SEC-02 | NFR | Data encryption |
 | TC-RPT-01 | FR-10 | Settlement reconciliation |
 | TC-RPT-02 | FR-13 | Attendance metrics |
+| TC-FIN-01 | FR-10 | Settlement discrepancy investigation |
 
 ---
 
@@ -963,7 +901,7 @@ And: Match rate recalculates for the period
 | FR-5  | ERP Integration                  | US-ERP-01, US-ERP-02, US-ERP-03, US-ERP-05, US-ERP-06, US-ADM-06 | TC-001, TC-003, TC-ERP-01 through TC-ERP-08, TC-PERF-02 | ✓ Complete |
 | FR-6  | Attendance Tracking              | US-NA-05                                                         | TC-ERP-04, TC-RPT-02                                    | ✓ Complete |
 | FR-7  | Penalty Management               | US-NA-03, US-NA-05                                               | TC-004, TC-005, TC-ERP-05                               | ✓ Complete |
-| FR-8  | Emergency File Upload            | US-ADM-03, US-ADM-04                                             | TC-007                                                  | ✓ Complete |
+| FR-8  | Acknowledgment Document Upload            | US-ADM-03, US-ADM-04                                             | TC-007                                                  | ✓ Complete |
 | FR-9  | Emergency Job Posting            | US-ADM-05                                                        | TC-008                                                  | ✓ Complete |
 | FR-10 | Settlement Reconciliation        | US-FIN-01, US-FIN-02                                             | TC-RPT-01                                               | ✓ Complete |
 | FR-11 | Manual Override                  | US-ADM-02                                                        | TC-ERP-02                                               | ✓ Complete |
@@ -994,28 +932,7 @@ And: Match rate recalculates for the period
 
 ---
 
-## TEST CASES
-|-----------|-------------|-----------|
-| TC-001 | FR-5 | Verify staff sync from ERP |
-| TC-002 | FR-1, FR-2 | Matching algorithm with underlist and score ranking |
-| TC-003 | FR-1, FR-5, FR-6 | Score update on attendance verification |
-| TC-004 | FR-1, FR-3, FR-7 | Penalty on early cancellation (>48h) |
-| TC-005 | FR-1, FR-3, FR-7 | Penalty on late cancellation (<48h) |
-| TC-007 | FR-3, FR-8 | Emergency file upload |
-| TC-008 | FR-3, FR-9 | Emergency job posting |
-| TC-ADM-01 | FR-4 | Admin dashboard functionality |
-| TC-ERP-01 | FR-5 | ERP staff API response |
-| TC-ERP-02 | FR-2, FR-5 | Assignment submission to ERP |
-| TC-ERP-03 | FR-2 | Assignment conflict handling |
-| TC-ERP-04 | FR-5, FR-6 | Attendance submission |
-| TC-ERP-05 | FR-5, FR-7 | Penalty submission |
-| TC-ERP-06 | FR-1, FR-5 | Score update to ERP |
-| TC-ERP-07 | FR-5 | Error handling - API timeout |
-| TC-ERP-08 | FR-5 | Webhook integration |
-| TC-PERF-01 | FR-2 | Matching performance |
-| TC-PERF-02 | FR-2, FR-5 | API response times |
-| TC-SEC-01 | NFR | Authentication required |
-| TC-SEC-02 | NFR | Data encryption |
+
 
 ---
 
@@ -1157,15 +1074,15 @@ And: Match rate recalculates for the period
 
 ---
 
-#### TC-007: Emergency File Upload
-**Objective:** Verify admin can upload and distribute emergency protocols
+#### TC-007: Acknowledgment Document Upload
+**Objective:** Verify admin can upload and distribute acknowledgment documents/files
 
 **Preconditions:**
 - Admin logged in
 - File: "Typhoon Emergency Procedures.pdf" (5MB)
 
 **Test Steps:**
-1. Navigate to Emergency Protocols
+1. Navigate to Acknowledgment Documents
 2. Click "Upload File"
 3. Select PDF file
 4. Enter title, description, priority=Critical, region=HKI
@@ -1174,7 +1091,7 @@ And: Match rate recalculates for the period
 **Expected Results:**
 ✅ File uploaded to S3/Azure Blob
 ✅ File metadata saved to database
-✅ File appears in emergency file list
+✅ File appears in acknowledgment document list
 ✅ WhatsApp notification sent to all HKI staff within 5 minutes
 ✅ Staff can view file via link
 ✅ Track view and confirmation
@@ -1583,6 +1500,105 @@ And: Match rate recalculates for the period
 
 ---
 
+### 5. Finance Test Cases
+
+#### TC-FIN-01: Settlement Discrepancy Investigation
+**Objective:** Verify finance admin can investigate and resolve discrepancies
+
+**Preconditions:**
+- Settlement Report generated for previous month
+- Discrepancy exists (e.g., missing penalty in ERP)
+- Finance admin logged in
+
+**Test Steps:**
+1. Navigate to Reports → Settlement Reconciliation
+2. Generate report for relevant period
+3. Click on a discrepancy in the Action List
+4. Review discrepancy details and API logs
+5. Manually update ERP (simulated)
+6. Click "Mark as Resolved" and enter notes
+
+**Expected Results:**
+✅ Discrepancy details viewable with all context
+✅ API logs accessible
+✅ Status changes to "Resolved" after confirmation
+✅ Resolution notes saved in audit trail
+✅ Match rate updated for the period
+
+**Priority:** High
+
+---
+
+### 6. Report Test Cases
+
+#### TC-RPT-01: Settlement Reconciliation Accuracy
+**Objective:** Verify settlement reconciliation report correctly identifies discrepancies
+
+**Test Data:**
+- Period: November 2025
+- PHC assignments: 150 staff worked
+- PHC penalties: 15 late cancellations (300 HKD each = 4,500 HKD total)
+- ERP penalties: 13 applied (3,900 HKD)
+- Expected discrepancy: 2 penalties missing in ERP (600 HKD)
+
+**Preconditions:**
+- November 2025 assignments completed
+- ERP settlement data available via API
+- Finance administrator logged in
+
+**Test Steps:**
+1. Navigate to Reports → Settlement Reconciliation
+2. Select Period: November 2025
+3. Click "Generate Report"
+4. Review Summary tab
+5. Review Unmatched tab
+6. Review Action List tab
+
+**Expected Results:**
+✅ Report generated within 30 seconds
+✅ Match rate displayed: 13/15 = 86.7% (penalties)
+✅ Summary shows: 150 assignments, 15 PHC penalties, 13 ERP penalties
+✅ Unmatched tab lists 2 missing penalties with details:
+   - Staff ID, assignment date, location, amount (300 HKD)
+   - Discrepancy type: "Penalty not applied"
+✅ Action List provides ERP reference format for manual update
+✅ Export to Excel includes all tabs (Summary, Matched, Unmatched, Action List)
+✅ Discrepancies can be marked for investigation
+
+**Priority:** High
+
+---
+
+#### TC-RPT-02: Attendance Performance Metrics
+**Objective:** Verify attendance dashboard shows correct metrics
+
+**Test Data:**
+- Period: Nov 1-30, 2025
+- 500 assignments created
+- 475 assignments filled (confirmed)
+- 25 assignments unfilled
+- 450 attended (from confirmed)
+- 25 cancelled (from confirmed)
+
+**Test Steps:**
+1. View Attendance Performance Dashboard for November 2025
+2. Check fill rate metric
+3. Check attendance rate metric
+4. Verify visualization data
+
+**Expected Results:**
+✅ Fill rate: 475/500 = 95.0%
+✅ Attendance rate: 450/475 = 94.7%
+✅ Cancellation rate: 25/475 = 5.3%
+✅ Chart shows trend correctly (improving/declining)
+✅ Table shows top/bottom performing facilities
+
+**Priority:** High
+
+**Note:** Per Product Spec v1.2, no-show tracking was removed. Metrics show completed vs cancelled only.
+
+---
+
 ## TEST EXECUTION SUMMARY
 
 ### Test Coverage Targets
@@ -1593,7 +1609,8 @@ And: Match rate recalculates for the period
 | ERP Integration | 8 | Pending |
 | Performance | 2 | Pending |
 | Security | 2 | Pending |
-| **Total** | **20** | **Pending** |
+| Finance & Reports | 3 | Pending |
+| **Total** | **23** | **Pending** |
 
 ---
 

@@ -217,7 +217,7 @@ This document outlines the UI screens required for the PHC system, organized by 
 | ADM-06 | Staff Management | High | - | ⬜ Todo |
 | ADM-07 | Manual Assignment | Medium | US-ADM-02 | ⬜ Todo |
 | ADM-08 | Emergency Job Posting | High | US-ADM-05 | ⬜ Todo |
-| ADM-09 | Emergency Files | Medium | US-ADM-03, US-ADM-04 | ⬜ Todo |
+| ADM-09 | Acknowledgment Documents | Medium | US-ADM-03, US-ADM-04 | ⬜ Todo |
 | ADM-10 | Document Acknowledgment Tracker | High | US-ADM-08 | ⬜ Todo |
 | ADM-11 | Attendance Verification | High | US-ERP-05 | ⬜ Todo |
 | ADM-12 | System Logs | Medium | US-ADM-06 | ⬜ Todo |
@@ -331,7 +331,7 @@ This document outlines the UI screens required for the PHC system, organized by 
 
 ---
 
-#### ADM-09: Emergency Files
+#### ADM-09: Acknowledgment Documents
 **Priority:** Medium | **User Story:** US-ADM-03, US-ADM-04
 
 **Components:**
@@ -572,7 +572,7 @@ All screens must support:
 ### Phase 3 - Medium Priority
 1. NA Profile Settings
 2. ADM Manual Assignment
-3. ADM Emergency Files
+3. ADM Acknowledgment Documents
 4. ADM System Logs
 5. ADM Reports
 6. FIN Discrepancy Investigation
