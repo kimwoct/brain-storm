@@ -20,7 +20,6 @@
 | US-NA-01   | FR-2, FR-3         | Receive job notification                  |
 | US-NA-02   | FR-1, FR-2, FR-3   | Apply for available shift                 |
 | US-NA-03   | FR-1, FR-3, FR-7   | Cancel shift with penalty warning         |
-| US-NA-04   | FR-1               | View current score *(Deferred)*           |
 | US-NA-05   | FR-1, FR-6         | View job history                          |
 | US-NA-06   | FR-7               | View penalty history                      |
 | US-NA-07   | FR-8               | Acknowledge required documents            |
@@ -192,23 +191,6 @@ And: Re-matching triggered with urgent flag
 **Priority:** High
 
 **Note:** Per Product Spec FR-7, only late cancellations (<48h) incur financial penalty.
-
----
-
-#### US-NA-04: View My Score *(Deferred to Phase 2)*
-**As a** nursing assistant,
-**I want** to view my current score and score history,
-**So that** I understand my reliability standing and can improve it.
-
-**Acceptance Criteria:**
-✅ Current score displayed as number (starting at 50, floor at -10)
-✅ Score history available (last 10 changes)
-✅ Each change shows: date, reason (attended/cancelled), impact (+1/-1)
-✅ Assignment reference for each score change
-
-**Priority:** Medium *(Deferred)*
-
-**Note:** Per Product Spec v1.3, tier system (Gold/Silver/Bronze) was removed. System uses raw score values only for ranking. Negative scores require manual admin approval for assignments.
 
 ---
 
@@ -943,14 +925,14 @@ And: Match rate recalculates for the period
 
 ### STORY SUMMARY
 
-**Total Stories: 25**
-- Nursing Assistant stories (US-NA-00 to US-NA-07): 8
+**Total Stories: 24**
+- Nursing Assistant stories (US-NA-00 to US-NA-07, excluding US-NA-04): 7
 - Admin stories (US-ADM-01 to US-ADM-08): 8
 - ERP System stories (US-ERP-01 to US-ERP-06): 6
 - **Finance Team stories:** US-FIN-01 to US-FIN-02: **2**
 - **Reports stories:** US-RPT-01 to US-RPT-03: **3**
 
-**Deferred Stories:** US-NA-04 (Score tiers removed, raw scores only)
+**Deferred Stories:** None
 
 **Priorities:**
 - Critical: 6 stories
@@ -1712,7 +1694,7 @@ And: Match rate recalculates for the period
 - No-show penalty references: Removed per Product Spec v1.2
 
 **Updated:**
-- US-NA-04: Deferred to Phase 2 (tier system removed)
+- US-NA-04: Removed (score display deferred indefinitely)
 - US-ADM-01: Dashboard auto-refresh changed to 60 seconds (was 30)
 - US-ADM-02: Enhanced with full conflict warning and audit trail details
 - US-ERP-04/05/06: Updated to reflect Human Screening Workflow and attendance verification
