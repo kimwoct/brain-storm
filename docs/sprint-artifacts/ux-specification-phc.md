@@ -451,7 +451,13 @@ Strategic work: Analyzes patterns, coaches low-scoring staff, optimizes
 ### 5.1 Nursing Assistant Mobile Interface
 
 **Core Features:**
-1. **Notification Center**
+1. **Secure Login & Authentication**
+   - Login via Mobile Number, Username, or Email
+   - Password authentication with "Forgot Password" flow
+   - Security: Account lockout after 5 failed attempts
+   - Session: Auto-logout after 30 minutes of inactivity
+
+2. **Notification Center**
    - WhatsApp + web push notifications
    - Shift opportunities matching preferences
    - Priority based on performance score
@@ -1085,6 +1091,12 @@ ROI = (Total Savings - Total Investment) ÷ Total Investment × 100
 - API authentication: OAuth 2.0 or API keys
 - Mobile app: TLS 1.3 encryption
 
+**User Authentication:**
+- Multi-identifier login (Mobile/User/Email)
+- Brute-force protection: Lockout after 5 failed attempts
+- Session management: 30-minute inactivity timeout
+- Password recovery: Secure OTP/Email flow
+
 **Access Control:**
 - Nursing assistants: View own data only (mobile)
 - Supervisors: View their location only (mobile)
@@ -1227,6 +1239,13 @@ ROI = (Total Savings - Total Investment) ÷ Total Investment × 100
 ---
 
 ### 11.2 Mobile Design Specifics (Nursing Assistants)
+
+**Screen 0: Login**
+- Input: Mobile / Username / Email
+- Input: Password (masked)
+- Action: "Login" button (Primary)
+- Link: "Forgot Password?" (Secondary)
+- Feedback: "Account locked after 5 failed attempts" (Error state)
 
 **Screen 1: Notification (WhatsApp / Push)**
 - Message: "[URGENT] Shift at Tseung Kwan O, 7am-3pm, $110/hr. You're ranked #3. Tap to view."
