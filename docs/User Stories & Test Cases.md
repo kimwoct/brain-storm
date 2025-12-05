@@ -40,6 +40,8 @@
 | US-ERP-05      | FR-5, FR-6         | Receive attendance records                                              |
 | US-ERP-06      | FR-1, FR-5, FR-7   | Receive penalty records                                                 |
 | US-ERP-07 (NEW)| FR-5               | Receive job demand updates                                              |
+| US-ERP-08 (NEW)| FR-5               | Receive OT job demand sync                                              |
+| US-ERP-09 (NEW)| FR-5               | Facility blacklist sync                                                 |
 | US-FIN-01      | FR-10              | Generate settlement reconciliation report                               |
 | US-FIN-02      | FR-10              | Investigate settlement discrepancy                                      |
 
@@ -573,20 +575,28 @@ And: I see a list of all staff who have applied
 And: Each applicant shows: name, score, availability status, relevant history, matching skillset
 And: I can approve or reject each application
 When: I approve an application
-Then: The assignment is confirmed and staff is notified
+Then: Confirmation message sent to awarded staff (WhatsApp/web push) (NEW)
+And: Assignment confirmed and automatically updated to ERP via API (NEW)
+When: I reject an application (NEW)
+Then: Failure message sent to rejected staff (WhatsApp/web push) (NEW)
+And: Pending applicants kept in waiting list for re-matching purposes (NEW)
+And: System requests ERP to query latest status candidate list for re-matching (NEW)
 ```
 
-**Acceptance Criteria:**
+**Acceptance Criteria:** (NEW)
 ✅ All applications visible for each job posting
 ✅ Applicant details include score and work history
 ✅ Approve/reject actions available
 ✅ Bulk approval supported for multiple applicants
-✅ Rejected applicants notified with reason (optional)
-✅ Approved assignments synced to ERP
+✅ Confirmation message sent to awarded staff (NEW)
+✅ Failure message sent to rejected staff (NEW)
+✅ Pending applicants maintained in waiting list (NEW)
+✅ Approved assignments synced to ERP automatically after confirmation (NEW)
+✅ ERP queried for latest candidate list status for re-matching (NEW)
 
 **Priority:** High
 
-**Note:** This replaces the removed Care Home Supervisor role. PHC Admin now handles application screening.
+**Note:** This replaces the removed Care Home Supervisor role. PHC Admin now handles application screening. After confirmation, information is automatically updated to ERP via API. Pending candidates are kept for re-matching if vacancies arise. (NEW)
 
 ---
 
@@ -851,7 +861,56 @@ And: Audit log records the change with admin ID and timestamp
 
 ---
 
-### 4. Finance Team User Stories (Tentative)
+#### (NEW) US-ERP-08: Receive OT Job Demand Sync
+**As an** ERP system,
+**I want** to sync overtime (OT) job demands to PHC,
+**So that** PHC can match staff to split OT shifts when a confirmed shift exceeds normal hours by 3+ hours.
+
+**API:** POST /api/v1/jobs/demands/ot
+**Trigger:** When a confirmed shift is identified as OT (3+ hours beyond normal), ERP splits it into 2 shifts and syncs the OT details to PHC for the specific helper.
+**Data Received:**
+- Original demand ID
+- Helper staff ID
+- OT shift details: date, start/end times, duration, facility, worker type, skillset
+- Split reason: "OT_split"
+
+**Acceptance Criteria:**
+✅ Accepts OT demand data for specific helper
+✅ Creates separate OT job demand in PHC
+✅ Links to original assignment
+✅ Triggers matching for the OT shift
+✅ Response time < 3 seconds
+✅ Audit logged
+
+**Priority:** Medium
+
+**Note:** OT shifts are handled separately to ensure proper scheduling and compensation tracking.
+
+---
+
+#### (NEW) US-ERP-09: Facility Blacklist Sync
+**As an** ERP system,
+**I want** to sync facility-specific blacklists to PHC,
+**So that** blacklisted workers are screened out during job matching for that facility.
+
+**API:** GET /api/v1/facilities/{facility_id}/blacklist
+**Frequency:** Real-time updates or daily sync
+**Data Provided:**
+- Facility ID
+- Blacklisted staff IDs
+- Reason codes (optional)
+- Effective dates
+
+**Acceptance Criteria:**
+✅ API responds in <3 seconds
+✅ Blacklist applied during matching (staff excluded from available list)
+✅ Updates reflected immediately in matching engine
+✅ Historical blacklists maintained
+✅ Only active blacklists returned
+
+**Priority:** High
+
+**Note:** Each facility maintains its own blacklist to prevent assignments of problematic workers, ensuring quality service.
 
 #### US-FIN-01: Generate Settlement Reconciliat ion Report
 
@@ -1043,6 +1102,8 @@ And: Match rate recalculates for the period
 | TC-ERP-07 | FR-5 | Error handling - API timeout |
 | TC-ERP-08 | FR-5 | Webhook integration |
 | TC-ERP-09 | FR-5 | Job demand update reception |
+| TC-ERP-10 (NEW) | FR-5 | OT job demand sync |
+| TC-ERP-11 (NEW) | FR-5 | Facility blacklist sync |
 | TC-PERF-01 | FR-2 | Matching performance |
 | TC-PERF-02 | FR-2, FR-5 | API response times |
 | TC-SEC-01 | NFR | Authentication required |
@@ -1065,7 +1126,7 @@ And: Match rate recalculates for the period
 | FR-2  | Matching Engine                  | US-NA-01, US-ERP-04, US-ADM-02                                   | TC-002, TC-ERP-02, TC-ERP-03, TC-PERF-01                | ✓ Complete |
 | FR-3  | WhatsApp + Web Push Notification | US-NA-01, US-NA-02, US-NA-04, US-ADM-04, US-ADM-05               | TC-007, TC-008                                          | ✓ Complete |
 | FR-4  | Admin Dashboard                  | US-ADM-01                                                        | TC-ADM-01                                               | ✓ Complete |
-| FR-5  | ERP Integration                  | US-ERP-01, US-ERP-02, US-ERP-03, US-ERP-05, US-ERP-06, US-ERP-07 (NEW), US-ADM-06, US-ADM-09 (NEW), US-NA-07 (NEW) | TC-001, TC-003, TC-ERP-01 through TC-ERP-09, TC-PERF-02 | ✓ Complete |
+| FR-5  | ERP Integration                  | US-ERP-01, US-ERP-02, US-ERP-03, US-ERP-05, US-ERP-06, US-ERP-07 (NEW), US-ERP-08 (NEW), US-ERP-09 (NEW), US-ADM-06, US-ADM-09 (NEW), US-NA-07 (NEW) | TC-001, TC-003, TC-ERP-01 through TC-ERP-11, TC-PERF-02 | ✓ Complete |
 | FR-6  | Attendance Tracking              | US-NA-04                                                         | TC-ERP-04, TC-RPT-02                                    | ✓ Complete |
 | FR-7  | Penalty Management               | US-NA-03, US-NA-04                                               | TC-004, TC-005, TC-ERP-05                               | ✓ Complete |
 | FR-8  | Acknowledgment Document Upload            | US-ADM-03, US-ADM-04                                             | TC-007                                                  | ✓ Complete |
@@ -1082,10 +1143,10 @@ And: Match rate recalculates for the period
 
 ### STORY SUMMARY
 
-**Total Stories: 26**
+**Total Stories: 28**
 - Nursing Assistant stories (US-NA-00 to US-NA-07): 8
 - Admin stories (US-ADM-01 to US-ADM-09): 9
-- ERP System stories (US-ERP-01 to US-ERP-07): 7
+- ERP System stories (US-ERP-01 to US-ERP-09): 9
 - **Finance Team stories:** US-FIN-01 to US-FIN-02: **2**
 - **Reports stories:** US-RPT-01 to US-RPT-03: **3**
 
@@ -1093,8 +1154,8 @@ And: Match rate recalculates for the period
 
 **Priorities:**
 - Critical: 6 stories
-- High: 9 stories
-- Medium: 8 stories
+- High: 10 stories
+- Medium: 9 stories
 - Low: 0 stories
 
 ---
@@ -1652,6 +1713,77 @@ And: Match rate recalculates for the period
 ✅ Invalid updates rejected (e.g., past dates)
 
 **Priority:** Medium
+
+---
+
+#### (NEW) TC-ERP-10: OT Job Demand Sync
+**Objective:** Verify ERP syncs overtime job demands to PHC for split shifts
+
+**API Call:** POST /api/v1/jobs/demands/ot
+
+**Request:**
+```json
+{
+  "original_demand_id": "DEM456",
+  "staff_id": "STF123",
+  "ot_shift": {
+    "date": "2025-12-05",
+    "start_time": "20:00",
+    "end_time": "23:00",
+    "duration": 3.0,
+    "facility_id": "LOC789",
+    "worker_type": "Nursing Assistant",
+    "skillset": ["elderly_care"]
+  },
+  "split_reason": "OT_split"
+}
+```
+
+**Expected Response (201):**
+```json
+{
+  "status": "success",
+  "ot_demand_id": "OT-001",
+  "message": "OT demand synced successfully"
+}
+```
+
+**Validation:**
+✅ OT demand created in PHC
+✅ Linked to original assignment
+✅ Matching triggered for OT shift
+✅ Response time < 3 seconds
+
+**Priority:** Medium
+
+---
+
+#### (NEW) TC-ERP-11: Facility Blacklist Sync
+**Objective:** Verify facility blacklists are synced from ERP and applied in matching
+
+**API Call:** GET /api/v1/facilities/{facility_id}/blacklist
+
+**Expected Response (200):**
+```json
+{
+  "facility_id": "LOC789",
+  "blacklisted_staff": [
+    {
+      "staff_id": "STF999",
+      "reason": "Performance issues",
+      "effective_date": "2025-01-01"
+    }
+  ]
+}
+```
+
+**Validation:**
+✅ Blacklist applied during job matching (blacklisted staff excluded)
+✅ Updates reflected immediately
+✅ Response time < 3 seconds
+✅ Only active blacklists returned
+
+**Priority:** High
 
 ---
 
