@@ -14,31 +14,34 @@
 
 ### REQUIREMENTS TRACEABILITY MATRIX
 
-| User Story | Related FRs        | Description                               |
-| ---------- | ------------------ | ----------------------------------------- |
-| US-NA-00   | FR-5, NFR          | Staff Login (ERP Credentials)             |
-| US-NA-01   | FR-2, FR-3         | Receive job notification                  |
-| US-NA-02   | FR-1, FR-2, FR-3   | Apply for available shift                 |
-| US-NA-03   | FR-1, FR-3, FR-7   | Cancel shift with penalty warning         |
-| US-NA-05   | FR-1, FR-6         | View job history                          |
-| US-NA-06   | FR-7               | View penalty history                      |
-| US-NA-07   | FR-8               | Acknowledge required documents            |
-| US-ADM-01  | FR-4, FR-5         | View real-time dashboard                  |
-| US-ADM-02  | FR-2, FR-11        | Manual confirmation + notification        |
-| US-ADM-03  | FR-8               | Upload acknowledgment documents/files     |
-| US-ADM-04  | FR-3, FR-8         | Distribute acknowledgment documents/files |
-| US-ADM-05  | FR-9               | Post emergency job                        |
-| US-ADM-06  | FR-5, FR-12, FR-13 | View system logs and reports              |
-| US-ADM-07  | FR-2               | View job applications overview            |
-| US-ADM-08  | FR-8               | Verify document acknowledgment            |
-| US-ERP-01  | FR-5               | Staff master data sync                    |
-| US-ERP-02  | FR-5               | Location master data sync                 |
-| US-ERP-03  | FR-5               | Job demand sync                           |
-| US-ERP-04  | FR-2, FR-5         | Receive assignment submission             |
-| US-ERP-05  | FR-5, FR-6         | Receive attendance records                |
-| US-ERP-06  | FR-1, FR-5, FR-7   | Receive penalty records                   |
-| US-FIN-01  | FR-10              | Generate settlement reconciliation report |
-| US-FIN-02  | FR-10              | Investigate settlement discrepancy        |
+| User Story     | Related FRs        | Description                                                             |
+| -------------- | ------------------ | ----------------------------------------------------------------------- |
+| US-NA-00       | FR-5, NFR          | Staff Login (ERP Credentials)                                           |
+| US-NA-01       | FR-2, FR-3         | Receive job notification (with facility, worker type, gender, times)    |
+| US-NA-02       | FR-1, FR-2, FR-3   | Apply for available shift (with complete job details)                   |
+| US-NA-03       | FR-1, FR-3, FR-7   | Cancel shift with penalty warning                                       |
+| US-NA-04       | FR-1, FR-6         | View job history (with facility, worker type, times)                    |
+| US-NA-05       | FR-7               | View penalty history                                                    |
+| US-NA-06       | FR-8               | Acknowledge required documents                                          |
+| US-NA-07 (New) | FR-5, NFR          | Update personal information                                             |
+| US-ADM-01      | FR-4, FR-5         | View real-time dashboard                                                |
+| US-ADM-02      | FR-2, FR-11        | Manual confirmation + notification                                      |
+| US-ADM-03      | FR-8               | Upload acknowledgment documents/files                                   |
+| US-ADM-04      | FR-3, FR-8         | Distribute acknowledgment documents/files                               |
+| US-ADM-05      | FR-9               | Post emergency job (with complete job details)                          |
+| US-ADM-06      | FR-5, FR-12, FR-13 | View system logs and reports                                            |
+| US-ADM-07      | FR-2               | View job applications overview (with facility, worker type, gender)     |
+| US-ADM-08      | FR-8               | Verify document acknowledgment                                          |
+| US-ADM-09 (NEW)| FR-5               | Update job posting details                                              |
+| US-ERP-01      | FR-5               | Staff master data sync (incl. worker type, skillset, gender)            |
+| US-ERP-02      | FR-5               | Location master data sync (incl. worker types, skillsets, gender prefs) |
+| US-ERP-03      | FR-5               | Job demand sync (with facility, worker type, gender, times)             |
+| US-ERP-04      | FR-2, FR-5         | Receive assignment submission                                           |
+| US-ERP-05      | FR-5, FR-6         | Receive attendance records                                              |
+| US-ERP-06      | FR-1, FR-5, FR-7   | Receive penalty records                                                 |
+| US-ERP-07 (NEW)| FR-5               | Receive job demand updates                                              |
+| US-FIN-01      | FR-10              | Generate settlement reconciliation report                               |
+| US-FIN-02      | FR-10              | Investigate settlement discrepancy                                      |
 
 ---
 
@@ -46,23 +49,23 @@
 
 #### US-NA-00: Staff Login
 **As a** nursing assistant,
-**I want** to log in to the PHC platform using my registered credentials (mobile number, username, or email),
+**I want** to log in to the PHC platform using my registered mobile number,
 **So that** I can access my dashboard and apply for shifts.
 
 **Scenario - Login:**
-```gherkin
+```
 Given: My staff account has been synced from ERP
-When: I enter my mobile number, username, or email
+When: I enter my mobile number
 And: I enter my password
 Then: I am successfully logged in
 And: I see my personal dashboard
 ```
 
 **Acceptance Criteria:**
-✅ Login supported via Mobile Number, Username, or Email
+✅ Login supported via Mobile Number only
 ✅ Credentials validated against synced ERP data
-✅ Account locked after 5 failed attempts
-✅ "Forgot Password" flow via SMS/Email OTP
+✅ Account locked after 10 failed attempts
+✅ "Forgot Password" flow via Email/Admin WhatsApp Reset Link
 ✅ Session timeout after 30 minutes of inactivity
 
 **Priority:** Critical
@@ -77,7 +80,7 @@ And: I see my personal dashboard
 **So that** I can apply for suitable shifts quickly.
 
 **Scenario:**
-```gherkin
+```
 Given: PHC System has sent the web push notifcation when receive the new job posting from ERP system
 Given: PHC coordinator has generated a WhatsApp template for available shifts
 When: Coordinator sends the message to my WhatsApp (individual or broadcast)
@@ -96,12 +99,13 @@ And: I can click the link to view and apply for the shift
 ✅ WhatsApp message includes: facility name, address, date, shift start/end times, worker type, gender requirement, contact person
 ✅ Application link opens PHC web portal with shift details
 ✅ Web push reminder sent if not applied within 2 hours (if logged into portal)
+✅ Inbox UI design highlights unread notifications with visual indicators (bold text, notification badges) (NEW)
 ✅ Works on both mobile and desktop browsers
 ✅ Bilingual support (English + Traditional Chinese)
 
 **Priority:** Critical
 
-**Note:** WhatsApp is primary channel (manual template-based). Web push notification is secondary for portal alerts only.
+**Note:** Web push notification is primary for portal alerts. WhatsApp is secondary channel (manual template-based). Inbox UI provides centralized notification management with read/unread status tracking.
 
 ---
 
@@ -111,7 +115,7 @@ And: I can click the link to view and apply for the shift
 **So that** I can be considered for assignment by the PHC administrator.
 
 **Scenario - Apply for Shift:**
-```gherkin
+```
 Given: I click the application link from WhatsApp message
 When: I open the PHC web portal
 Then: I see the complete shift details:
@@ -129,7 +133,7 @@ And: PHC administrator receives notification of my application
 ```
 
 **Scenario - Application Approved:**
-```gherkin
+```
 Given: I have applied for a shift
 When: PHC administrator approves my application
 Then: Assignment status changes to "confirmed"
@@ -146,6 +150,8 @@ And: My score will increase by +1 point upon attendance verification
 ✅ ERP updated via API after admin approval
 ✅ Confirmation visible in "My Shifts" section
 ✅ Conflict check: Cannot apply if already assigned to overlapping shift
+✅ Apply button disabled if job quota (including waiting list) is full (NEW)
+✅ Empty job posting notification to ERP/Admin then re-matching
 
 **Priority:** Critical
 
@@ -159,22 +165,24 @@ And: My score will increase by +1 point upon attendance verification
 **So that** the system can find a replacement, and I understand the consequences.
 
 **Scenario - Early Cancellation (>48 hours before shift):**
-```gherkin
+```
 Given: I have a confirmed assignment more than 48 hours before shift start
 When: I navigate to "My Shifts" in the PHC portal
 And: I click "Cancel Shift"
 Then: I see confirmation modal: "You are cancelling with sufficient notice."
-And: I see penalty details: -1 score, no financial penalty
+And: I see penalty details: -1 score, no attendance bonus 
 When: I confirm cancellation
 Then: Assignment status changes to "cancelled"
 And: Score decreases by 1 point
 And: No financial penalty applied
 And: I receive cancellation confirmation
+And: System automatically closes current job post and raises new job demand to ERP for re-matching with updated available candidate list (NEW)
+And: Admin staff notified of vacancy and re-matching initiation (NEW)
 And: Re-matching triggered for the vacancy
 ```
 
 **Scenario - Late Cancellation (<48 hours before shift):**
-```gherkin
+```
 Given: I have a confirmed assignment less than 48 hours before shift start
 When: I navigate to "My Shifts" in the PHC portal
 And: I click "Cancel Shift"
@@ -186,33 +194,37 @@ Then: Assignment status changes to "cancelled"
 And: Score decreases by 1 point
 And: 300 HKD penalty recorded for next settlement deduction
 And: I receive cancellation confirmation
+And: System automatically closes current job post and raises new job demand to ERP for re-matching with updated available candidate list
+And: Admin staff notified of vacancy and re-matching initiation
 And: Re-matching triggered with urgent flag
 ```
 
 **Acceptance Criteria:**
 ✅ System checks cancellation window (48-hour threshold)
 ✅ Warning modal displayed clearly for late cancellations
-✅ Early cancellation: -1 score only, no financial penalty
+✅ Early cancellation: -1 score only, no attendance bonus
 ✅ Late cancellation: -1 score AND 300 HKD penalty
 ✅ Staff can keep shift (reject cancellation) after seeing warning
 ✅ ERP updated via penalty API (POST /api/v1/penalties)
+✅ Automatic re-matching: Closes current job post and raises new demand to ERP for updated candidate list
+✅ Admin staff notified immediately of vacancy and re-matching initiation
 ✅ Re-matching triggered for vacancy (urgent if <24 hours)
 ✅ Cancellation recorded in staff's assignment history
 ✅ Admin alerted if unfilled after 30 minutes
 
 **Priority:** High
 
-**Note:** Per Product Spec FR-7, only late cancellations (<48h) incur financial penalty.
+**Note:** Per Product Spec FR-7, only late cancellations (<48h) incur financial penalty. Upon any cancellation (normal or late), the system automatically triggers re-matching by closing the current job post and raising a new job demand to ERP to retrieve an updated available candidate list, ensuring fresh matching. Admin staff are notified immediately of the vacancy and re-matching process.
 
 ---
 
-#### US-NA-05: View Job History
+#### US-NA-04: View Job History
 **As a** nursing assistant,
 **I want** to view my job history and attendance records,
 **So that** I can track completed shifts, review penalties, and verify my work history.
 
 **Scenario - View Job History List:**
-```gherkin
+```
 Given: I am logged into the PHC platform
 When: I navigate to "My Job History" section
 Then: I see a list of my past assignments sorted by date (newest first)
@@ -225,7 +237,7 @@ And: I can filter by date range and status
 ```
 
 **Scenario - View Job Details:**
-```gherkin
+```
 Given: I am viewing my job history list
 When: I click on a specific job record
 Then: I see detailed information including:
@@ -256,13 +268,13 @@ Then: I see detailed information including:
 
 ---
 
-#### US-NA-06: View Penalty History
+#### US-NA-05: View Penalty History
 **As a** nursing assistant,
 **I want** to view my penalty history,
 **So that** I can understand past deductions and improve my reliability.
 
 **Scenario:**
-```gherkin
+```
 Given: I am logged into the PHC platform
 When: I navigate to "My Penalties" section
 Then: I see a list of all penalties applied to my account
@@ -282,88 +294,13 @@ And: I can see the related assignment details
 
 ---
 
-### 2. PHC Admin User Stories (Continued)
-
-#### US-ADM-07: View Job Applications Overview
-**As a** PHC administrator,
-**I want** to view all staff applications for each job posting,
-**So that** I can screen candidates and approve assignments.
-
-**Scenario:**
-```gherkin
-Given: A job posting has received staff applications
-When: I navigate to the job posting details
-Then: I see the complete job information:
-  - Facility name and full address/location
-  - Date, shift start time, shift end time
-  - Worker type / skillset required
-  - Gender requirement (if applicable)
-  - Contact person
-And: I see a list of all staff who have applied
-And: Each applicant shows: name, score, availability status, relevant history, matching skillset
-And: I can approve or reject each application
-When: I approve an application
-Then: The assignment is confirmed and staff is notified
-```
-
-**Acceptance Criteria:**
-✅ All applications visible for each job posting
-✅ Applicant details include score and work history
-✅ Approve/reject actions available
-✅ Bulk approval supported for multiple applicants
-✅ Rejected applicants notified with reason (optional)
-✅ Approved assignments synced to ERP
-
-**Priority:** High
-
-**Note:** This replaces the removed Care Home Supervisor role. PHC Admin now handles application screening.
-
----
-
-#### US-ADM-08: Verify Staff Document Acknowledgment
-**As a** PHC administrator,
-**I want** to verify that staff have read and acknowledged required documents (remarks, supplements, protocols) before starting their duty,
-**So that** I can ensure compliance and staff preparedness.
-
-**Scenario - View Document Acknowledgment Status:**
-```gherkin
-Given: A job posting has required documents attached (remarks, supplements, protocols)
-When: I navigate to the job posting details
-Then: I see a list of assigned staff with their document acknowledgment status
-And: Each staff shows: name, documents required, documents viewed, documents acknowledged
-And: Staff who have not acknowledged are highlighted in red
-```
-
-**Scenario - Send Reminder for Unacknowledged Documents:**
-```gherkin
-Given: Staff have not acknowledged required documents before shift start
-When: I click "Send Reminder" for specific staff
-Then: A push notification is sent reminding them to review documents
-And: Reminder is logged in the system
-```
-
-**Acceptance Criteria:**
-✅ Document acknowledgment status visible per staff per job
-✅ Shows: document name, view timestamp, acknowledgment timestamp
-✅ Unacknowledged documents clearly highlighted (red indicator)
-✅ Filter by acknowledgment status (All/Acknowledged/Pending)
-✅ Bulk reminder option for all staff with pending acknowledgments
-✅ Individual reminder option per staff
-✅ Report exportable showing acknowledgment compliance rate
-✅ Staff cannot be marked as "ready for duty" until all required documents acknowledged
-✅ Acknowledgment tracking synced with acknowledgment document distribution (FR-8)
-
-**Priority:** High
-
----
-
-#### US-NA-07: Acknowledge Required Documents
+#### US-NA-06: Acknowledge Required Documents
 **As a** nursing assistant,
 **I want** to view and acknowledge required documents before my shift,
 **So that** I am prepared and compliant with duty requirements.
 
 **Scenario:**
-```gherkin
+```
 Given: I have a confirmed assignment with required documents
 When: I navigate to my assignment details
 Then: I see a list of required documents to review
@@ -389,7 +326,44 @@ And: Admin can see my acknowledgment status
 
 ---
 
-### 3. PHC Admin User Stories
+#### US-NA-07: Update Personal Information (NEW)
+**As a** nursing assistant,
+**I want** to update my personal information including mobile number,
+**So that** I can ensure my contact details are current for login and notifications.
+
+**Scenario - Update Mobile Number:**
+```
+Given: Staff has an existing WhatsApp channel with PHC
+When: Staff sends a change request message via WhatsApp: "Change mobile number to [new number]"
+Then: PHC receives the request and updates ERP with the change request
+And: I receive a confirmation that the request has been sent
+And: Admin manually verifies the change in ERP system
+When: Admin approves the change in ERP
+Then: ERP initiates the update to PHC dispatch system
+And: My mobile number is updated in PHC
+And: I receive a confirmation notification via the new mobile number
+And: The old mobile number is no longer valid for login
+When: Admin denies the change in ERP
+Then: The old number remains active
+And: I am notified that the change was denied
+```
+
+**Acceptance Criteria:**
+✅ Mobile number format validation (8 digits, HK format)
+✅ Change request submitted to ERP for admin verification
+✅ Admin manually verifies in existing ERP system
+✅ If approved: ERP pushes update to PHC, confirmation SMS sent to new number
+✅ If denied: Old number stays active, staff notified of denial
+✅ Change logged in audit trail
+✅ Cannot update if assignment within 24 hours (to prevent abuse)
+
+**Priority:** Medium
+
+**Note:** Mobile number changes require admin verification to prevent fraud. Staff submits change request via WhatsApp existing communication channel, then update ERP. Admin manually verifies in existing ERP system. If approved, ERP pushes the update to PHC dispatch system. If denied, old number stays active and staff is notified. Changes are logged for audit purposes and cannot be undone once approved. ERP updates are necessary for synchronization.
+
+---
+
+### 2. PHC Admin User Stories
 
 #### US-ADM-01: View Real-Time Dashboard
 **As a** PHC administrator,
@@ -427,7 +401,7 @@ And: Admin can see my acknowledgment status
 **So that** I can handle special facility requests, unique qualifications, and emergency situations.
 
 **Scenario:**
-```gherkin
+```
 Given: A job demand is unfilled or requires specific staff
 When: I click "Manual Confirmation" on the job details
 And: I search for staff by name, staff number, or availability
@@ -484,7 +458,7 @@ And: Override logged with: admin ID, timestamp, reason, original match (if any)
 **So that** they receive critical information quickly.
 
 **Scenario:**
-```gherkin
+```
 Given: I uploaded an acknowledgment document with priority = Critical
 And: I specified target regions (e.g., HKI, KLN)
 When: File upload completes successfully
@@ -519,7 +493,7 @@ And: System tracks who confirmed receipt
 **So that** urgent staffing needs are filled immediately without waiting for the standard polling cycle.
 
 **Scenario:**
-```gherkin
+```
 Given: There is an urgent staffing need (e.g., 2 staff needed today 18:00-22:00)
 When: I click "Emergency Job Posting" in the admin portal
 And: I fill the form with complete job details:
@@ -580,7 +554,113 @@ And: If unfilled after 30 minutes: admin receives push/email alert
 
 ---
 
-### 4. ERP Team User Stories
+#### US-ADM-07: View Job Applications Overview
+**As a** PHC administrator,
+**I want** to view all staff applications for each job posting,
+**So that** I can screen candidates and approve assignments.
+
+**Scenario:**
+```
+Given: A job posting has received staff applications
+When: I navigate to the job posting details
+Then: I see the complete job information:
+  - Facility name and full address/location
+  - Date, shift start time, shift end time
+  - Worker type / skillset required
+  - Gender requirement (if applicable)
+  - Contact person
+And: I see a list of all staff who have applied
+And: Each applicant shows: name, score, availability status, relevant history, matching skillset
+And: I can approve or reject each application
+When: I approve an application
+Then: The assignment is confirmed and staff is notified
+```
+
+**Acceptance Criteria:**
+✅ All applications visible for each job posting
+✅ Applicant details include score and work history
+✅ Approve/reject actions available
+✅ Bulk approval supported for multiple applicants
+✅ Rejected applicants notified with reason (optional)
+✅ Approved assignments synced to ERP
+
+**Priority:** High
+
+**Note:** This replaces the removed Care Home Supervisor role. PHC Admin now handles application screening.
+
+---
+
+#### US-ADM-08: Verify Staff Document Acknowledgment
+**As a** PHC administrator,
+**I want** to verify that staff have read and acknowledged required documents (remarks, supplements, protocols) before starting their duty,
+**So that** I can ensure compliance and staff preparedness.
+
+**Scenario - View Document Acknowledgment Status:**
+```
+Given: A job posting has required documents attached (remarks, supplements, protocols)
+When: I navigate to the job posting details
+Then: I see a list of assigned staff with their document acknowledgment status
+And: Each staff shows: name, documents required, documents viewed, documents acknowledged
+And: Staff who have not acknowledged are highlighted in red
+```
+
+**Scenario - Send Reminder for Unacknowledged Documents:**
+```
+Given: Staff have not acknowledged required documents before shift start
+When: I click "Send Reminder" for specific staff
+Then: A push notification is sent reminding them to review documents
+And: Reminder is logged in the system
+```
+
+**Acceptance Criteria:**
+✅ Document acknowledgment status visible per staff per job
+✅ Shows: document name, view timestamp, acknowledgment timestamp
+✅ Unacknowledged documents clearly highlighted (red indicator)
+✅ Filter by acknowledgment status (All/Acknowledged/Pending)
+✅ Bulk reminder option for all staff with pending acknowledgments
+✅ Individual reminder option per staff
+✅ Report exportable showing acknowledgment compliance rate
+✅ Staff cannot be marked as "ready for duty" until all required documents acknowledged
+✅ Acknowledgment tracking synced with acknowledgment document distribution (FR-8)
+
+**Priority:** High
+
+---
+
+#### (NEW) US-ADM-09: Update Job Posting Details
+**As a** PHC administrator,
+**I want** to update job posting details (e.g., shift times, requirements, contact info),
+**So that** changes are synced to ERP for accurate staffing coordination.
+
+**Scenario - Update Job Details:**
+```
+Given: A job posting exists in PHC
+When: I navigate to the job posting details
+And: I click "Edit Job"
+Then: I can modify fields: shift start/end times, worker type, skillset, gender requirement, contact person, special notes
+When: I save the changes
+Then: Job details are updated in PHC database
+And: Update is sent to ERP via API (PATCH /api/v1/jobs/demands/{demand_id})
+And: Confirmation received from ERP
+And: Audit log records the change with admin ID and timestamp
+```
+
+**Acceptance Criteria:**
+✅ Editable fields: shift times, worker type, skillset, gender, contact info, notes
+✅ Changes validated (e.g., time format, required fields)
+✅ API call to ERP: PATCH /api/v1/jobs/demands/{id} with updated data
+✅ ERP confirmation required before marking update complete
+✅ Audit trail logged for all changes
+✅ Notifications sent to affected staff if critical changes (e.g., time changes)
+✅ Cannot edit if job already filled or in progress
+
+**Priority:** Medium
+
+**Note:** Job updates ensure ERP has the latest information for matching and scheduling. Changes are pushed immediately to maintain data consistency.
+
+---
+
+### 3. ERP Team User Stories (Tentative)
 
 #### US-ERP-01: Staff Master Data Sync
 **As an** ERP system,
@@ -650,7 +730,8 @@ And: If unfilled after 30 minutes: admin receives push/email alert
 - Status (open/filled/cancelled)
 - Priority, special requirements
 - Contact person and phone number
-
+- Availability staff list
+- Blacklist
 **Acceptance Criteria:**
 ✅ API responds in <3 seconds
 ✅ Unfilled demands (status: open) returned
@@ -742,11 +823,35 @@ And: If unfilled after 30 minutes: admin receives push/email alert
 - Late cancellation (<48h): -1 score AND 300 HKD penalty
 - No-show penalties removed in v1.2
 
+---
 
+#### (NEW) US-ERP-07: Receive Job Demand Updates
+**As an** ERP system,
+**I want** to receive job demand updates from PHC,
+**So that** I can maintain synchronized job information for matching and scheduling.
+
+**API:** PATCH /api/v1/jobs/demands/{demand_id}
+**Trigger:** When PHC admin updates job posting details
+**Data Received:**
+- Demand ID
+- Updated fields: shift start/end times, worker type, skillset, gender requirement, contact person, special notes
+- Update timestamp, admin ID
+
+**Acceptance Criteria:**
+✅ Accepts valid update data
+✅ Validates changes (e.g., time conflicts, required fields)
+✅ Updates job record in ERP database
+✅ Returns confirmation with updated demand_id
+✅ Logs update in audit trail
+✅ Response time < 3 seconds
+
+**Priority:** Medium
+
+**Note:** Job updates from PHC ensure ERP has the latest demand information for accurate staff matching and facility coordination.
 
 ---
 
-### 8. Finance Team User Stories
+### 4. Finance Team User Stories (Tentative)
 
 #### US-FIN-01: Generate Settlement Reconciliat ion Report
 
@@ -755,7 +860,7 @@ And: If unfilled after 30 minutes: admin receives push/email alert
 **So that** I can verify PHC records match ERP settlements, identify discrepancies, and generate action lists for manual ERP updates.
 
 **Scenario - Generate Monthly Report:**
-```gherkin
+```
 Given: It is December 3, 2025
 And: PHC has processed 150 staff assignments for November 2025
 And: ERP has processed settlements for the same period
@@ -771,7 +876,7 @@ And: Generates Excel export with Matched/Unmatched tabs
 ```
 
 **Scenario - Generate Penalty Action List:**
-```gherkin
+```
 Given: PHC has 15 late cancellation penalties for November 2025
 And: 13 penalties have been applied in ERP
 And: 2 penalties are missing in ERP
@@ -811,7 +916,7 @@ And: I can export Action List as separate worksheet
 **So that** I can resolve it by updating ERP manually and mark it as completed in PHC.
 
 **Scenario - Investigate Missing Penalty:**
-```gherkin
+```
 Given: Settlement Report shows 2 missing penalties in ERP
 When: I click on a discrepancy row in the Action List
 Then: I see full discrepancy details:
@@ -826,7 +931,7 @@ And: I can see if API call failed or was never triggered
 ```
 
 **Scenario - Resolve Discrepancy:**
-```gherkin
+```
 Given: I have investigated the discrepancy
 And: I have manually updated ERP with the penalty
 When: I click "Mark as Resolved"
@@ -852,7 +957,7 @@ And: Match rate recalculates for the period
 
 ---
 
-### 9. Reports User Stories
+### 5. Reports User Stories
 
 #### US-RPT-01: View Attendance Performance Dashboard
 
@@ -937,10 +1042,13 @@ And: Match rate recalculates for the period
 | TC-ERP-06 | FR-1, FR-5 | Score update to ERP |
 | TC-ERP-07 | FR-5 | Error handling - API timeout |
 | TC-ERP-08 | FR-5 | Webhook integration |
+| TC-ERP-09 | FR-5 | Job demand update reception |
 | TC-PERF-01 | FR-2 | Matching performance |
 | TC-PERF-02 | FR-2, FR-5 | API response times |
 | TC-SEC-01 | NFR | Authentication required |
 | TC-SEC-02 | NFR | Data encryption |
+| TC-SEC-03 | NFR | Staff login |
+| TC-SEC-04 | NFR | Update personal information |
 | TC-RPT-01 | FR-10 | Settlement reconciliation |
 | TC-RPT-02 | FR-13 | Attendance metrics |
 | TC-FIN-01 | FR-10 | Settlement discrepancy investigation |
@@ -953,13 +1061,13 @@ And: Match rate recalculates for the period
 
 | FR    | Feature                          | Stories                                                          | Test Cases                                              | Coverage   |
 | ----- | -------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------- | ---------- |
-| FR-1  | Scoring Algorithm                | US-NA-02, US-NA-03, US-NA-05, US-ERP-06                          | TC-003, TC-004, TC-005                                  | ✓ Complete |
+| FR-1  | Scoring Algorithm                | US-NA-02, US-NA-03, US-NA-04, US-ERP-06                          | TC-003, TC-004, TC-005                                  | ✓ Complete |
 | FR-2  | Matching Engine                  | US-NA-01, US-ERP-04, US-ADM-02                                   | TC-002, TC-ERP-02, TC-ERP-03, TC-PERF-01                | ✓ Complete |
-| FR-3  | WhatsApp + Web Push Notification | US-NA-01, US-NA-02, US-NA-05, US-ADM-04, US-ADM-05               | TC-007, TC-008                                          | ✓ Complete |
+| FR-3  | WhatsApp + Web Push Notification | US-NA-01, US-NA-02, US-NA-04, US-ADM-04, US-ADM-05               | TC-007, TC-008                                          | ✓ Complete |
 | FR-4  | Admin Dashboard                  | US-ADM-01                                                        | TC-ADM-01                                               | ✓ Complete |
-| FR-5  | ERP Integration                  | US-ERP-01, US-ERP-02, US-ERP-03, US-ERP-05, US-ERP-06, US-ADM-06 | TC-001, TC-003, TC-ERP-01 through TC-ERP-08, TC-PERF-02 | ✓ Complete |
-| FR-6  | Attendance Tracking              | US-NA-05                                                         | TC-ERP-04, TC-RPT-02                                    | ✓ Complete |
-| FR-7  | Penalty Management               | US-NA-03, US-NA-05                                               | TC-004, TC-005, TC-ERP-05                               | ✓ Complete |
+| FR-5  | ERP Integration                  | US-ERP-01, US-ERP-02, US-ERP-03, US-ERP-05, US-ERP-06, US-ERP-07 (NEW), US-ADM-06, US-ADM-09 (NEW), US-NA-07 (NEW) | TC-001, TC-003, TC-ERP-01 through TC-ERP-09, TC-PERF-02 | ✓ Complete |
+| FR-6  | Attendance Tracking              | US-NA-04                                                         | TC-ERP-04, TC-RPT-02                                    | ✓ Complete |
+| FR-7  | Penalty Management               | US-NA-03, US-NA-04                                               | TC-004, TC-005, TC-ERP-05                               | ✓ Complete |
 | FR-8  | Acknowledgment Document Upload            | US-ADM-03, US-ADM-04                                             | TC-007                                                  | ✓ Complete |
 | FR-9  | Emergency Job Posting            | US-ADM-05                                                        | TC-008                                                  | ✓ Complete |
 | FR-10 | Settlement Reconciliation        | US-FIN-01, US-FIN-02                                             | TC-RPT-01                                               | ✓ Complete |
@@ -974,10 +1082,10 @@ And: Match rate recalculates for the period
 
 ### STORY SUMMARY
 
-**Total Stories: 24**
-- Nursing Assistant stories (US-NA-00 to US-NA-07, excluding US-NA-04): 7
-- Admin stories (US-ADM-01 to US-ADM-08): 8
-- ERP System stories (US-ERP-01 to US-ERP-06): 6
+**Total Stories: 26**
+- Nursing Assistant stories (US-NA-00 to US-NA-07): 8
+- Admin stories (US-ADM-01 to US-ADM-09): 9
+- ERP System stories (US-ERP-01 to US-ERP-07): 7
 - **Finance Team stories:** US-FIN-01 to US-FIN-02: **2**
 - **Reports stories:** US-RPT-01 to US-RPT-03: **3**
 
@@ -1510,6 +1618,43 @@ And: Match rate recalculates for the period
 
 ---
 
+#### TC-ERP-09: Job Demand Update Reception
+**Objective:** Verify ERP receives and processes job demand updates from PHC
+
+**API Call:** PATCH /api/v1/jobs/demands/{demand_id}
+
+**Request:**
+```json
+{
+  "demand_id": "DEM789",
+  "shift_start": "15:00",
+  "shift_end": "23:00",
+  "contact_person": "Ms. Chan",
+  "contact_phone": "98765432",
+  "updated_by": "admin_id_123",
+  "update_timestamp": "2025-12-05T10:00:00Z"
+}
+```
+
+**Expected Response (200):**
+```json
+{
+  "status": "success",
+  "demand_id": "DEM789",
+  "message": "Job demand updated successfully"
+}
+```
+
+**Validation:**
+✅ Job record updated in ERP database
+✅ Changes logged in audit trail
+✅ Response time < 3 seconds
+✅ Invalid updates rejected (e.g., past dates)
+
+**Priority:** Medium
+
+---
+
 ### 3. Performance Test Cases
 
 #### TC-PERF-01: Matching with Large Dataset
@@ -1586,7 +1731,7 @@ And: Match rate recalculates for the period
 - Staff status is "Active"
 
 **Test Steps:**
-1. Enter valid Mobile Number/Email
+1. Enter valid Mobile Number
 2. Enter valid password
 3. Click Login
 
@@ -1597,6 +1742,39 @@ And: Match rate recalculates for the period
 ✅ Inactive staff (in ERP) cannot login
 
 **Priority:** Critical
+
+---
+
+#### TC-SEC-04: Update Personal Information
+**Objective:** Verify staff can request mobile number update with ERP admin verification
+
+**Preconditions:**
+- Staff has existing WhatsApp channel with PHC
+- Staff has no assignment within 24 hours
+- ERP admin access available
+
+**Test Steps:**
+1. Staff sends WhatsApp message to PHC channel: "Change mobile number to 98765432"
+2. Verify request submitted to ERP
+3. Admin logs into ERP system
+4. Admin approves the change request
+5. Verify ERP pushes update to PHC
+6. Check staff receives confirmation SMS on new number
+7. (Denial Test) Admin denies the change request
+8. Verify old number stays active
+9. Check staff receives denial notification
+
+**Expected Results:**
+✅ Change request submitted successfully via WhatsApp
+✅ Request appears in ERP for admin review
+✅ Admin can approve/deny in ERP
+✅ Upon approval: ERP pushes update to PHC, confirmation SMS sent to new number
+✅ Upon denial: Old number stays active, staff notified
+✅ Old number invalidated for login after approval
+✅ Change logged in audit trail
+✅ ERP sync updated
+
+**Priority:** Medium
 
 ---
 
@@ -1708,9 +1886,9 @@ And: Match rate recalculates for the period
 | Functional | 8 | Pending |
 | ERP Integration | 8 | Pending |
 | Performance | 2 | Pending |
-| Security | 2 | Pending |
+| Security | 4 | Pending |
 | Finance & Reports | 3 | Pending |
-| **Total** | **23** | **Pending** |
+| **Total** | **25** | **Pending** |
 
 ---
 
@@ -1753,9 +1931,14 @@ And: Match rate recalculates for the period
   - Worker type / skillset required
   - Gender requirement (M/F/Any)
   - Contact person and phone number
-- Updated US-NA-01, US-NA-02, US-NA-05, US-ADM-05, US-ADM-07
+- Updated US-NA-01, US-NA-02, US-NA-04, US-ADM-05, US-ADM-07
 - Updated US-ERP-01, US-ERP-02, US-ERP-03 data sync specifications
 - Updated TC-002, TC-ERP-01, TC-ERP-02, TC-ERP-08 test cases
+
+**v1.4 Changes (2025-12-05):**
+- Added US-NA-07: Update Personal Information (mobile number change subflow)
+- Added TC-SEC-04: Update Personal Information test case
+- Updated traceability matrix and story summary
 
 **v1.2 Changes (2025-11-28):**
 - Added US-NA-00: Staff Login (using ERP credentials)
@@ -1788,7 +1971,7 @@ And: Match rate recalculates for the period
 
 ---
 
-**Last Updated:** 2025-11-27
+**Last Updated:** 2025-12-05
 **Next Review:** Before testing begins
 **Aligned With:** Product Specification v1.5, PHC Meeting Minutes, PHC Requirements
 

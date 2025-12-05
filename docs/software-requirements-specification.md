@@ -117,7 +117,7 @@ This Software Requirements Specification (SRS) defines the complete functional a
 **Description:** Staff must be able to log in using credentials synced from ERP.
 
 **System Actions:**
-1. User enters Mobile Number, Username, or Email
+1. User enters Mobile Number
 2. User enters Password
 3. System validates credentials against PHC database (synced from ERP)
 4. If valid:
@@ -132,7 +132,7 @@ This Software Requirements Specification (SRS) defines the complete functional a
    - Send alert email/SMS
 
 **Acceptance Criteria:**
-- Login works with Mobile, Username, Email
+- Login works with Mobile Number only
 - Account locking works
 - Session timeout after 30 mins
 
@@ -1410,7 +1410,7 @@ See detailed data mapping tables in Appendix A.
 ### 6.2 Staff Portal Interface
 
 #### 6.2.1 Login Page
-- Fields: Mobile/Username/Email, Password
+- Fields: Mobile Number, Password
 - "Forgot Password" link
 - "Remember Me" checkbox
 - Language toggle (EN/ZH)

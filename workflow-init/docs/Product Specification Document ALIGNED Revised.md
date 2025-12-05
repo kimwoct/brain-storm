@@ -141,14 +141,14 @@ The PHC system streamlines dispatch of nursing assistants to care home shifts us
 - **Email:** Registered email address
 
 **System Behavior:**
-- User enters identifier (Mobile/Username/Email) and password
+- User enters mobile number and password
 - System resolves user and validates hash
 - Successful login grants JWT token
 - Failed login increments failure counter
 - "Forgot Password" triggers OTP flow
 
 **Acceptance Criteria:**
-✅ Staff can login with Mobile OR Username OR Email
+✅ Staff can login with Mobile Number only
 ✅ Account locks after 5 failed attempts
 ✅ Session expires after 30 minutes of inactivity
 ✅ Forgot Password flow sends OTP and allows reset
@@ -1358,10 +1358,10 @@ Please read and confirm receipt via portal
 - **RATIONALE:** Reflects shift from fully automated matching to human-screened application workflow where staff apply for shifts and admins perform final screening/approval; Performance targets adjusted for MVP realism; Multiple review markers added for management input on critical decisions
 
 **Version 1.5 → 1.6 (2025-11-25)**
-- **ADDED:** FR-0 Staff Login - Added authentication requirements (Mobile/Username/Email)
-- **UPDATED:** Data Model - Added username and email as login credentials for Users entity
+- **ADDED:** FR-0 Staff Login - Added authentication requirements (Mobile Number only)
+- **UPDATED:** Data Model - Added mobile number as login credential for Users entity
 - **UPDATED:** Traceability Matrix - Added FR-0 mapping to US-NA-00
-- **RATIONALE:** Ensures staff can login using their preferred ERP-synced credentials
+- **RATIONALE:** Ensures staff can login using their ERP-synced mobile number
 
 **⚠️ CRITICAL SECURITY ISSUE FLAGGED:** Section 9.3 shows TLS 1.1 which is deprecated and insecure. This must be reverted to TLS 1.3 before implementation.
 

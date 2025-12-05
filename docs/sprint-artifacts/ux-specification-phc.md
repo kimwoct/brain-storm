@@ -429,7 +429,7 @@ End of day: Reviews metrics dashboard
 
 **Core Features:**
 1. **Secure Login & Authentication**
-   - Login via Mobile Number, Username, or Email
+   - Login via Mobile Number only
    - Password authentication with "Forgot Password" flow
    - Security: Account lockout after 5 failed attempts
    - Session: Auto-logout after 30 minutes of inactivity
@@ -1210,7 +1210,7 @@ ROI = (Total Savings - Total Investment) ÷ Total Investment × 100
 ### 11.2 Mobile Design Specifics (Nursing Assistants)
 
 **Screen 0: Login**
-- Input: Mobile / Username / Email
+- Input: Mobile Number
 - Input: Password (masked)
 - Action: "Login" button (Primary)
 - Link: "Forgot Password?" (Secondary)

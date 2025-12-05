@@ -106,7 +106,7 @@ See Executive Summary (Section 6)
 **Description:** Secure login for nursing assistants using ERP credentials
 
 **Requirements:**
-- Login via Mobile Number, Username, or Email
+- Login via Mobile Number only
 - Validate against synced ERP data
 - Account locking (5 failed attempts)
 - Forgot Password flow (OTP)
