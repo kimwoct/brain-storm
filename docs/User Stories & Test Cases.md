@@ -1,10 +1,10 @@
 
-# User Stories v1.3
+# User Stories v1.4
 
 **Prestige Health Care Match/Dispatch System (PHC)**
 
-**Version:** 1.3
-**Date:** 2025-11-28
+**Version:** 1.4
+**Date:** 2025-12-08
 
 **Aligned With:** Product Specification v1.5 (Human Screening Workflow)
 
@@ -2103,7 +2103,38 @@ And: Match rate recalculates for the period
 
 ---
 
-**Last Updated:** 2025-12-05
+## CHANGE LOG
+
+### Version 1.4 (2025-12-08)
+- **New User Stories Added:**
+  - US-ADM-09: Update Job Posting Details (admin job updates with ERP sync)
+  - US-ERP-07: Receive Job Demand Updates (ERP receives PHC job updates)
+  - US-ERP-08: Receive OT Job Demand Sync (OT shift splitting for confirmed shifts >3 hours)
+  - US-ERP-09: Facility Blacklist Sync (facility-specific blacklists for matching)
+- **New Test Cases Added:**
+  - TC-ERP-10: OT Job Demand Sync
+  - TC-ERP-11: Facility Blacklist Sync
+- **Enhanced User Stories:**
+  - US-ADM-07: Added confirmation/failure messages for job applications, waiting list for re-matching, automatic ERP sync after approval
+  - US-NA-02: Added waiting list quota management
+  - US-NA-03: Enhanced re-matching workflow with ERP candidate list queries
+- **Documentation Improvements:**
+  - Added (NEW) remarks to all newly added items
+  - Updated traceability matrices and coverage summaries
+  - Updated story summary: Total 28 stories (9 ERP, 9 Admin, 8 NA, 2 Finance, 3 Reports)
+- **Version Update:** From 1.3 to 1.4
+- **Date Update:** Last modified date updated to 2025-12-08
+
+### Version 1.3 (2025-11-28)
+- Initial release with comprehensive user stories and test cases
+- Aligned with Product Specification v1.5 (Human Screening Workflow)
+- Included 26 user stories covering all functional requirements
+- Added ERP integration, scoring algorithm, notification systems
+- Implemented penalty management and attendance tracking
+
+---
+
+**Last Updated:** 2025-12-08
 **Next Review:** Before testing begins
 **Aligned With:** Product Specification v1.5, PHC Meeting Minutes, PHC Requirements
 
