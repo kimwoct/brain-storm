@@ -14,36 +14,36 @@
 
 ### REQUIREMENTS TRACEABILITY MATRIX
 
-| User Story     | Related FRs        | Description                                                             |
-| -------------- | ------------------ | ----------------------------------------------------------------------- |
-| US-NA-00       | FR-5, NFR          | Staff Login (ERP Credentials)                                           |
-| US-NA-01       | FR-2, FR-3         | Receive job notification (with facility, worker type, gender, times)    |
-| US-NA-02       | FR-1, FR-2, FR-3   | Apply for available shift (with complete job details)                   |
-| US-NA-03       | FR-1, FR-3, FR-7   | Cancel shift with penalty warning                                       |
-| US-NA-04       | FR-1, FR-6         | View job history (with facility, worker type, times)                    |
-| US-NA-05       | FR-7               | View penalty history                                                    |
-| US-NA-06       | FR-8               | Acknowledge required documents                                          |
-| US-NA-07 (New) | FR-5, NFR          | Update personal information                                             |
-| US-ADM-01      | FR-4, FR-5         | View real-time dashboard                                                |
-| US-ADM-02      | FR-2, FR-11        | Manual confirmation + notification                                      |
-| US-ADM-03      | FR-8               | Upload acknowledgment documents/files                                   |
-| US-ADM-04      | FR-3, FR-8         | Distribute acknowledgment documents/files                               |
-| US-ADM-05      | FR-9               | Post emergency job (with complete job details)                          |
-| US-ADM-06      | FR-5, FR-12, FR-13 | View system logs and reports                                            |
-| US-ADM-07      | FR-2               | View job applications overview (with facility, worker type, gender)     |
-| US-ADM-08      | FR-8               | Verify document acknowledgment                                          |
-| US-ADM-09 (NEW)| FR-5               | Update job posting details                                              |
-| US-ERP-01      | FR-5               | Staff master data sync (incl. worker type, skillset, gender)            |
-| US-ERP-02      | FR-5               | Location master data sync (incl. worker types, skillsets, gender prefs) |
-| US-ERP-03      | FR-5               | Job demand sync (with facility, worker type, gender, times)             |
-| US-ERP-04      | FR-2, FR-5         | Receive assignment submission                                           |
-| US-ERP-05      | FR-5, FR-6         | Receive attendance records                                              |
-| US-ERP-06      | FR-1, FR-5, FR-7   | Receive penalty records                                                 |
-| US-ERP-07 (NEW)| FR-5               | Receive job demand updates                                              |
-| US-ERP-08 (NEW)| FR-5               | Receive OT job demand sync                                              |
-| US-ERP-09 (NEW)| FR-5               | Facility blacklist sync                                                 |
-| US-FIN-01      | FR-10              | Generate settlement reconciliation report                               |
-| US-FIN-02      | FR-10              | Investigate settlement discrepancy                                      |
+| User Story      | Related FRs        | Description                                                             |
+| --------------- | ------------------ | ----------------------------------------------------------------------- |
+| US-NA-00        | FR-5, NFR          | Staff Login (ERP Credentials)                                           |
+| US-NA-01        | FR-2, FR-3         | Receive job notification (with facility, worker type, gender, times)    |
+| US-NA-02        | FR-1, FR-2, FR-3   | Apply for available shift (with complete job details)                   |
+| US-NA-03        | FR-1, FR-3, FR-7   | Cancel shift with penalty warning                                       |
+| US-NA-04        | FR-1, FR-6         | View job history (with facility, worker type, times)                    |
+| US-NA-05        | FR-7               | View penalty history                                                    |
+| US-NA-06        | FR-8               | Acknowledge required documents                                          |
+| US-NA-07 (New)  | FR-5, NFR          | Update personal information                                             |
+| US-ADM-01       | FR-4, FR-5         | View real-time dashboard                                                |
+| US-ADM-02       | FR-2, FR-11        | Manual confirmation + notification                                      |
+| US-ADM-03       | FR-8               | Upload acknowledgment documents/files                                   |
+| US-ADM-04       | FR-3, FR-8         | Distribute acknowledgment documents/files                               |
+| US-ADM-05       | FR-9               | Post emergency job (with complete job details)                          |
+| US-ADM-06       | FR-5, FR-12, FR-13 | View system logs and reports                                            |
+| US-ADM-07       | FR-2               | View job applications overview (with facility, worker type, gender)     |
+| US-ADM-08       | FR-8               | Verify document acknowledgment                                          |
+| US-ADM-09 (NEW) | FR-5               | Update job posting details                                              |
+| US-ERP-01       | FR-5               | Staff master data sync (incl. worker type, skillset, gender)            |
+| US-ERP-02       | FR-5               | Location master data sync (incl. worker types, skillsets, gender prefs) |
+| US-ERP-03       | FR-5               | Job demand sync (with facility, worker type, gender, times)             |
+| US-ERP-04       | FR-2, FR-5         | Receive assignment submission                                           |
+| US-ERP-05       | FR-5, FR-6         | Receive attendance records                                              |
+| US-ERP-06       | FR-1, FR-5, FR-7   | Receive penalty records                                                 |
+| US-ERP-07 (NEW) | FR-5               | Receive job demand updates                                              |
+| US-ERP-08 (NEW) | FR-5               | Receive OT job demand sync                                              |
+| US-ERP-09 (NEW) | FR-5               | Facility blacklist sync                                                 |
+| US-FIN-01       | FR-10              | Generate settlement reconciliation report                               |
+| US-FIN-02       | FR-10              | Investigate settlement discrepancy                                      |
 
 ---
 
@@ -637,36 +637,35 @@ And: Reminder is logged in the system
 
 ---
 
-#### (NEW) US-ADM-09: Update Job Posting Details
+#### (NEW) US-ADM-09: Update Job Posting Details in ERP
 **As a** PHC administrator,
-**I want** to update job posting details (e.g., shift times, requirements, contact info),
-**So that** changes are synced to ERP for accurate staffing coordination.
+**I want** to update job posting details in ERP,
+**So that** synchronized job details are reflected in PHC for accurate staffing coordination.
 
 **Scenario - Update Job Details:**
 ```
-Given: A job posting exists in PHC
-When: I navigate to the job posting details
-And: I click "Edit Job"
-Then: I can modify fields: shift start/end times, worker type, skillset, gender requirement, contact person, special notes
-When: I save the changes
-Then: Job details are updated in PHC database
-And: Update is sent to ERP via API (PATCH /api/v1/jobs/demands/{demand_id})
-And: Confirmation received from ERP
+Given: A job posting exists in ERP
+When: I navigate to the ERP system
+And: I update job details: shift start/end times, worker type, skillset, gender requirement, contact person, special notes
+And: I save the changes in ERP
+Then: ERP syncs updated job details to PHC via API (PATCH /api/v1/jobs/demands/{demand_id})
+And: PHC receives and processes the update
+And: Job details are updated in PHC database
 And: Audit log records the change with admin ID and timestamp
 ```
 
 **Acceptance Criteria:**
-✅ Editable fields: shift times, worker type, skillset, gender, contact info, notes
-✅ Changes validated (e.g., time format, required fields)
-✅ API call to ERP: PATCH /api/v1/jobs/demands/{id} with updated data
-✅ ERP confirmation required before marking update complete
-✅ Audit trail logged for all changes
+✅ Editable fields in ERP: shift times, worker type, skillset, gender, contact info, notes
+✅ Changes validated in ERP (e.g., time format, required fields)
+✅ ERP pushes update to PHC: PATCH /api/v1/jobs/demands/{id} with updated data
+✅ PHC confirms receipt and processing of update
+✅ Audit trail logged for all changes in both systems
 ✅ Notifications sent to affected staff if critical changes (e.g., time changes)
 ✅ Cannot edit if job already filled or in progress
 
 **Priority:** Medium
 
-**Note:** Job updates ensure ERP has the latest information for matching and scheduling. Changes are pushed immediately to maintain data consistency.
+**Note:** Job updates are made in ERP (source of truth) and synchronized to PHC. Changes are pushed immediately to maintain data consistency between systems.
 
 ---
 
@@ -835,29 +834,29 @@ And: Audit log records the change with admin ID and timestamp
 
 ---
 
-#### (NEW) US-ERP-07: Receive Job Demand Updates
+#### (NEW) US-ERP-07: Post Job Detail Updates to PHC
 **As an** ERP system,
-**I want** to receive job demand updates from PHC,
-**So that** I can maintain synchronized job information for matching and scheduling.
+**I want** to post job detail updates to PHC,
+**So that** PHC can maintain synchronized job information for matching and scheduling.
 
 **API:** PATCH /api/v1/jobs/demands/{demand_id}
-**Trigger:** When PHC admin updates job posting details
-**Data Received:**
+**Trigger:** When ERP has job demand updates to send to PHC
+**Data Sent:**
 - Demand ID
 - Updated fields: shift start/end times, worker type, skillset, gender requirement, contact person, special notes
-- Update timestamp, admin ID
+- Update timestamp, ERP admin ID
 
 **Acceptance Criteria:**
-✅ Accepts valid update data
+✅ Sends valid update data to PHC
 ✅ Validates changes (e.g., time conflicts, required fields)
-✅ Updates job record in ERP database
-✅ Returns confirmation with updated demand_id
+✅ Updates job record in PHC database
+✅ Receives confirmation from PHC
 ✅ Logs update in audit trail
 ✅ Response time < 3 seconds
 
 **Priority:** Medium
 
-**Note:** Job updates from PHC ensure ERP has the latest demand information for accurate staff matching and facility coordination.
+**Note:** Job updates from ERP ensure PHC has the latest demand information for accurate staff matching and facility coordination.
 
 ---
 
@@ -2016,11 +2015,25 @@ And: Match rate recalculates for the period
 | Category | Test Cases | Status |
 |----------|-----------|--------|
 | Functional | 8 | Pending |
-| ERP Integration | 8 | Pending |
+| ERP Integration | 11 | Pending |
 | Performance | 2 | Pending |
 | Security | 4 | Pending |
 | Finance & Reports | 3 | Pending |
-| **Total** | **25** | **Pending** |
+| **Total** | **28** | **Pending** |
+
+---
+
+### Project Timeline
+
+| Milestone | Date | Description |
+|-----------|------|-------------|
+| Requirements Confirmation | 2025-Dec-12 | Final sign-off on User Stories & Test Cases v1.4 |
+| Project Start | 2025-Dec-15 | Development kickoff |
+| Phase 1: Unit Testing | 2025-Dec-15 to 2025-Dec-29 | Individual component testing, mock external APIs |
+| Phase 2: Integration Testing | 2025-Dec-30 to 2026-Jan-13 | End-to-end flow testing, test with ERP sandbox |
+| Phase 3: System Testing | 2026-Jan-14 to 2026-Jan-23 | Full system testing, performance & security testing |
+| Phase 4: UAT | 2026-Jan-24 to 2026-Feb-02 | User acceptance testing, real-world scenarios |
+| Go-Live Target | 2026-Feb-03 | Production deployment |
 
 ---
 
