@@ -1,34 +1,37 @@
 # Healthcare Worker Dispatch System (PHC)
-## Prestige Health Care Agency Ltd
+## Prestige Health Care Ltd
 
-**Document Version:** 1.4 (ALIGNED WITH PRD)
-**Date:** November 25, 2025
-**Status:** Aligned with Product Requirements Document
+**Document Version:** 1.7 (ALIGNED WITH USER STORIES v1.4)
+**Date:** December 8, 2025
+**Status:** Updated for Enhanced ERP Integration and Job Management
 
 ---
 
 ## Document Control
 
-| Version | Date       | Author        | Changes                      |
-|---------|------------|---------------|------------------------------|
-| 1.0     | 2025-11-24 | System Analyst| Initial draft for client review |
-| 1.1     | 2025-11-24 | System Analyst| Added FR details, aligned with PRD |
-| 1.2     | 2025-11-25 | System Analyst| Fixed inconsistencies, removed supervisor role |
-| 1.3     | 2025-11-25 | System Analyst| Removed score tier logic, using raw scores only |
-| 1.4     | 2025-11-25 | System Analyst| Removed cloud provider-specific references |
+| Version | Date       | Author         | Changes                                         |
+| ------- | ---------- | -------------- | ----------------------------------------------- |
+| 1.0     | 2025-11-24 | System Analyst | Initial draft for client review                 |
+| 1.1     | 2025-11-24 | System Analyst | Added FR details, aligned with PRD              |
+| 1.2     | 2025-11-25 | System Analyst | Fixed inconsistencies, removed supervisor role  |
+| 1.3     | 2025-11-25 | System Analyst | Removed score tier logic, using raw scores only |
+| 1.4     | 2025-11-25 | System Analyst | Removed cloud provider-specific references      |
+| 1.5     | 2025-11-25 | System Analyst | Human screening workflow amendments             |
+| 1.6     | 2025-11-25 | System Analyst | Added FR-0 Staff Login requirements             |
+| 1.7     | 2025-12-08 | System Analyst | Enhanced ERP integration with job updates, OT demands, facility blacklists; updated job application workflow |
 
 ---
 
 ## Executive Summary
 
-This document specifies the functional and technical requirements for the Prestige Health Dispatch System (PHC), a web-based platform designed to streamline healthcare worker-to-facility matching based on preference-driven allocation, merit-based scoring, and real-time availability.
+This document specifies the functional and technical requirements for the Prestige Health Care Dispatch System (PHC), a web-based platform designed to streamline healthcare worker-to-facility matching based on preference-driven allocation, merit-based scoring, and real-time availability.
 
 **Project Objectives:**
 
 - Streamline and semi-automate the current manual WhatsApp/phone-based dispatch process while maintaining administrator's final decision control
 - Integrate the matching subsystem with existing ERP for bidirectional data synchronization
 - Enable faster job posting and worker assignment to handle increased order volume without proportional staff increases
-- Reduce manual data entry workload and operational errors through automation
+- Reduce manual data entry workload and operational errors through dispatch system
 - Improve data consistency, traceability, and audit capabilities across all dispatch operations
 - Create foundation for potential future self-service portal for care facilities
 - Target metrics: Coordinator efficiency improvement by 50%+
@@ -37,9 +40,9 @@ This document specifies the functional and technical requirements for the Presti
 
 **Target Users:**
 
-1. **Nursing Assistants (500+)** - Receive shift assignments via WhatsApp, confirm via web portal
-2. **PHC Administrators (5-10)** - Monitor operations, handle exceptions, verify attendance via admin dashboard
-3. **ERP System** - Bidirectional data sync (13 API endpoints)
+1. **Nursing Assistants (500+ initially, scalable to 5000+)** - Receive shift assignments via WhatsApp, apply/confirm via web portal
+2. **PHC Administrators (5-10)** - Monitor operations, manual screening, handle exceptions, verify attendance via admin dashboard
+3. **ERP System** - Bidirectional data sync (16 API endpoints)
 
 ---
 
@@ -51,19 +54,18 @@ The PHC system streamlines dispatch of nursing assistants to care home shifts us
 - Preference-driven matching (facility underlist priority)
 - Scoring algorithm for merit-based allocation
 - Real-time ERP integration
-- WhatsApp notifications (manual template-based for MVP)
+- Web push notifications (including WhatsApp messages template - manual release to existing WhatsApp Groups)
 - Web-based confirmation portal
-- Attendance verification (admin-based centralized verification)
 
 ### 1.2 System Context
 
 **External Systems:**
-- Existing ERP System (primary source of truth for staff, locations, job demands)
+- Existing ERP System (primary source of truth for staff, locations, job demands/preferences)
 - WhatsApp (primary communication channel)
 - Firebase Cloud Messaging (web push notifications for reminders)
 
 **Primary Users:**
-- Nursing assistants (recipients of assignments)
+- Nursing assistants (recipients of assignments), different roles, such as...[fixme] 
 - PHC administrators (monitoring, overrides, attendance verification)
 
 ### 1.3 System Boundaries
@@ -71,7 +73,7 @@ The PHC system streamlines dispatch of nursing assistants to care home shifts us
 **In Scope (Version 1.0):**
 - Scoring and performance tracking (FR-1)
 - Preference-driven matching engine (FR-2)
-- WhatsApp + Firebase hybrid notifications (FR-3)
+- Web push notification and WhatsApp template message(FR-3)
 - Admin dashboard (FR-4)
 - ERP integration (13 APIs) (FR-5)
 - Attendance tracking (admin-based verification) (FR-6)
@@ -115,21 +117,46 @@ The PHC system streamlines dispatch of nursing assistants to care home shifts us
 
 ### 2.2 Permission Matrix
 
-| Function | Admin | Worker | ERP |
-|----------|-------|--------|-----|
-| View Dashboard | ✓ | ✓ | ✗ |
-| Create Job Post | ✓ | ✗ | ✓ |
-| Edit Job Post | ✓ | ✗ | ✗ |
-| Assign Worker | ✓ | ✗ | ✗ |
-| Confirm/Cancel Shift | ✗ | ✓ | ✗ |
-| Verify Attendance | ✓ | ✗ | ✗ |
-| View Score | ✗ | ✓ | ✗ |
-| Manual Override | ✓ | ✗ | ✗ |
-| ERP API Access | ✓ | ✗ | ✓ |
+| Function          | Admin | Worker | ERP |
+| ----------------- | ----- | ------ | --- |
+| View Dashboard    | ✓     | ✓      | ✗   |
+| Create Job Post   | ✓     | ✗      | ✓   |
+| Edit Job Post     | ✓     | ✗      | ✗   |
+| Assign Worker     | ✓     | ✗      | ✗   |
+| Apply/Cancel      | ✗     | ✓      | ✗   |
+| Verify Attendance | ✓     | ✗      | ✗   |
+| View Score        | ✗     | ✓      | ✗   |
+| Manual Override   | ✓     | ✗      | ✗   |
+| ERP API Access    | ✓     | ✗      | ✓   |
 
 ---
 
 ## 3. Functional Requirements
+
+### 3.0 Staff Login (FR-0)
+
+**Description:** Secure authentication for staff using ERP-synced credentials
+
+**Login Methods:**
+- **Mobile Number:** 8-digit HK phone number
+- **Username:** Unique system username
+- **Email:** Registered email address
+
+**System Behavior:**
+- User enters mobile number and password
+- System resolves user and validates hash
+- Successful login grants JWT token
+- Failed login increments failure counter
+- "Forgot Password" triggers OTP flow
+
+**Acceptance Criteria:**
+✅ Staff can login with Mobile Number only
+✅ Account locks after 5 failed attempts
+✅ Session expires after 30 minutes of inactivity
+✅ Forgot Password flow sends OTP and allows reset
+✅ Login events logged for audit
+
+---
 
 ### 3.1 Scoring Algorithm (FR-1)
 
@@ -151,7 +178,7 @@ The PHC system streamlines dispatch of nursing assistants to care home shifts us
 
 **Acceptance Criteria:**
 ✅ Score updates based on configured rules upon attendance confirmation
-✅ ERP sync confirmed within 1 minute
+✅ ERP sync confirmed within short time
 ✅ Manual override requires reason field
 ✅ Score floor enforced at -10
 ✅ Score displayed correctly in staff portal
@@ -164,7 +191,7 @@ The PHC system streamlines dispatch of nursing assistants to care home shifts us
 
 **Matching Criteria (Priority Order):**
 
-1. **Underlist** (previous work history at facility)
+1. **Underlist** (previous work history at facility)/(from ERP)
    - Staff who worked at facility before get priority
    - Ordered by positive history and frequency
 
@@ -172,15 +199,15 @@ The PHC system streamlines dispatch of nursing assistants to care home shifts us
    - Rank by actual score value (descending)
    - Higher scores get priority
 
-3. **Availability** (from ERP sync)
+1. **Availability** (from ERP)
    - Must be marked as available
    - Check for conflicting shifts
 
-4. **Document Validity**
+1. **Document Validity** (Preset/Manually Upload)
    - Required certificates/permits valid
    - Expiration dates checked
 
-5. **Blacklist Exclusion**
+1. **Blacklist Exclusion** (from ERP)
    - Facility-specific blacklist respected
    - Cannot assign blacklisted staff
 
@@ -240,18 +267,18 @@ Step 6: Notify and confirm
 
 ---
 
-### 3.3 WhatsApp + Firebase Hybrid Notifications (FR-3)
+### 3.3 Web Push Hybrid Notifications + WhatsApp Message Template (FR-3)
 
-**Description:** WhatsApp for primary notifications (manual template-based) + Firebase web push for portal alerts and reminders
+**Description:** WhatsApp for primary notifications (manual template-based) + web push for portal alerts and reminders
 
-**WhatsApp Notifications (Primary Channel):**
+**WhatsApp Message Template (Primary Channel):**
 - System generates WhatsApp message templates with shift details
 - Coordinator copies template and sends via WhatsApp
 - Templates include: date, location, shift time, contact person, confirmation link
 - Support for urgent shift notifications
 - Bilingual templates (English + Traditional Chinese)
 
-**Template Format:**
+**Template Format:** [fixme]
 ```
 🩺 Prestige Health Assignment
 📅 Date: {date}
@@ -273,47 +300,47 @@ Please confirm: {confirmation_link}
 5. Mark as "sent_via_whatsapp" in system
 6. Track confirmation status
 
-**Firebase Web Push (Secondary - Portal Alerts):**
+**Web Push (Secondary - Portal Alerts):**
 
 **Triggers:**
 1. **New Assignment Alert**
-   - When: Immediately after coordinator marks sent
+   - When: Immediately after coordinator marks sent [fixme]
    - Audience: Assigned staff
    - Purpose: Alert in web portal (if logged in)
 
 2. **Pending Confirmation Reminder**
-   - When: 2 hours after assignment (if not confirmed)
+   - When: 2 hours after assignment (if not confirmed) [fixme]
    - Audience: Staff with pending confirmations
    - Content: "Reminder: Shift confirmation pending - 2 hours left"
 
 3. **Day-Before Shift Reminder**
-   - When: 24 hours before shift start
+   - When: 24 hours before shift start [fixme]
    - Audience: All confirmed staff for next day
    - Content: "Reminder: Your shift tomorrow at {location}"
 
 4. **Admin Confirmation Notification**
-   - When: Staff confirms shift
+   - When: Staff applies shift [fixme]
    - Audience: Coordinators and administrators
-   - Content: "{staff_name} confirmed shift at {location}"
+   - Content: "{staff_name} applied shift at {location}"
 
-**Firebase Implementation:**
+**Web Push Notification Implementation:**
 - Service Worker registration for web push
-- FCM token storage per user device
+- Token storage per user device
 - Permission request on first login
 - Graceful degradation if denied (rely on WhatsApp primary)
 - Token refresh handling
 
 **Delivery SLA:**
-- WhatsApp template generation: < 5 seconds
-- Coordinator send time: < 1 minute per assignment
-- Firebase notification delivery: < 30 seconds
+- WhatsApp template generation: < 10 seconds
+- Coordinator send time: < 3 minute per assignment
+- Web push notification delivery: < 60 seconds
 
 **Acceptance Criteria:**
 ✅ Template generated with correct details
 ✅ Confirmation link works with deep linking to assignment
-✅ Firebase notifications delivered within 30 seconds
+✅ Web push notifications delivered within 60 seconds
 ✅ Staff can confirm/cancel via web portal after clicking link
-✅ Scheduled reminders sent at configured intervals (2h and 24h)
+✅ Scheduled reminders sent at configured intervals (2h and 24h) [fixme]
 ✅ Works on mobile and desktop browsers
 ✅ Coordinator dashboard shows pending confirmations
 
@@ -323,7 +350,7 @@ Please confirm: {confirmation_link}
 
 **Description:** Real-time view of all operations
 
-**Dashboard Widgets:**
+**Dashboard Widgets:** [fixme]
 - Today's jobs (total, filled, unfilled)
 - Confirmed staff vs pending confirmations
 - Completed shifts
@@ -335,16 +362,16 @@ Please confirm: {confirmation_link}
 - Score distribution (histogram of score ranges)
 
 **Features:**
-- Auto-refresh every 30 seconds
+- Auto-refresh every 60 seconds
 - Click any metric to drill down to details
-- Color-coded status (green/yellow/red)
-- Export to PDF/Excel for management reports
-- Filter by date range, facility, shift type
+- Color-coded status (green/yellow/red) [fixme]
+- Export to PDF/Excel for management reports [fixme]
+- Filter by date range, facility, shift type [fixme]
 
 **Acceptance Criteria:**
 ✅ All metrics accurate and real-time
 ✅ Configurable auto-refresh works without manual intervention
-✅ Load time < 3 seconds
+✅ Load time < 30 seconds
 ✅ Drill-down navigation functional
 ✅ Color coding matches status accurately
 
@@ -352,72 +379,82 @@ Please confirm: {confirmation_link}
 
 ### 3.5 ERP Integration (FR-5)
 
-**Description:** Bi-directional data sync with existing ERP (13 API endpoints)
+**Description:** Bi-directional data sync with existing ERP (16 API endpoints)
 
-**ERP → PHC (7 pull endpoints):**
+**ERP → PHC (8 pull endpoints):**
 
-1. **GET /api/v1/staff/active** - Daily at 02:00 AM
+1. **GET /api/v1/staff/active** - Daily at 02:00 AM [fixme]
    - All active staff data
    - Fields: staff_id, names, contact, HKID, certificates, bank account, status
-   - Validates HKID format, phone numbers (8 digits)
-   - Sync completed in < 5 minutes
+   - Sync completed in < 10 minutes
 
-2. **GET /api/v1/staff/availability** - Daily at 02:30 AM
+1. **GET /api/v1/staff/availability** - Daily at 02:30 AM [fixme]
    - Staff availability schedules
    - Fields: staff_id, available dates/times, preferred locations
 
-3. **GET /api/v1/staff/{id}/documents** - Weekly
+1. **GET /api/v1/staff/{id}/documents** - Weekly [fixme]
    - Download required documents: qualifications, certs, permits
    - Validate expiration dates
 
-4. **GET /api/v1/locations/active** - Daily at 03:00 AM
+1. **GET /api/v1/locations/active** - Daily at 03:00 AM [fixme]
    - All active care home locations
    - Fields: location_id, name, address, contact, region, district
    - Includes underlist (priority staff) and blacklist
 
-5. **GET /api/v1/locations/{id}/preferences** - Daily at 03:30 AM
+1. **GET /api/v1/locations/{id}/preferences** - Daily at 03:30 AM [fixme]
    - Location-specific requirements
    - Fields: special requirements, certifications needed
 
-6. **GET /api/v1/jobs/demands** - Every 15 minutes (09:00-22:00)
+1. **GET /api/v1/jobs/demands** - Every 15 minutes (09:00-22:00) [fixme]
    - Unfilled job demands
    - Fields: demand_id, location_id, date, shift_start/end, required_count, status
    - Webhook support if available
 
-7. **GET /api/v1/settlements/{id}** - Monthly (1st of month)
+1. **GET /api/v1/facilities/{facility_id}/blacklist (NEW)** - Real-time or daily [fixme]
+   - Facility-specific blacklisted staff
+   - Fields: facility_id, blacklisted_staff_ids, reasons, effective_dates
+
+1. **GET /api/v1/settlements/{id}** - Monthly (1st of month) [fixme]
    - Settlement data for reconciliation
    - Fields: staff_id, payment_amount, deductions, period
 
-**PHC → ERP (6 push endpoints):**
+**PHC → ERP (8 push endpoints):**
 
-8. **POST /api/v1/jobs/assignments** - Real-time
-   - Submit confirmed assignments
+9. **POST /api/v1/jobs/assignments** - Real-time [fixme]
+   - Submit applied assignments
    - Fields: phc_assignment_id, demand_id, staff_id, location_id, date, shift_times
    - Return: erp_assignment_id, confirmation
    - Handles 409 conflict if staff unavailable
 
-9. **PATCH /api/v1/jobs/assignments/{id}** - Real-time
-   - Update assignment status changes
-   - Fields: status, timestamps
+10. **PATCH /api/v1/jobs/assignments/{id}** - Real-time
+    - Update assignment status changes
+    - Fields: status, timestamps
 
-10. **POST /api/v1/attendance** - Post-shift (within 1 hour)
+11. **POST /api/v1/attendance** - Post-shift (within 1 hour)
     - Submit attendance records
-    - Fields: assignment_id, staff_id, location_id, clock_in/out, actual_hours, status
+    - Fields: assignment_id, staff_id, location_id, actual_hours, status
     - Status: completed, partial
 
-11. **POST /api/v1/penalties** - Real-time
+12. **POST /api/v1/penalties** - Real-time
     - Submit penalty records
     - Fields: assignment_id, staff_id, penalty_type (cancellation), amount (300 HKD), score_impact (-1)
     - ERP deducts from next settlement
 
-12. **PATCH /api/v1/staff/{id}/score** - Real-time
+13. **PATCH /api/v1/staff/{id}/score** - Real-time
     - Update score after attendance/penalty
     - Fields: score_change, new_score, reason, assignment_id
 
-13. **POST /api/v1/finance/deduction** - TBD
-    - Actual financial deduction (awaiting ERP API specification)
+14. **PATCH /api/v1/jobs/demands/{demand_id} (NEW)** - Real-time
+    - Update job demand details after admin edits
+    - Fields: updated shift_times, worker_type, skillset, contact_info, special_notes
+    - Update timestamp, admin_id
 
-**Integration Details:**
+15. **POST /api/v1/jobs/demands/ot (NEW)** - Real-time
+    - Sync overtime job demands for split shifts
+    - Fields: original_demand_id, staff_id, ot_shift_details, split_reason
+
+16. **POST /api/v1/finance/deduction (NEW)** - TBD
+    - Actual financial deduction (awaiting ERP API specification)**Integration Details:**
 
 **Polling Frequency:**
 - Staff/Locations: Daily at 02:00-03:30 AM (low traffic period)
@@ -431,19 +468,19 @@ Please confirm: {confirmation_link}
 - API timeouts: Alert after 3 failures, queue for manual retry
 
 **Data Validation:**
-- Staff: HKID format validation, phone numbers (8 digits), active status check
+- Staff: Phone numbers (8 digits), active status check
 - Locations: Unique codes, active status, regional mapping
 - Assignments: Staff availability conflict check, blacklist check, fair sharing limits
 
 **Acceptance Criteria:**
-✅ All 13 APIs tested and working (mock + real ERP endpoints)
+✅ All 13 APIs tested and working (mock/testing + real ERP endpoints)
 ✅ Zero data loss during sync
 ✅ Retry logic executes 3 attempts as specified
 ✅ Error logging captures all failures
 ✅ Alerts sent to admin for critical failures (>3 consecutive)
-✅ Performance SLA met: < 3 seconds per API call
+✅ Performance SLA met: < 30 seconds per API call
 ✅ Daily sync completed by 05:00 AM
-✅ Real-time updates sent within 1 minute
+✅ Real-time updates sent within 10 minute
 
 ---
 
@@ -470,26 +507,20 @@ Please confirm: {confirmation_link}
 - Centralized view of all facilities
 - Batch processing capability
 - Can delegate to facility contacts via phone confirmation
-- Total time: ~5 minutes for 20 facilities
+- Total time: ~10 minutes for 20 facilities
 - Add notes for deviations (late arrival, early departure)
 
 **Facility Contact Phone Confirmation:**
+- Admin export the staff attendance list to individual facility
 - Admin calls facility contact person
 - Verbally confirms staff attendance
 - Admin records in system
 - Maintains single source of truth in PHC system
 
-**Clock-in/Clock-out Recording:**
-- Admin records clock-in time (via facility contact confirmation)
-- Admin records clock-out time at shift end
-- Actual hours calculated by system
-- Deviation alerts: >1 hour difference from scheduled hours (configurable threshold)
-- Admin reviews and approves/adjusts as needed
-
 **ERP Sync:**
 - Attendance submitted to ERP within 1 hour of shift completion
-- Fields: assignment_id, staff_id, location_id, clock_in/out, actual_hours, status
-- Status: completed, partial
+- Fields: assignment_id, staff_id, location_id, actual_hours, status [fixme]
+- Status: completed, partial [fixme]
 
 **Benefits:**
 - No additional user role needed
@@ -499,7 +530,7 @@ Please confirm: {confirmation_link}
 - Simpler permission model
 
 **Trade-offs:**
-- Slightly more admin workload (5 min vs 2 min distributed)
+- Slightly more admin workload (10 min vs 5 min distributed)
 - Requires phone communication with facilities
 - Less real-time (but acceptable for post-shift verification)
 
@@ -578,22 +609,21 @@ ELSE:
 
 ---
 
-### 3.8 Emergency File Upload (FR-8)
+### 3.8 Emergency File Upload (FR-8) [fixme]
 
 **Description:** Upload and distribute emergency protocols to staff
 
 **File Upload:**
-- Supported formats: PDF, DOC, DOCX, JPG, PNG, MP4
+- Supported formats: PDF, DOC, DOCX, JPG, PNG
 - Maximum file size: 10MB per file
 - Required metadata:
   - Title (required)
   - Description
   - Priority: Normal/High/Critical
-  - Regions (Optional): HKI/KLN/NT (select multiple)
+  - Regions (Optional): HKI/KLN/NT (select multiple) [fixme]
 
 **Storage:**
-- Secure cloud storage
-- Encrypted in transit (TLS 1.3) and at rest (AES-256)
+- Secure server storage
 - File metadata stored in PHC database
 - Unique file ID generated
 - Upload logged with admin ID and timestamp
@@ -751,20 +781,19 @@ Please read and confirm receipt via portal
    - Name (partial match)
    - Staff number
    - Location preference
-   - Current score
-   - Availability status
-4. System shows search results with profiles
-5. Select staff member
-6. System shows conflict warnings if:
-   - Staff already assigned to overlapping shift
-   - Staff on facility blacklist
-   - Staff unavailable that day
-   - Staff will exceed fair sharing limits
-7. Admin enters override reason (required field, minimum 20 characters)
-8. Confirm assignment
-9. System records assignment (assigned_by: manual_admin)
-10. WhatsApp notification sent to staff
-11. Override logged in audit trail with:
+   - Availability status (from ERP)
+1. System shows search results with profiles (from ERP)
+2. Select staff member
+3. System shows conflict warnings if:
+   - Staff already assigned to overlapping shift (from ERP)
+   - Staff on facility blacklist (from ERP)
+   - Staff unavailable that day (from ERP)
+   - Staff will exceed fair sharing limits (from ERP)
+1. Admin enters override reason (required field, minimum 20 characters)
+2. Confirm assignment
+3. System records assignment (assigned_by: manual_admin)
+4. WhatsApp notification sent to staff
+5. Override logged in audit trail with:
     - Admin ID
     - Timestamp
     - Original matched staff (if applicable)
@@ -876,14 +905,15 @@ Please read and confirm receipt via portal
 
 ---
 
-## 4. Data Model
+## 4. Data Model [FIXME]
 
 ### Core Data Entities
 
 **Entity: Users (Staff and Admins)**
 - user_id: Primary key
+- username: UNIQUE, login credential
 - phone_number: UNIQUE, login credential (8-digit HK format)
-- email: UNIQUE (for admins, NULL for workers)
+- email: UNIQUE, login credential
 - password_hash: bcrypt hashed (cost factor 12)
 - full_name: English or Traditional Chinese
 - role: ENUM (admin, worker)
@@ -931,8 +961,6 @@ Please read and confirm receipt via portal
 - record_id: Primary key
 - assignment_id: References job demand
 - staff_id: References worker
-- clock_in: Timestamp
-- clock_out: Timestamp
 - actual_hours: Calculated decimal
 - status: ENUM (completed, partial)
 - verification_method: ENUM (admin_portal, phone_confirmation)
@@ -1048,7 +1076,7 @@ Please read and confirm receipt via portal
 
 ### 7.1 MVP Prioritization
 
-**Phase 1: Core Automation (Must complete for 60-day launch)**
+**Phase 1: Core Functionality (Must complete for 45-day launch)**
 
 1. **Scoring Algorithm (FR-1)**
    - Implement point system and tier logic
@@ -1058,9 +1086,9 @@ Please read and confirm receipt via portal
 2. **Matching Engine (FR-2)**
    - Configuration-driven filtering logic (availability, blacklist, documents)
    - Preference-based ranking (facility underlist and staff score tier)
-   - < 5 minute matching SLA
+   - < 10 minute matching SLA (from ERP)
 
-3. **WhatsApp + Firebase Notifications (FR-3)**
+1. **WhatsApp + Web Push Notifications (FR-3)**
    - Template generation system
    - Coordinator dashboard for sending
    - Firebase FCM setup for reminders
@@ -1103,19 +1131,20 @@ Please read and confirm receipt via portal
 
 | FR | Feature | Covered In | Status |
 |----|---------|------------|--------|
-| FR-1 | Scoring Algorithm | US-NA-02, US-NA-03, US-NA-05, US-ERP-06 | ✓ |
-| FR-2 | Matching Engine | US-ERP-04, US-ADM-02 | ✓ |
+| FR-0 | Staff Login | US-NA-00, TC-SEC-03 | ✓ |
+| FR-1 | Scoring Algorithm | US-NA-02, US-NA-03, US-NA-04, US-NA-05, US-ERP-06 | ✓ |
+| FR-2 | Matching Engine | US-NA-01, US-ERP-04, US-ADM-02, US-ADM-07 | ✓ |
 | FR-3 | WhatsApp + Firebase | US-NA-01, US-NA-02, US-ADM-04, US-ADM-05 | ✓ |
 | FR-4 | Admin Dashboard | US-ADM-01 | ✓ |
-| FR-5 | ERP Integration | US-ERP-01 through US-ERP-06 | ✓ |
-| FR-6 | Attendance Tracking | US-CS-02, US-CS-03, US-NA-05 | ✓ |
+| FR-5 | ERP Integration | US-ERP-01 through US-ERP-06, US-ERP-07 (NEW), US-ERP-08 (NEW), US-ERP-09 (NEW), US-ADM-06, US-ADM-09 (NEW), US-NA-07 | ✓ |
+| FR-6 | Attendance Tracking | US-NA-04, US-ERP-05 | ✓ |
 | FR-7 | Penalty Management | US-NA-03, US-NA-05, US-ERP-06 | ✓ |
 | FR-8 | Emergency File Upload | US-ADM-03, US-ADM-04 | ✓ |
 | FR-9 | Emergency Job Posting | US-ADM-05 | ✓ |
-| FR-10 | Settlement Reconciliation | Test Cases TC-ERP-01, TC-ERP-07 | ⚠️ |
+| FR-10 | Settlement Reconciliation | US-FIN-01, US-FIN-02 | ✓ |
 | FR-11 | Manual Override | US-ADM-02 | ✓ |
 | FR-12 | System Monitoring | US-ADM-06 | ✓ |
-| FR-13 | Reporting | US-ADM-06 | ⚠️ |
+| FR-13 | Reporting | US-RPT-01, US-RPT-02, US-RPT-03 | ✓ |
 
 **Note:** FR-10 and FR-13 have minimal story coverage - recommend adding dedicated user stories:
 - **FR-10:** US-FIN-01: Monthly settlement reconciliation
@@ -1125,28 +1154,28 @@ Please read and confirm receipt via portal
 
 ## 9. Non-Functional Requirements
 
-### 9.1 Performance
-- Page load time: < 3 seconds
-- API response time: < 500ms (95th percentile)
-- Matching completion: < 5 minutes
-- Database query time: < 100ms
+### 9.1 Performance [FIXME]
+- Page load time: < 30 seconds
+- API response time: < 5000ms (95th percentile)
+- Matching completion: < 10 minutes
+- Database query time: < 500ms
 - Concurrent users: 200+ simultaneous
 
-### 9.2 Scalability
+### 9.2 Scalability [FIXME]
 - Support 500 workers in v1.0
 - Scalable to 2,000 workers within 12 months
 - Handle 500+ job postings per day
 - 99.5% uptime target
 
-### 9.3 Security
-- TLS 1.3 for all connections
-- JWT tokens with 4-hour expiration
+### 9.3 Security [FIXME]
+- TLS 1.1 for all connections
+- JWT tokens with 8-hour expiration
 - Password hashing with bcrypt (cost 12)
 - Role-based access control (RBAC)
 - Audit logging of all authentication and data modifications
 - HK Personal Data (Privacy) Ordinance compliance
 
-### 9.4 Reliability
+### 9.4 Reliability [FIXME]
 - Daily backups (full) + hourly incremental
 - RPO < 1 hour, RTO < 4 hours
 - Auto-retry on ERP failures (3 attempts)
@@ -1155,7 +1184,7 @@ Please read and confirm receipt via portal
 
 ---
 
-## 10. Deployment
+## 10. Deployment [FIXME]
 
 **Infrastructure:**
 - Cloud hosting platform
@@ -1191,7 +1220,7 @@ Please read and confirm receipt via portal
 
 ---
 
-## 12. Future Enhancements (Post-MVP)
+## 12. Future Enhancements (Post-MVP) [FIXME]
 
 ### Version 2.0 (Months 4-6)
 
@@ -1303,8 +1332,66 @@ Please read and confirm receipt via portal
 - **UPDATED:** Deployment Infrastructure - Generic cloud hosting platform and CDN
 - **RATIONALE:** Platform-agnostic approach, allows flexibility in cloud provider selection during implementation
 
+**Version 1.4 → 1.5 (2025-11-25)**
+- **WORKFLOW CHANGE:** Permission Matrix - "Confirm/Cancel Shift" changed to "Apply/Cancel" to reflect staff application workflow with admin screening
+- **UPDATED:** Target user count - Clarified 500+ initial with 5000+ scalability target
+- **UPDATED:** API endpoint count - Restored to 13 APIs (from "10+") for specification clarity
+- **UPDATED:** System Context - Added "job demands/preferences" to ERP responsibilities
+- **UPDATED:** FR-2 Matching Criteria - Added "(from ERP)" annotations for Underlist, Availability, and Blacklist sources
+- **UPDATED:** FR-2 Matching Criteria - Changed Document Validity to "(Preset/Manually Upload)" for flexibility
+- **UPDATED:** FR-3 Notification - Changed "Staff confirms shift" to "Staff applies shift" for workflow consistency
+- **UPDATED:** FR-5 API #8 - Changed "confirmed assignments" to "applied assignments" reflecting screening workflow
+- **UPDATED:** FR-6 Attendance - Added "Admin export the staff attendance list to individual facility" step
+- **UPDATED:** FR-6 ERP Sync - Removed clock_in/clock_out fields, keeping only actual_hours and status [pending final review]
+- **UPDATED:** FR-8 Storage - Changed from "Secure cloud storage" to "Secure server storage" [pending infrastructure decision]
+- **UPDATED:** FR-11 Manual Override - Added "(from ERP)" annotations for availability, profiles, conflict checks from ERP source
+- **UPDATED:** Section 1.2 - Added placeholder for different nursing assistant roles [pending HR input]
+- **ADJUSTED:** Performance SLAs for realistic MVP targets:
+  - FR-3: Template generation 5s→10s, Coordinator send 1min→3min, Notification delivery 30s→60s
+  - FR-4: Dashboard load time 3s→30s
+  - FR-5: Sync time 5min→10min, API response 3s→30s, Real-time updates 1min→10min
+  - Section 9.1: Page load 3s→30s, API response 500ms→5000ms, Matching 5min→10min, DB query 100ms→500ms
+- **ADJUSTED:** Section 9.3 Security - JWT token expiration 4hr→8hr for better user experience
+- **ADJUSTED:** MVP Timeline - Changed from "60-day launch" to "45-day launch" for accelerated delivery
+- **MARKED:** Multiple [fixme] markers added throughout for management review of:
+  - Template format finalization (FR-3)
+  - Notification trigger timing confirmation (FR-3)
+  - Dashboard widget specifications (FR-4)
+  - Dashboard feature priorities (FR-4)
+  - ERP sync schedules and frequencies (FR-5)
+  - Attendance field requirements (FR-6)
+  - Emergency file regions configuration (FR-8)
+  - Data model validation (Section 4)
+  - Performance requirements validation (Section 9.1)
+  - Scalability targets (Section 9.2)
+  - Security standards (Section 9.3 - TLS version needs review)
+  - Reliability metrics (Section 9.4)
+  - Deployment strategy (Section 10)
+  - Future enhancement prioritization (Section 12)
+- **RATIONALE:** Reflects shift from fully automated matching to human-screened application workflow where staff apply for shifts and admins perform final screening/approval; Performance targets adjusted for MVP realism; Multiple review markers added for management input on critical decisions
+
+**Version 1.5 → 1.6 (2025-11-25)**
+- **ADDED:** FR-0 Staff Login - Added authentication requirements (Mobile Number only)
+- **UPDATED:** Data Model - Added mobile number as login credential for Users entity
+- **UPDATED:** Traceability Matrix - Added FR-0 mapping to US-NA-00
+- **RATIONALE:** Ensures staff can login using their ERP-synced mobile number
+
+**Version 1.6 → 1.7 (2025-12-08)**
+- **ENHANCED:** FR-5 ERP Integration - Added 3 new API endpoints (16 total):
+  - GET /api/v1/facilities/{facility_id}/blacklist (facility blacklists)
+  - PATCH /api/v1/jobs/demands/{demand_id} (job demand updates)
+  - POST /api/v1/jobs/demands/ot (OT job demand sync)
+- **ADDED:** New User Stories - US-ADM-09 (job updates), US-ERP-07/08/09 (enhanced ERP sync)
+- **ENHANCED:** US-ADM-07 Job Applications - Added confirmation/failure messages, waiting list for re-matching, automatic ERP sync
+- **UPDATED:** Traceability Matrix - Aligned with User Stories v1.4 coverage
+- **UPDATED:** API Count - From 13 to 16 endpoints
+- **RATIONALE:** Aligns Product Spec with User Stories v1.4 enhancements for job management and ERP integration
+
+**⚠️ CRITICAL SECURITY ISSUE FLAGGED:** Section 9.3 shows TLS 1.1 which is deprecated and insecure. This must be reverted to TLS 1.3 before implementation.
+
 ---
 
-**Document Status:** ✓ ALIGNED WITH PRD (v1.4 - Cloud Platform Agnostic)
-**Architecture Approval:** ⏳ Ready for review
-**Last Updated:** November 25, 2025
+**Document Status:** ✓ ALIGNED WITH USER STORIES v1.4 (v1.7 - Enhanced ERP Integration)
+**Architecture Approval:** ⏳ Pending management review of [fixme] sections
+**Last Updated:** December 8, 2025
+**Review Priority:** CRITICAL - Section 9.3 Security (TLS 1.1 must be corrected to TLS 1.3)
