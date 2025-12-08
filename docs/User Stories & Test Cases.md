@@ -2023,17 +2023,21 @@ And: Match rate recalculates for the period
 
 ---
 
-### Project Timeline
+### (NEW) Project Timeline (Tentative)
 
-| Milestone | Date | Description |
-|-----------|------|-------------|
-| Requirements Confirmation | 2025-Dec-12 | Final sign-off on User Stories & Test Cases v1.4 |
-| Project Start | 2025-Dec-15 | Development kickoff |
-| Phase 1: Unit Testing | 2025-Dec-15 to 2025-Dec-29 | Individual component testing, mock external APIs |
-| Phase 2: Integration Testing | 2025-Dec-30 to 2026-Jan-13 | End-to-end flow testing, test with ERP sandbox |
-| Phase 3: System Testing | 2026-Jan-14 to 2026-Jan-23 | Full system testing, performance & security testing |
-| Phase 4: UAT | 2026-Jan-24 to 2026-Feb-02 | User acceptance testing, real-world scenarios |
-| Go-Live Target | 2026-Feb-03 | Production deployment |
+| Milestone | Date | Description | Actioned by |
+|-----------|------|-------------|-------------|
+| Requirements Confirmation | 2025-Dec-12 | Final sign-off on User Stories & Test Cases v1.4 | Ms Sze |
+| API Preparation | 2025-Dec-9 to 2025-Dec-12 | Brief Morris for preparation | Octopus |
+| Project Start | 2025-Dec-15 | Development kickoff | Octopus |
+| API Integration | 2025-Dec-15 to 2025-Dec-19 | API from ERP (Morris) to PHC | Octopus |
+| UI Design Layout | 2025-Dec-17 | UI design layout | Octopus |
+| UI Design Confirmation | 2025-Dec-19 | UI design confirmation | Ms Sze |
+| Phase 1: System Production - Unit Testing | 2025-Dec-15 to 2025-Dec-29 | Individual component testing, mock external APIs | Octopus |
+| Phase 2: System Production - Integration Testing | 2025-Dec-30 to 2026-Jan-13 | End-to-end flow testing, test with ERP sandbox | Octopus |
+| Phase 3: System Production - System Testing | 2026-Jan-14 to 2026-Jan-23 | Full system testing, performance & security testing | Octopus |
+| Phase 4: System Production - UAT | 2026-Jan-24 to 2026-Feb-02 | User acceptance testing, real-world scenarios | Ms Sze |
+| Go-Live Target | 2026-Feb-03 | Production deployment | Octopus |
 
 ---
 
